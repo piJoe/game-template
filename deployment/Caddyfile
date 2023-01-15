@@ -1,0 +1,9 @@
+http://localhost:8080 {
+    @websockets {
+        header Connection *Upgrade*
+        header Upgrade    websocket
+    }
+    reverse_proxy @websockets quiz-server:8081
+    root * /serve
+    file_server
+}

@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  quiz-server:
+    build: .
+    restart: unless-stopped
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - ./deployment/Caddyfile:/etc/caddy/Caddyfile
+      - ./quiz/client/serve:/serve
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

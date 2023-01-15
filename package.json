@@ -1,0 +1,32 @@
+{
+  "name": "animu-quiz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test.js",
+  "type": "module",
+  "scripts": {
+    "build-client": "esbuild ./quiz/client/src/client.ts --bundle --outfile=./quiz/client/serve/client.js",
+    "watch-client": "esbuild ./quiz/client/src/client.ts --bundle --outfile=./quiz/client/serve/client.js --watch",
+    "build-server": "esbuild ./quiz/index.ts --bundle --platform=node --format=esm --packages=external --outfile=./quiz/build/index.mjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/lodash-es": "^4.17.6",
+    "@types/ws": "^8.5.4",
+    "esbuild": "0.16.12",
+    "escape-html": "^1.0.3",
+    "fast-shuffle": "^5.0.2",
+    "flat": "^5.0.2",
+    "lodash-es": "^4.17.21",
+    "node-fetch": "^3.3.0",
+    "seedrandom": "^3.0.5",
+    "sqlite3": "^5.1.4",
+    "uuid": "^9.0.0",
+    "ws": "^8.11.0"
+  },
+  "devDependencies": {
+    "@types/escape-html": "^1.0.2",
+    "typescript": "^4.9.4"
+  }
+}
