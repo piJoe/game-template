@@ -67,6 +67,7 @@ export class Game {
     this.session.resetPlayerScores();
     this.sendQuestion(this.currentQuestion);
     await timeout(BUFFER_TIMER);
+    this.session.resetPlayerLastActivity();
     this.gameLoop();
   }
 
@@ -94,6 +95,9 @@ export class Game {
       this.endGame();
       return;
     }
+
+    // first, kick all inactive players before we contine
+    this.session.kickInactivePlayers();
 
     this.sendQuestionActive(this.currentQuestion);
 

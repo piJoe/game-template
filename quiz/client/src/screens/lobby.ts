@@ -2,10 +2,15 @@ import {
   ClientPacketType,
   ServerPacketType,
 } from "../../../common/types/packets";
-import { PlayerListEntry, SESSION_STATUS } from "../../../common/types/session";
+import {
+  PlayerListEntry,
+  PLAYER_LEFT_REASON,
+  SESSION_STATUS,
+} from "../../../common/types/session";
 import { globalState } from "../globalstate";
 import { showDialog } from "../overlay";
 import { socket } from "../websocket";
+import { JoinScreen } from "./join";
 import { QuestionScreen } from "./question";
 import { DOMScreen } from "./screen";
 
@@ -17,6 +22,8 @@ export class LobbyScreen extends DOMScreen {
   private playerlistListener: number;
   private questionListener: number;
   private questionActiveListener: number;
+  private questionAnswersListener: number;
+  private selfLeftListener: number;
   private scoreboardDom: HTMLElement;
   private scoreboardCloseCallback: () => void;
   private lobbyId = "";
@@ -40,6 +47,10 @@ export class LobbyScreen extends DOMScreen {
 
     const toggleSettingsButton = this.domRef.querySelector(
       "#toggle-lobby-settings"
+    ) as HTMLInputElement;
+
+    const backToJoinButton = this.domRef.querySelector(
+      "#lobby-back-button"
     ) as HTMLInputElement;
 
     document.addEventListener("keydown", this.keydown.bind(this));
@@ -146,11 +157,25 @@ export class LobbyScreen extends DOMScreen {
       }
     );
 
-    this.questionActiveListener = socket.on(
+    this.questionAnswersListener = socket.on(
       ServerPacketType.GAME_QUESTION_ANSWERS,
       ({ id, answers, playerAnswers }) => {
         const q = this.questions.get(id);
         q.showAnswers(answers, playerAnswers);
+      }
+    );
+
+    this.selfLeftListener = socket.on(
+      ServerPacketType.ME_LEFT_GAME,
+      ({ reason }) => {
+        console.log("CALLED SELF LEFT LISTENER");
+        this.leaveLobby();
+        if (reason === PLAYER_LEFT_REASON.KICKED_INACTIVITY) {
+          showDialog(
+            "You were kicked",
+            "You were kicked from the game due to inactivity."
+          );
+        }
       }
     );
 
@@ -182,6 +207,11 @@ export class LobbyScreen extends DOMScreen {
         ],
       });
     });
+
+    backToJoinButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      socket.sendMsg(ClientPacketType.GAME_LEAVE);
+    });
   }
 
   updateReadyButton() {
@@ -201,6 +231,11 @@ export class LobbyScreen extends DOMScreen {
     return this.playerlist.find((e) => {
       return e.playerId === id;
     });
+  }
+
+  leaveLobby() {
+    DOMScreen.spawnScreen(new JoinScreen()).setActive();
+    this.die();
   }
 
   template() {
@@ -235,7 +270,10 @@ export class LobbyScreen extends DOMScreen {
         </a>
         <input type="button" class="button button-primary" id="lobby-ready" value="Ready!" disabled=true>
       </div>
-    </section>`;
+    </section>
+    <div class="bottom-container">
+      <input type="button" id="lobby-back-button" class="button button-outline" value="Back">
+    </div>`;
   }
 
   keydown(event: KeyboardEvent) {
@@ -283,6 +321,8 @@ export class LobbyScreen extends DOMScreen {
 
   die() {
     super.die();
+
+    // unregister all listeners
     socket.off(ServerPacketType.GAME_STATUS, this.statusListener);
     socket.off(ServerPacketType.GAME_PLAYERLIST, this.playerlistListener);
     socket.off(ServerPacketType.GAME_QUESTION, this.questionListener);
@@ -290,7 +330,18 @@ export class LobbyScreen extends DOMScreen {
       ServerPacketType.GAME_QUESTION_ACTIVE,
       this.questionActiveListener
     );
+    socket.off(
+      ServerPacketType.GAME_QUESTION_ANSWERS,
+      this.questionAnswersListener
+    );
+    socket.off(ServerPacketType.ME_LEFT_GAME, this.selfLeftListener);
 
+    //cleanup existing questions in dom
+    this.questions.forEach((q) => {
+      q.die();
+    });
+
+    // unregister keyboard listeners
     document.removeEventListener("keydown", this.keydown);
     document.removeEventListener("keyup", this.keyup);
   }

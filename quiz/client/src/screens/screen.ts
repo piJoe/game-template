@@ -39,6 +39,9 @@ export abstract class DOMScreen {
   }
 
   die() {
+    if (activeScreen === this) {
+      activeScreen = null;
+    }
     window.setTimeout(() => {
       this.domRef.remove();
     }, 1000);

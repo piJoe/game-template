@@ -5,6 +5,7 @@ import {
   ServerPackets,
   ServerPacketType,
 } from "../../common/types/packets";
+import { showDialog } from "./overlay";
 
 class Socket {
   private ws: WebSocket = null;
@@ -25,6 +26,17 @@ class Socket {
     this.ws.addEventListener("message", (m) => {
       const { type, data } = JSON.parse(m.data);
       this.handleMessage(type, data);
+    });
+    this.ws.addEventListener("close", () => {
+      showDialog(
+        "You were disconnected",
+        "The session was closed by the server.",
+        {
+          callback: () => {
+            location.reload();
+          },
+        }
+      );
     });
     return new Promise<void>((res) => {
       this.ws.addEventListener(
@@ -55,7 +67,7 @@ class Socket {
     }
     const id = this.listenerId++;
     this.listener.get(type).push({ callback, once, id });
-    return;
+    return id;
   }
 
   public once<T extends ServerPacketKey>(
@@ -101,6 +113,12 @@ class Socket {
         this.callListeners(
           ServerPacketType.ME,
           data as ServerPackets[ServerPacketType.ME]
+        );
+        break;
+      case ServerPacketType.ME_LEFT_GAME:
+        this.callListeners(
+          ServerPacketType.ME_LEFT_GAME,
+          data as ServerPackets[ServerPacketType.ME_LEFT_GAME]
         );
         break;
       case ServerPacketType.GAME_STATUS:

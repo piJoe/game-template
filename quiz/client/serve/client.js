@@ -96,6 +96,65 @@
     }
   };
 
+  // quiz/client/src/overlay.ts
+  var overlay = document.querySelector(".overlay-container");
+  var openDialogs = /* @__PURE__ */ new Map();
+  var dialogId = 0;
+  overlay.addEventListener("click", (e) => {
+    const target = e.target;
+    if (target.hasAttribute("data-popup-id")) {
+      const id = target.getAttribute("data-popup-id");
+      const value = target.getAttribute("data-value");
+      closeDialog(id, value);
+    }
+  });
+  function closeDialog(id, value) {
+    var _a;
+    const d = openDialogs.get(id);
+    if (d) {
+      overlay.removeChild(d.dom);
+    }
+    openDialogs.delete(id);
+    if ((_a = d.options) == null ? void 0 : _a.callback) {
+      d.options.callback(value);
+    }
+    if (openDialogs.size < 1) {
+      overlay.setAttribute("data-active", "false");
+    }
+  }
+  function showDialog(title, msg, options) {
+    const id = (dialogId++).toString();
+    const container = document.createElement("div");
+    container.classList.add("container", "container-fadein");
+    const actions = [];
+    if (!(options == null ? void 0 : options.actions)) {
+      actions.push(
+        `<input type="button" data-popup-id="${id}" data-value="ok" class="button button-outline" value="OK">`
+      );
+    } else {
+      actions.push(
+        ...options.actions.map(
+          (a) => `<input type="button" data-popup-id="${id}" data-value="${a.value}" class="button ${a.class}" value="${a.title}">`
+        )
+      );
+    }
+    container.innerHTML = `
+    <div class="title-h2">${title}</div>
+    <div class="dialog-content">${msg && msg.length > 0 ? `${msg}` : ""}</div>
+    <div class="dialog-actions">${actions.join("")}</div>`;
+    if (options == null ? void 0 : options.alternativeContentDom) {
+      container.querySelector(".dialog-content").appendChild(options.alternativeContentDom);
+    }
+    openDialogs.set(id, { dom: container, options });
+    overlay.setAttribute("data-active", "true");
+    overlay.appendChild(container);
+    if (options == null ? void 0 : options.closeDialogPromise) {
+      options.closeDialogPromise.then(() => {
+        closeDialog(id);
+      });
+    }
+  }
+
   // quiz/client/src/websocket.ts
   var Socket = class {
     constructor() {
@@ -113,6 +172,17 @@
       this.ws.addEventListener("message", (m) => {
         const { type, data } = JSON.parse(m.data);
         this.handleMessage(type, data);
+      });
+      this.ws.addEventListener("close", () => {
+        showDialog(
+          "You were disconnected",
+          "The session was closed by the server.",
+          {
+            callback: () => {
+              location.reload();
+            }
+          }
+        );
       });
       return new Promise((res) => {
         this.ws.addEventListener(
@@ -136,7 +206,7 @@
       }
       const id = this.listenerId++;
       this.listener.get(type).push({ callback, once, id });
-      return;
+      return id;
     }
     once(type, callback) {
       return this.on(type, callback, true);
@@ -168,6 +238,12 @@
         case "me" /* ME */:
           this.callListeners(
             "me" /* ME */,
+            data
+          );
+          break;
+        case "me.game.left" /* ME_LEFT_GAME */:
+          this.callListeners(
+            "me.game.left" /* ME_LEFT_GAME */,
             data
           );
           break;
@@ -211,65 +287,6 @@
     }
   };
   var socket = new Socket();
-
-  // quiz/client/src/overlay.ts
-  var overlay = document.querySelector(".overlay-container");
-  var openDialogs = /* @__PURE__ */ new Map();
-  var dialogId = 0;
-  overlay.addEventListener("click", (e) => {
-    const target = e.target;
-    if (target.hasAttribute("data-popup-id")) {
-      const id = target.getAttribute("data-popup-id");
-      const value = target.getAttribute("data-value");
-      closeDialog(id, value);
-    }
-  });
-  function closeDialog(id, value) {
-    var _a;
-    const d = openDialogs.get(id);
-    if (d) {
-      overlay.removeChild(d.dom);
-    }
-    openDialogs.delete(id);
-    if ((_a = d.options) == null ? void 0 : _a.callback) {
-      d.options.callback(value);
-    }
-    if (openDialogs.size < 1) {
-      overlay.setAttribute("data-active", "false");
-    }
-  }
-  function showDialog(title, msg, options) {
-    const id = (dialogId++).toString();
-    const container = document.createElement("div");
-    container.classList.add("container", "container-fadein");
-    const actions = [];
-    if (!(options == null ? void 0 : options.actions)) {
-      actions.push(
-        `<input type="button" data-popup-id="${id}" data-value="ok" class="button button-outline" value="Ok">`
-      );
-    } else {
-      actions.push(
-        ...options.actions.map(
-          (a) => `<input type="button" data-popup-id="${id}" data-value="${a.value}" class="button ${a.class}" value="${a.title}">`
-        )
-      );
-    }
-    container.innerHTML = `
-    <div class="title-h2">${title}</div>
-    <div class="dialog-content">${msg && msg.length > 0 ? `${msg}` : ""}</div>
-    <div class="dialog-actions">${actions.join("")}</div>`;
-    if (options == null ? void 0 : options.alternativeContentDom) {
-      container.querySelector(".dialog-content").appendChild(options.alternativeContentDom);
-    }
-    openDialogs.set(id, { dom: container, options });
-    overlay.setAttribute("data-active", "true");
-    overlay.appendChild(container);
-    if (options == null ? void 0 : options.closeDialogPromise) {
-      options.closeDialogPromise.then(() => {
-        closeDialog(id);
-      });
-    }
-  }
 
   // quiz/client/src/screens/question.ts
   var import_escape_html = __toESM(require_escape_html(), 1);
@@ -758,6 +775,9 @@
       }
     }
     die() {
+      if (activeScreen === this) {
+        activeScreen = null;
+      }
       window.setTimeout(() => {
         this.domRef.remove();
       }, 1e3);
@@ -892,6 +912,9 @@
       const toggleSettingsButton = this.domRef.querySelector(
         "#toggle-lobby-settings"
       );
+      const backToJoinButton = this.domRef.querySelector(
+        "#lobby-back-button"
+      );
       document.addEventListener("keydown", this.keydown.bind(this));
       document.addEventListener("keyup", this.keyup.bind(this));
       const playerListDom = this.domRef.querySelector(".playerlist");
@@ -968,11 +991,24 @@
           q.setActive();
         }
       );
-      this.questionActiveListener = socket.on(
+      this.questionAnswersListener = socket.on(
         "game.question.answers" /* GAME_QUESTION_ANSWERS */,
         ({ id, answers, playerAnswers }) => {
           const q = this.questions.get(id);
           q.showAnswers(answers, playerAnswers);
+        }
+      );
+      this.selfLeftListener = socket.on(
+        "me.game.left" /* ME_LEFT_GAME */,
+        ({ reason }) => {
+          console.log("CALLED SELF LEFT LISTENER");
+          this.leaveLobby();
+          if (reason === "KICKED_INACTIVITY" /* KICKED_INACTIVITY */) {
+            showDialog(
+              "You were kicked",
+              "You were kicked from the game due to inactivity."
+            );
+          }
         }
       );
       this.readyButton.addEventListener("click", (e) => {
@@ -1001,6 +1037,10 @@
           ]
         });
       });
+      backToJoinButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        socket.sendMsg("game.leave" /* GAME_LEAVE */);
+      });
     }
     updateReadyButton() {
       this.readyButton.value = this.currentLobbyStatus === "IN_GAME" /* IN_GAME */ ? "GAME STARTING" : this.selfReady ? "NOT Ready" : "READY";
@@ -1011,6 +1051,10 @@
       return this.playerlist.find((e) => {
         return e.playerId === id;
       });
+    }
+    leaveLobby() {
+      DOMScreen.spawnScreen(new JoinScreen()).setActive();
+      this.die();
     }
     template() {
       return `
@@ -1044,7 +1088,10 @@
         </a>
         <input type="button" class="button button-primary" id="lobby-ready" value="Ready!" disabled=true>
       </div>
-    </section>`;
+    </section>
+    <div class="bottom-container">
+      <input type="button" id="lobby-back-button" class="button button-outline" value="Back">
+    </div>`;
     }
     keydown(event) {
       if (this.currentLobbyStatus !== "IN_GAME" /* IN_GAME */) {
@@ -1091,6 +1138,14 @@
         "game.question.active" /* GAME_QUESTION_ACTIVE */,
         this.questionActiveListener
       );
+      socket.off(
+        "game.question.answers" /* GAME_QUESTION_ANSWERS */,
+        this.questionAnswersListener
+      );
+      socket.off("me.game.left" /* ME_LEFT_GAME */, this.selfLeftListener);
+      this.questions.forEach((q) => {
+        q.die();
+      });
       document.removeEventListener("keydown", this.keydown);
       document.removeEventListener("keyup", this.keyup);
     }

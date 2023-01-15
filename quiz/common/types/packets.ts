@@ -1,6 +1,6 @@
 import { GameSetting, GameSettingInput } from "./game";
 import { ClientQuestion } from "./question";
-import { PlayerListEntry, SESSION_STATUS } from "./session";
+import { PlayerListEntry, PLAYER_LEFT_REASON, SESSION_STATUS } from "./session";
 
 export enum ClientPacketType {
   GAME_CREATE = "game.create",
@@ -31,6 +31,7 @@ export type ClientPacketKey = keyof ClientPackets;
 
 export enum ServerPacketType {
   ME = "me",
+  ME_LEFT_GAME = "me.game.left",
   GAME_STATUS = "game.status",
   GAME_PLAYERLIST = "game.playerlist",
   GAME_QUESTION = "game.question",
@@ -44,6 +45,9 @@ export type ServerPackets = {
   [ServerPacketType.ME]: {
     name: string;
     id: string;
+  };
+  [ServerPacketType.ME_LEFT_GAME]: {
+    reason: PLAYER_LEFT_REASON;
   };
   [ServerPacketType.GAME_STATUS]: {
     id: string;

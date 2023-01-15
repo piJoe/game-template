@@ -3,7 +3,11 @@ import {
   ServerPackets,
   ServerPacketType,
 } from "../common/types/packets";
-import { PlayerListEntry, SESSION_STATUS } from "../common/types/session";
+import {
+  PlayerListEntry,
+  PLAYER_LEFT_REASON,
+  SESSION_STATUS,
+} from "../common/types/session";
 import { generateUniqueId } from "../utils/uid";
 import { Game } from "./game";
 import { Player } from "./player";
@@ -39,8 +43,11 @@ export class GameSession {
     return false;
   }
 
-  playerLeave(player: Player) {
+  playerLeave(player: Player, reason: PLAYER_LEFT_REASON) {
     console.log("PLAYER LEFT", this.id, player.id, player.name);
+    player.sendMsg(ServerPacketType.ME_LEFT_GAME, {
+      reason,
+    });
     this.playerStates.delete(player.id);
     this.sendPlayerlist();
 
@@ -86,6 +93,20 @@ export class GameSession {
     this.playerStates.forEach((s) => (s.ready = false));
     this.sendPlayerlist();
     console.log("GAME ENDED", this.id);
+  }
+
+  kickInactivePlayers() {
+    this.playerStates.forEach((pS) => {
+      if (pS.player.isInactive) {
+        pS.player.leaveSession(PLAYER_LEFT_REASON.KICKED_INACTIVITY);
+      }
+    });
+  }
+
+  resetPlayerLastActivity() {
+    this.playerStates.forEach((pS) => {
+      pS.player.updateActivity();
+    });
   }
 
   sendGameStatus() {

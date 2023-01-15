@@ -8,8 +8,13 @@ import {
   ServerPackets,
   ServerPacketType,
 } from "../common/types/packets";
+import { PLAYER_LEFT_REASON } from "../common/types/session";
 import { generateUniqueId } from "../utils/uid";
 import { getGameSessionById, GameSession } from "./session";
+
+const PING_INTERVAL = 10_000;
+const PING_TIMEOUT = PING_INTERVAL * 6;
+const ACTIVITY_TIMEOUT = 180_000;
 
 const allPlayers = new Map<string, Player>();
 
@@ -18,7 +23,9 @@ export class Player {
   public socket: WebSocket;
   public name: string;
   public gameSession: GameSession | null = null;
-  public lastActivity: number;
+  private pingInterval: NodeJS.Timer;
+  private lastActivity: number;
+  private lastPing: number;
 
   constructor(socket: WebSocket, name = generateUniqueId(5)) {
     console.log("PLAYER CONNECTED", this.id);
@@ -26,14 +33,26 @@ export class Player {
     this.name = name;
 
     this.socket.once("close", () => {
-      console.log("PLAYER DISCONNECTED", this.id);
-      this.socket.terminate();
-      this.destroy();
+      this.disconnect();
     });
 
     allPlayers.set(this.id, this);
     this.sendSelf();
     this.updateActivity();
+
+    this.pingInterval = setInterval(() => {
+      // close connection if last ping
+      if (this.lastPing <= Date.now() - PING_TIMEOUT) {
+        console.log(
+          `Player ${this.id} (${this.name}) did not react to pings for a while, disconnecting...`
+        );
+        this.socket.close();
+        this.disconnect();
+        return;
+      }
+
+      this.socket.ping();
+    }, PING_INTERVAL);
   }
 
   handleMessage<T extends ClientPacketKey>(type: T, data: ClientPackets[T]) {
@@ -63,6 +82,9 @@ export class Player {
         this.setReady(ready);
         break;
     }
+
+    // everytime a message comes from the client, we can assume he's not afk
+    this.updateActivity();
   }
 
   sendSelf() {
@@ -96,13 +118,13 @@ export class Player {
     this.gameSession = game;
   }
 
-  leaveSession() {
+  leaveSession(reason: PLAYER_LEFT_REASON = PLAYER_LEFT_REASON.SELF_LEAVE) {
     if (!this.gameSession) {
       //TOOD: NO GAME FOUND, THROW SOME ERRORS, OR NOT
       return;
     }
 
-    this.gameSession.playerLeave(this);
+    this.gameSession.playerLeave(this, reason);
     this.gameSession = null;
   }
 
@@ -133,13 +155,30 @@ export class Player {
     this.gameSession.playerReady(this, ready);
   }
 
+  get isInactive(): boolean {
+    return this.lastActivity <= Date.now() - ACTIVITY_TIMEOUT;
+  }
+
   updateActivity() {
     this.lastActivity = Date.now();
+  }
+
+  updateLastPing() {
+    this.lastPing = Date.now();
+  }
+
+  disconnect() {
+    console.log("PLAYER DISCONNECTED", this.id);
+    if (this.socket) {
+      this.socket.terminate();
+    }
+    this.destroy();
   }
 
   destroy() {
     this.leaveSession();
     allPlayers.delete(this.id);
     this.gameSession = null;
+    clearInterval(this.pingInterval);
   }
 }

@@ -55,7 +55,7 @@ export function showDialog(
   const actions: string[] = [];
   if (!options?.actions) {
     actions.push(
-      `<input type="button" data-popup-id="${id}" data-value="ok" class="button button-outline" value="Ok">`
+      `<input type="button" data-popup-id="${id}" data-value="ok" class="button button-outline" value="OK">`
     );
   } else {
     actions.push(
