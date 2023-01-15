@@ -234,7 +234,7 @@ export class LobbyScreen extends DOMScreen {
   }
 
   leaveLobby() {
-    DOMScreen.spawnScreen(new JoinScreen()).setActive();
+    DOMScreen.spawnScreen(new JoinScreen()).setActive("left");
     this.die();
   }
 

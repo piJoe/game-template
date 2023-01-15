@@ -318,9 +318,15 @@ h1,h2,h3,h4,h5,h6 {
 .screen[data-screen-active=cur] {
     animation: slide-in-right 0.5s ease forwards;
 }
+.screen[data-screen-active=cur-left] {
+    animation: slide-in-left 0.5s ease forwards;
+}
 
 .screen[data-screen-active=prev] {
-    animation: slide-out 0.5s ease forwards;
+    animation: slide-out-right 0.5s ease forwards;
+}
+.screen[data-screen-active=prev-left] {
+    animation: slide-out-left 0.5s ease forwards;
 }
 
 .screen[data-screen-active=next] {
@@ -344,7 +350,16 @@ h1,h2,h3,h4,h5,h6 {
         transform: translateX(0);
     }
 }
-@keyframes slide-out {
+@keyframes slide-out-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100vw);
+    }
+}
+@keyframes slide-out-right {
     0% {
         transform: translateX(0);
     }
