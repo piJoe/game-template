@@ -9,6 +9,7 @@ COPY quiz ./quiz
 
 RUN npm install
 RUN npm run build-server
+Run npm prune --production
 
 FROM node:19-alpine
 
@@ -16,6 +17,6 @@ WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/quiz/build/index.mjs ./
-COPY quiz/animedb.sqlite /app/animedb.sqlite
+# COPY quiz/animedb.sqlite /app/animedb.sqlite
 
 CMD ["node", "index.mjs"]

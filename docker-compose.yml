@@ -3,6 +3,8 @@ services:
   quiz-server:
     build: .
     restart: unless-stopped
+    volumes:
+      - ./quiz/animedb.sqlite:/animedb.sqlite
   caddy:
     image: caddy
     restart: unless-stopped

@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import flat from "flat";
 
-const db = new sqlite3.Database("./animedb.sqlite");
+const db = new sqlite3.Database("/animedb.sqlite");
 
 export function queryFirst(query, ...params) {
   return new Promise((res, rej) => {
