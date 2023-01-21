@@ -11,7 +11,7 @@ export interface QuestionAnimeStudioOptions extends AnimeOptions {
 }
 
 export const QuestionAnimeStudio = {
-  name: "Guess the anime's /studio/",
+  name: "Guess the anime's studio",
   create: async (
     count: number,
     options: QuestionAnimeStudioOptions = {}

@@ -9,7 +9,7 @@ export interface QuestionAnimeFromCharacterOptions extends CharacterOptions {
 }
 
 export const QuestionAnimeFromCharacter = {
-  name: "What /anime title/ is /character/ from?",
+  name: "What anime title is the character from?",
   create: async (
     count: number,
     options: QuestionAnimeFromCharacterOptions = {}

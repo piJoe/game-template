@@ -1,3 +1,4 @@
+import { fixCharacterName } from "../common/uitls/animehelper.js";
 import { queryAll } from "./db.mjs";
 
 export interface CharacterOptions {
@@ -76,6 +77,7 @@ export async function getRandomCharacters(
   // console.log("QUERY", query, queryParams);
   const res = await queryAll(query, ...queryParams);
   return res.map((r) => {
+    r.title = fixCharacterName(r.title);
     const animes = JSON.parse(r.animes).map((a) => {
       return { ...a, alternative_titles: JSON.parse(a.alternative_titles) };
     });

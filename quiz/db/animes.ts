@@ -1,3 +1,4 @@
+import { fixCharacterName } from "../common/uitls/animehelper.js";
 import { queryAll } from "./db.mjs";
 
 export interface AnimeOptions {
@@ -94,7 +95,12 @@ export async function getRandomAnimesWithCharacters(
     return {
       ...r,
       alternative_titles: JSON.parse(r.alternative_titles),
-      characters: JSON.parse(r.characters),
+      characters: JSON.parse(r.characters).map((c) => {
+        return {
+          ...c,
+          title: fixCharacterName(c.title),
+        };
+      }),
     };
   });
 }

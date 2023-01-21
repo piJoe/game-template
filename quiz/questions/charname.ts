@@ -5,7 +5,7 @@ import { ServerQuestion } from "../common/types/question";
 export interface QuestionCharacterOptions extends CharacterOptions {}
 
 export const QuestionCharName = {
-  name: "What's the name of /picture/ char?",
+  name: "What's the name of the anime char (by picture)?",
   create: async (
     count: number,
     options: QuestionCharacterOptions = {}

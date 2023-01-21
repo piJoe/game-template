@@ -12,7 +12,7 @@ export interface QuestionAnimeGenreOptions extends AnimeOptions {
 }
 
 export const QuestionAnimeGenre = {
-  name: "Guess the anime's /genre/",
+  name: "Guess the anime's genre",
   create: async (
     count: number,
     options: QuestionAnimeGenreOptions = {}
