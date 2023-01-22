@@ -276,62 +276,68 @@ export class LobbyScreen extends DOMScreen {
     availableQuestions: GAME_AVAILABLE_QUESTION_ID[]
   ) {
     this.lobbySettingsDom.innerHTML = `
-    <div class="game-setting-entry">
-      <label class="game-setting-title">No. of Questions:</label> 
-      <input type="number" name="${
-        GAME_SETTING.QUESTION_COUNT
-      }" autocomplete="off" min=3 max=50 required value="${
+    <div class="lobby-settings-wrapper">
+      <div class="lobby-settings-column">
+          <div class="game-setting-entry">
+            <label class="game-setting-title">No. of Questions:</label> 
+            <input type="number" name="${
+              GAME_SETTING.QUESTION_COUNT
+            }" autocomplete="off" min=3 max=50 required value="${
       settings[GAME_SETTING.QUESTION_COUNT]
     }">
-    </div>
+          </div>
 
-    <div class="game-setting-entry">
-      <label class="game-setting-title">Popularity:</label> 
+          <div class="game-setting-entry">
+              <label class="game-setting-title">Popularity:</label> 
 
-      <div class="game-setting-double">
-        <input type="number" name="${
-          GAME_SETTING.MIN_POPULARITY
-        }" autocomplete="off" min=-1 max=10000 required value="${
+              <div class="game-setting-double">
+                <input type="number" name="${
+                  GAME_SETTING.MIN_POPULARITY
+                }" autocomplete="off" min=-1 max=10000 required value="${
       settings[GAME_SETTING.MIN_POPULARITY]
     }">
-      -
-        <input type="number" name="${
-          GAME_SETTING.MAX_POPULARITY
-        }" autocomplete="off" min=-1 max=10000 required value="${
+              -
+                <input type="number" name="${
+                  GAME_SETTING.MAX_POPULARITY
+                }" autocomplete="off" min=-1 max=10000 required value="${
       settings[GAME_SETTING.MAX_POPULARITY]
     }">
-      </div>
+              </div>
 
-      <label class="game-setting-list-option" for="gs_mainOnly">
-          <input type="checkbox" id="gs_mainOnly" name="${
-            GAME_SETTING.MAIN_ROLE_ONLY
-          }" ${
+              <label class="game-setting-list-option" for="gs_mainOnly">
+                  <input type="checkbox" id="gs_mainOnly" name="${
+                    GAME_SETTING.MAIN_ROLE_ONLY
+                  }" ${
       settings[GAME_SETTING.MAIN_ROLE_ONLY] ? "checked" : ""
     }> Main characters only
-      </label>
-    </div>
+              </label>
+            </div>
+      </div>
 
-          
-
-    <div class="game-setting-entry game-setting-list">
-      <label class="game-setting-title">Questions:</label> 
-      ${availableQuestions
-        .map((qId) => {
-          return `<label class="game-setting-list-option" for="q_${qId}">
-          <input type="checkbox" id="q_${qId}" name="${
-            GAME_SETTING.ACTIVE_QUESTIONS
-          }" value="${qId}" ${
-            settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
-              ? "checked"
-              : ""
-          }>
-          ${getQuestionNameById(qId)}
-        </label>`;
-        })
-        .join("")}
+      <div class="lobby-settings-column">
+        <div class="game-setting-entry game-setting-list">
+          <label class="game-setting-title">Questions:</label> 
+          ${availableQuestions
+            .map((qId) => {
+              return `<label class="game-setting-list-option" for="q_${qId}">
+              <input type="checkbox" id="q_${qId}" name="${
+                GAME_SETTING.ACTIVE_QUESTIONS
+              }" value="${qId}" ${
+                settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
+                  ? "checked"
+                  : ""
+              }>
+              ${getQuestionNameById(qId)}
+            </label>`;
+            })
+            .join("")}
+        </div>
+      </div>  
     </div>
     
-    <input type="submit" class="button button-outline" name="update-settings" value="Save">`;
+    <div class="lobby-settings-actions">
+      <input type="submit" class="button button-outline" name="update-settings" value="Save">
+    </div>`;
   }
 
   updateReadyButton() {

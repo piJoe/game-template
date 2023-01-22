@@ -150,6 +150,7 @@ input[type=number] {
     color: var(--color-black);
     padding: 10px 16px;
     text-transform: uppercase;
+    min-width: 0;
 }
 
 input[type=checkbox] {
@@ -413,6 +414,7 @@ h1,h2,h3,h4,h5,h6 {
 
 .settings-container {
     display: none;
+    max-width: 800px;
 }
 .settings-container--visible {
     display: flex;
@@ -425,6 +427,21 @@ h1,h2,h3,h4,h5,h6 {
     text-align: left;
 }
 
+.lobby-settings-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+.lobby-settings-column {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    flex: 0 0 50%;
+}
+.lobby-settings-actions {
+    margin: auto;
+}
+
 .game-setting-entry {
     display: flex;
     flex-direction: column;
@@ -435,6 +452,20 @@ h1,h2,h3,h4,h5,h6 {
 .game-setting-title {
     margin-bottom: 16px;
 }
+.game-setting-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.game-setting-list::-webkit-scrollbar {
+    background: var(--color-black);
+    border-radius: var(--border-radius-medium);
+    width: 8px;
+}
+.game-setting-list::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: var(--border-radius-medium);
+}
+
 .game-setting-list > .game-setting-title {
     margin-bottom: 8px;
 }
@@ -455,6 +486,9 @@ h1,h2,h3,h4,h5,h6 {
     flex-direction: row;
     gap: 16px;
     align-items: center;
+}
+.game-setting-double > input {
+    flex: 1 1 auto;
 }
 
 .lobby-container {
