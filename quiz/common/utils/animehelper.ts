@@ -25,6 +25,8 @@ export function getQuestionNameById(qId: GAME_AVAILABLE_QUESTION_ID) {
       return "Guess the anime's studio";
     case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
       return "Guess character from picture";
+    case GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING:
+      return "Guess anime from opening";
     default:
       throw Error("Id not recognized: " + qId);
   }

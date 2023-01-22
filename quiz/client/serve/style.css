@@ -552,10 +552,27 @@ h1,h2,h3,h4,h5,h6 {
     align-items: center;
 }
 
-.question-image {
-    height: 300px;
+.question-image-container {
+    overflow: hidden;
     border-radius: var(--border-radius-medium);
     margin: 12px 0 24px;
+    height: 300px;
+    /* background: var(--color-black); */
+}
+
+.question-image {
+    height: 300px;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    transform: scale(1.0);
+    opacity: 1;
+}
+.question-image[data-blurred=true] {
+    /* filter: blur(100px); */
+    visibility: hidden;
+    transform: scale(0.8);
+    opacity: 0;
 }
 
 .question-title {

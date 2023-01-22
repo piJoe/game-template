@@ -7,3 +7,8 @@ http://localhost:8080 {
     root * /serve
     file_server
 }
+
+http://a.localhost:8080 {
+    root * /openings
+    file_server
+}

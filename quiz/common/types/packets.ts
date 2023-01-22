@@ -2,12 +2,17 @@ import { GameSettings, GAME_AVAILABLE_QUESTION_ID } from "./game";
 import { ClientQuestion } from "./question";
 import { PlayerListEntry, PLAYER_LEFT_REASON, SESSION_STATUS } from "./session";
 
+export enum MediaType {
+  AUDIO = "audio",
+}
+
 export enum ClientPacketType {
   GAME_CREATE = "game.create",
   GAME_JOIN = "game.join",
   GAME_LEAVE = "game.leave",
   GAME_SETTINGS = "game.settings",
   GAME_QUESTION_ANSWER = "game.question.answer",
+  PRELOAD_DONE = "preload.done",
   ME_CHANGE_NAME = "me.change_name",
   ME_READY = "me.ready",
 }
@@ -19,6 +24,9 @@ export type ClientPackets = {
   [ClientPacketType.GAME_LEAVE]: undefined;
   [ClientPacketType.GAME_SETTINGS]: {
     settings: GameSettings;
+  };
+  [ClientPacketType.PRELOAD_DONE]: {
+    url: string;
   };
   [ClientPacketType.ME_CHANGE_NAME]: {
     name: string;
@@ -42,6 +50,7 @@ export enum ServerPacketType {
   GAME_QUESTION_ACTIVE = "game.question.active",
   GAME_QUESTION_ANSWERS = "game.question.answers",
   GAME_SETTINGS = "game.settings",
+  PRELOAD_URL = "preload.url",
   ERROR = "generic.error",
 }
 export type ServerPackets = {
@@ -81,6 +90,10 @@ export type ServerPackets = {
   [ServerPacketType.GAME_SETTINGS]: {
     currentSettings: GameSettings;
     availableQuestions: GAME_AVAILABLE_QUESTION_ID[];
+  };
+  [ServerPacketType.PRELOAD_URL]: {
+    url: string;
+    type: MediaType;
   };
   [ServerPacketType.ERROR]: {
     title: string;

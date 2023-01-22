@@ -1,10 +1,8 @@
 import escapeHTML from "escape-html";
 import { toPairs } from "lodash-es";
-import {
-  ClientPacketType,
-  ServerPacketType,
-} from "../../../common/types/packets";
+import { ClientPacketType } from "../../../common/types/packets";
 import { ClientQuestion } from "../../../common/types/question";
+import { globalState } from "../globalstate";
 import { socket } from "../websocket";
 import { LobbyScreen } from "./lobby";
 import { DOMScreen } from "./screen";
@@ -16,6 +14,7 @@ export class QuestionScreen extends DOMScreen {
   private ownAnwser: number = null;
   private timerStarted: number;
   private timerDOM: HTMLElement;
+  private audio: HTMLAudioElement;
   private questionDone = false;
   constructor(
     lobby: LobbyScreen,
@@ -50,24 +49,40 @@ export class QuestionScreen extends DOMScreen {
       elem.setAttribute("data-answer-selected", "true");
     });
 
+    //preload audio, if exists
+    if (this.question.question.audioUrl) {
+      this.audio = new Audio(this.question.question.audioUrl);
+      this.audio.preload = "auto";
+      this.audio.autoplay = false;
+      this.audio.volume = globalState.settings.volume;
+    }
+
     this.timerDOM = this.domRef.querySelector(".question-timer");
   }
 
   setActive(): void {
     super.setActive();
     this.timerStarted = Date.now();
+
+    // start audio playback, if exists
+    if (this.audio) {
+      this.audio.play();
+    }
+
     window.requestAnimationFrame(() => {
       this.updateTimer();
     });
   }
 
   updateTimer() {
+    const timeoutMs = this.question.timeoutMs - 500;
+
     const timeLeftSeconds = Math.ceil(
-      (this.timerStarted + this.question.timeoutMs - Date.now()) / 1000
+      (this.timerStarted + timeoutMs - Date.now()) / 1000
     );
 
     let timePercentage = Math.max(
-      1 - (Date.now() - this.timerStarted) / this.question.timeoutMs,
+      1 - (Date.now() - this.timerStarted) / timeoutMs,
       0.0
     );
 
@@ -103,6 +118,12 @@ export class QuestionScreen extends DOMScreen {
         .setAttribute("data-answer-correct", "false");
     }
 
+    //unblur image, if exists
+    if (this.question.question.image) {
+      const img = this.domRef.querySelector(".question-image");
+      img.removeAttribute("data-blurred");
+    }
+
     otherAnswers.forEach(([playerId, answerId]) => {
       const playerName = this.lobby.getPlayerEntryById(playerId).name;
       const answerContainer = this.domRef.querySelector(
@@ -116,6 +137,22 @@ export class QuestionScreen extends DOMScreen {
     });
 
     this.questionDone = true;
+
+    // // stop audio, if exists
+    // if (this.audio) {
+    //   this.audio.pause();
+    //   this.audio.remove();
+    // }
+  }
+
+  setInactive(direction?: "left" | "right"): void {
+    super.setInactive(direction);
+
+    // stop audio, if exists
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.remove();
+    }
   }
 
   template(): string {
@@ -132,7 +169,11 @@ export class QuestionScreen extends DOMScreen {
       }</div>
         ${
           hasImage
-            ? `<img class="question-image" src="${escapeHTML(question.image)}">`
+            ? `<div class="question-image-container">
+            <img class="question-image" ${
+              question.imageBlurred ? "data-blurred=true" : ""
+            } src="${escapeHTML(question.image)}">
+            </div>`
             : ""
         }
         <div class="question-title title-h3">${escapeHTML(question.title)}</div>

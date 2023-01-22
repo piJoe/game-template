@@ -18,6 +18,7 @@ export enum GAME_AVAILABLE_QUESTION_ID {
   ANIME_GENRE = "animeGenre",
   ANIME_STUDIO = "animeStudio",
   CHAR_BY_PICTURE = "charByPicture",
+  ANIME_OPENING = "animeOpening",
 }
 
 export enum GAME_SETTING {

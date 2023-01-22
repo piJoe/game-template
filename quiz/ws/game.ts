@@ -11,13 +11,14 @@ import { SESSION_STATUS } from "../common/types/session";
 import { distributeNumbers } from "../common/utils/math";
 import { QuestionAnimeFromCharacter } from "../questions/anime-from-char";
 import { QuestionAnimeGenre } from "../questions/anime-genre";
+import { QuestionAnimeOpening } from "../questions/anime-opening";
 import { QuestionAnimeStudio } from "../questions/anime-studio";
 import { QuestionCharByPicture } from "../questions/charname.js";
 import { timeout } from "../utils/promises";
 import { Player } from "./player";
 import { GameSession } from "./session";
 
-const BUFFER_TIMER = 3 * 1000;
+const UX_SLEEP_TIMER = 3 * 1000;
 
 export class Game {
   public status: GAME_STATUS = GAME_STATUS.CREATED;
@@ -63,6 +64,10 @@ export class Game {
           return QuestionAnimeStudio.create(questionCounts[i], options);
         case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
           return QuestionCharByPicture.create(questionCounts[i], options);
+        case GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING:
+          return QuestionAnimeOpening.create(questionCounts[i], options);
+        default:
+          throw new Error("No handler for Question " + id);
       }
     });
 
@@ -75,7 +80,7 @@ export class Game {
     this.currentQuestion = 0;
     this.session.resetPlayerScores();
     this.sendQuestion(this.currentQuestion);
-    await timeout(BUFFER_TIMER);
+    await timeout(UX_SLEEP_TIMER);
     this.session.resetPlayerLastActivity();
     this.gameLoop();
   }
@@ -108,7 +113,14 @@ export class Game {
     // first, kick all inactive players before we contine
     this.session.kickInactivePlayers();
 
+    // activate current question
     this.sendQuestionActive(this.currentQuestion);
+
+    // then send next question to clients for buffering
+    const nextQuestion = this.getNextQuestion();
+    if (nextQuestion !== false) {
+      this.sendQuestion(nextQuestion);
+    }
 
     const timeoutQuestion = timeout(q.timeoutMs);
     // TODO: activate additional promise
@@ -119,13 +131,10 @@ export class Game {
     this.updateGameScores(this.currentQuestion);
     this.sendQuestionAnswers(this.currentQuestion);
 
-    const hasNextQuestion = this.setNextQuestionActive();
-    if (hasNextQuestion) {
-      this.sendQuestion(this.currentQuestion); // already send next question to clients
-    }
+    const hasNextQuestion = this.setNextActiveQuestionIndex();
 
     // sleep for some time for players to process the results
-    await timeout(BUFFER_TIMER);
+    await timeout(UX_SLEEP_TIMER);
 
     if (!hasNextQuestion) {
       // no more questions available, end the game now!
@@ -136,9 +145,18 @@ export class Game {
     this.gameLoop();
   }
 
-  setNextQuestionActive(): boolean {
+  getNextQuestion(): number | false {
     let nextQuestion = this.currentQuestion + 1;
     if (!this.questions[nextQuestion]) {
+      // THIS WAS THE LAST QUESTION ALREADY
+      return false;
+    }
+    return nextQuestion;
+  }
+
+  setNextActiveQuestionIndex(): boolean {
+    let nextQuestion = this.getNextQuestion();
+    if (nextQuestion === false) {
       // THIS WAS THE LAST QUESTION ALREADY
       return false;
     }
@@ -252,6 +270,7 @@ export class Game {
     GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR,
     GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE,
     GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO,
+    GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING,
   ];
 
   static MIN_QUESTION_AMOUNT = 3;

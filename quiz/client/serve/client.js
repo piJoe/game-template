@@ -93,6 +93,9 @@
     me: {
       id: "",
       name: ""
+    },
+    settings: {
+      volume: 0.5
     }
   };
 
@@ -307,6 +310,8 @@
         return "Guess the anime's studio";
       case "charByPicture" /* CHAR_BY_PICTURE */:
         return "Guess character from picture";
+      case "animeOpening" /* ANIME_OPENING */:
+        return "Guess anime from opening";
       default:
         throw Error("Id not recognized: " + qId);
     }
@@ -848,21 +853,31 @@
         });
         elem.setAttribute("data-answer-selected", "true");
       });
+      if (this.question.question.audioUrl) {
+        this.audio = new Audio(this.question.question.audioUrl);
+        this.audio.preload = "auto";
+        this.audio.autoplay = false;
+        this.audio.volume = globalState.settings.volume;
+      }
       this.timerDOM = this.domRef.querySelector(".question-timer");
     }
     setActive() {
       super.setActive();
       this.timerStarted = Date.now();
+      if (this.audio) {
+        this.audio.play();
+      }
       window.requestAnimationFrame(() => {
         this.updateTimer();
       });
     }
     updateTimer() {
+      const timeoutMs = this.question.timeoutMs - 500;
       const timeLeftSeconds = Math.ceil(
-        (this.timerStarted + this.question.timeoutMs - Date.now()) / 1e3
+        (this.timerStarted + timeoutMs - Date.now()) / 1e3
       );
       let timePercentage = Math.max(
-        1 - (Date.now() - this.timerStarted) / this.question.timeoutMs,
+        1 - (Date.now() - this.timerStarted) / timeoutMs,
         0
       );
       if (this.questionDone) {
@@ -884,6 +899,10 @@
       if (wrong.includes(this.ownAnwser)) {
         this.domRef.querySelector(`li[data-answer="${this.ownAnwser}"]`).setAttribute("data-answer-correct", "false");
       }
+      if (this.question.question.image) {
+        const img = this.domRef.querySelector(".question-image");
+        img.removeAttribute("data-blurred");
+      }
       otherAnswers.forEach(([playerId, answerId]) => {
         const playerName = this.lobby.getPlayerEntryById(playerId).name;
         const answerContainer = this.domRef.querySelector(
@@ -896,6 +915,13 @@
       });
       this.questionDone = true;
     }
+    setInactive(direction) {
+      super.setInactive(direction);
+      if (this.audio) {
+        this.audio.pause();
+        this.audio.remove();
+      }
+    }
     template() {
       const question = this.question.question;
       const answers = this.question.answers;
@@ -905,7 +931,9 @@
     <div class="question-wrapper">
       <div class="container question-container">
       <div class="skewed-tag skewed-tag-big tag-question-number">${this.questionId + 1}</div>
-        ${hasImage ? `<img class="question-image" src="${(0, import_escape_html.default)(question.image)}">` : ""}
+        ${hasImage ? `<div class="question-image-container">
+            <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
+            </div>` : ""}
         <div class="question-title title-h3">${(0, import_escape_html.default)(question.title)}</div>
         <div class="question-timer"></div>
       </div>

@@ -3,6 +3,8 @@ services:
   quiz-server:
     build: .
     restart: unless-stopped
+    environment:
+      MEDIA_SERVER: "http://a.localhost:8080"
     volumes:
       - ./animedb.sqlite:/animedb.sqlite:ro
   caddy:
@@ -13,6 +15,7 @@ services:
     volumes:
       - ./deployment/Caddyfile:/etc/caddy/Caddyfile
       - ./quiz/client/serve:/serve
+      - ./openings:/openings
       - caddy_data:/data
       - caddy_config:/config
 
