@@ -1,63 +1,102 @@
 import { shuffle } from "fast-shuffle";
-import { GAME_STATUS } from "../common/types/game";
+import { flatten } from "lodash-es";
+import {
+  GameSettings,
+  GAME_AVAILABLE_QUESTION_ID,
+  GAME_STATUS,
+} from "../common/types/game";
 import { ServerPacketType } from "../common/types/packets";
 import { ServerQuestion } from "../common/types/question";
 import { SESSION_STATUS } from "../common/types/session";
+import { distributeNumbers } from "../common/utils/math";
 import { QuestionAnimeFromCharacter } from "../questions/anime-from-char";
 import { QuestionAnimeGenre } from "../questions/anime-genre";
 import { QuestionAnimeStudio } from "../questions/anime-studio";
-import { QuestionCharName } from "../questions/charname.js";
+import { QuestionCharByPicture } from "../questions/charname.js";
 import { timeout } from "../utils/promises";
 import { Player } from "./player";
 import { GameSession } from "./session";
 
-const QUESTION_AMOUNT_EASY = 3;
-const QUESTION_AMOUNT = 5;
 const BUFFER_TIMER = 3 * 1000;
 
 export class Game {
   public status: GAME_STATUS = GAME_STATUS.CREATED;
+  private settings: GameSettings;
   private questions: ServerQuestion[];
   private currentQuestion: number;
   private session: GameSession;
   private waitForAnswersCallback = new Map<number, () => void>();
   private endGameNextTick = false;
 
-  constructor(session: GameSession) {
+  constructor(session: GameSession, settings: GameSettings) {
     this.session = session;
+    this.settings = settings;
     this.init();
   }
 
   async init() {
     this.status = GAME_STATUS.GENERATING;
-    this.questions = shuffle([
-      // genre questions
-      ...(await QuestionAnimeGenre.create(QUESTION_AMOUNT)),
-      // studio questions
-      ...(await QuestionAnimeStudio.create(QUESTION_AMOUNT, {
-        maxPopularity: 300,
-      })),
-      // easy char questions
-      ...(await QuestionCharName.create(QUESTION_AMOUNT_EASY, {
-        mainRoleOnly: true,
-        maxPopularity: 100,
-      })),
-      // medium char questions
-      ...(await QuestionCharName.create(QUESTION_AMOUNT, {
-        maxPopularity: 500,
-      })),
-      // hard char questions
-      ...(await QuestionCharName.create(QUESTION_AMOUNT)),
-      // easyum
-      ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT_EASY, {
-        mainRoleOnly: true,
-        maxPopularity: 800,
-      })),
-      // hard
-      ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT, {
-        imageOnly: true,
-      })),
-    ]);
+    // this.questions = shuffle([
+    //   // genre questions
+    //   ...(await QuestionAnimeGenre.create(QUESTION_AMOUNT)),
+    //   // studio questions
+    //   ...(await QuestionAnimeStudio.create(QUESTION_AMOUNT, {
+    //     maxPopularity: 300,
+    //   })),
+    //   // easy char questions
+    //   ...(await QuestionCharName.create(QUESTION_AMOUNT_EASY, {
+    //     mainRoleOnly: true,
+    //     maxPopularity: 100,
+    //   })),
+    //   // medium char questions
+    //   ...(await QuestionCharName.create(QUESTION_AMOUNT, {
+    //     maxPopularity: 500,
+    //   })),
+    //   // hard char questions
+    //   ...(await QuestionCharName.create(QUESTION_AMOUNT)),
+    //   // easyum
+    //   ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT_EASY, {
+    //     mainRoleOnly: true,
+    //     maxPopularity: 800,
+    //   })),
+    //   // hard
+    //   ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT, {
+    //     imageOnly: true,
+    //   })),
+    // ]);
+
+    const options = {
+      mainRoleOnly: this.settings?.mainRoleOnly ?? false,
+      maxPopularity:
+        this.settings?.maxPopularity > -1
+          ? this.settings?.maxPopularity
+          : undefined,
+      minPopularity:
+        this.settings?.minPopularity > -1
+          ? this.settings?.minPopularity
+          : undefined,
+    };
+
+    console.log("options", options);
+
+    const questionCounts = distributeNumbers(
+      this.settings.questionCount,
+      this.settings.activeQuestions.length
+    );
+    const questionPromises = this.settings.activeQuestions.map((id, i) => {
+      switch (id) {
+        case GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR:
+          return QuestionAnimeFromCharacter.create(questionCounts[i], options);
+        case GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE:
+          return QuestionAnimeGenre.create(questionCounts[i], options);
+        case GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO:
+          return QuestionAnimeStudio.create(questionCounts[i], options);
+        case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
+          return QuestionCharByPicture.create(questionCounts[i], options);
+      }
+    });
+
+    this.questions = shuffle(flatten(await Promise.all(questionPromises)));
     this.startGame();
   }
 
@@ -237,4 +276,14 @@ export class Game {
   sendGameFinalScoreboard() {
     // send scoreboard packet, also indicating to client that game is done, idk
   }
+
+  static ALL_AVAILABLE_QUESTIONS = [
+    GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE,
+    GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR,
+    GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE,
+    GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO,
+  ];
+
+  static MIN_QUESTION_AMOUNT = 3;
+  static MAX_QUESTION_AMOUNT = 50;
 }

@@ -1,4 +1,4 @@
-import { fixCharacterName } from "../common/uitls/animehelper.js";
+import { fixCharacterName } from "../common/utils/animehelper.js";
 import { queryAll } from "./db.mjs";
 
 export interface CharacterOptions {
@@ -73,6 +73,8 @@ export async function getRandomCharacters(
   // limit by count
   query += ` LIMIT 0,?`;
   queryParams.push(count);
+
+  console.log("QUERY", query);
 
   // console.log("QUERY", query, queryParams);
   const res = await queryAll(query, ...queryParams);

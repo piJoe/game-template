@@ -1,4 +1,9 @@
 import {
+  GameSettings,
+  GAME_AVAILABLE_QUESTION_ID,
+  GAME_SETTING,
+} from "../common/types/game";
+import {
   ServerPacketKey,
   ServerPackets,
   ServerPacketType,
@@ -25,6 +30,13 @@ export class GameSession {
   public playerStates = new Map<string, PlayerState>();
   public status = SESSION_STATUS.LOBBY;
   public game: Game;
+  private settings: GameSettings = {
+    [GAME_SETTING.QUESTION_COUNT]: 20,
+    [GAME_SETTING.ACTIVE_QUESTIONS]: [...Game.ALL_AVAILABLE_QUESTIONS],
+    [GAME_SETTING.MAIN_ROLE_ONLY]: false,
+    [GAME_SETTING.MIN_POPULARITY]: -1,
+    [GAME_SETTING.MAX_POPULARITY]: -1,
+  };
 
   constructor() {
     allSessions.set(this.id, this);
@@ -36,6 +48,7 @@ export class GameSession {
       this.playerStates.set(player.id, { player, score: 0, ready: false });
       this.sendGameStatus();
       this.sendPlayerlist();
+      this.sendGameSettings(player);
       console.log("PLAYER JOINED", this.id, player.id, player.name);
       return true;
     }
@@ -75,7 +88,7 @@ export class GameSession {
     if (this.game) {
       return;
     }
-    this.game = new Game(this);
+    this.game = new Game(this, this.settings);
     this.updateStatus(SESSION_STATUS.IN_GAME);
     console.log("GAME CREATED", this.id);
   }
@@ -83,6 +96,59 @@ export class GameSession {
   updateStatus(status: SESSION_STATUS) {
     this.status = status;
     this.sendGameStatus();
+  }
+
+  updateGameSettings(settings: GameSettings) {
+    if (typeof settings[GAME_SETTING.QUESTION_COUNT] !== "number") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (!Array.isArray(settings[GAME_SETTING.ACTIVE_QUESTIONS])) {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.MAIN_ROLE_ONLY] !== "boolean") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.MIN_POPULARITY] !== "number") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.MAX_POPULARITY] !== "number") {
+      console.error("failed to validate settings");
+      return;
+    }
+
+    this.settings[GAME_SETTING.QUESTION_COUNT] = Math.min(
+      Math.max(Game.MIN_QUESTION_AMOUNT, settings[GAME_SETTING.QUESTION_COUNT]),
+      Game.MAX_QUESTION_AMOUNT
+    );
+
+    this.settings[GAME_SETTING.ACTIVE_QUESTIONS] = settings[
+      GAME_SETTING.ACTIVE_QUESTIONS
+    ].filter((q) => Game.ALL_AVAILABLE_QUESTIONS.includes(q));
+
+    this.settings[GAME_SETTING.MAIN_ROLE_ONLY] =
+      settings[GAME_SETTING.MAIN_ROLE_ONLY] ?? false;
+
+    this.settings[GAME_SETTING.MIN_POPULARITY] = Math.min(
+      Math.max(-1, settings[GAME_SETTING.MIN_POPULARITY]),
+      10000
+    );
+    if (this.settings[GAME_SETTING.MIN_POPULARITY] < 1) {
+      this.settings[GAME_SETTING.MIN_POPULARITY] = -1;
+    }
+
+    this.settings[GAME_SETTING.MAX_POPULARITY] = Math.min(
+      Math.max(-1, settings[GAME_SETTING.MAX_POPULARITY]),
+      10000
+    );
+    if (this.settings[GAME_SETTING.MAX_POPULARITY] < 1) {
+      this.settings[GAME_SETTING.MAX_POPULARITY] = -1;
+    }
+
+    this.sendGameSettings();
   }
 
   gameEnded() {
@@ -120,6 +186,20 @@ export class GameSession {
     const playerlist = this.playerList;
     const count = this.playerCount;
     this.sendMsg(ServerPacketType.GAME_PLAYERLIST, { playerlist, count });
+  }
+
+  sendGameSettings(player?: Player) {
+    const data = {
+      currentSettings: this.settings,
+      availableQuestions: Game.ALL_AVAILABLE_QUESTIONS,
+    };
+
+    if (!player) {
+      this.sendMsg(ServerPacketType.GAME_SETTINGS, data);
+      return;
+    }
+
+    player.sendMsg(ServerPacketType.GAME_SETTINGS, data);
   }
 
   sendMsg<T extends ServerPacketKey>(type: T, data: ServerPackets[T]) {

@@ -3,12 +3,17 @@ import { CharacterOptions, getRandomCharacters } from "../db/characters";
 import { ServerQuestion } from "../common/types/question";
 import { flatten, uniq } from "lodash-es";
 import { getRandomAnimesWithCharacters } from "../db/animes";
+import {
+  AnimeQuestionGenerator,
+  GAME_AVAILABLE_QUESTION_ID,
+} from "../common/types/game";
 
 export interface QuestionAnimeFromCharacterOptions extends CharacterOptions {
   imageOnly?: boolean;
 }
 
-export const QuestionAnimeFromCharacter = {
+export const QuestionAnimeFromCharacter: AnimeQuestionGenerator = {
+  id: GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR,
   name: "What anime title is the character from?",
   create: async (
     count: number,

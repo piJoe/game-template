@@ -1,4 +1,8 @@
 import { shuffle } from "fast-shuffle";
+import {
+  AnimeQuestionGenerator,
+  GAME_AVAILABLE_QUESTION_ID,
+} from "../common/types/game";
 import { ServerQuestion } from "../common/types/question";
 import {
   AnimeOptions,
@@ -10,7 +14,8 @@ export interface QuestionAnimeStudioOptions extends AnimeOptions {
   imageOnly?: boolean;
 }
 
-export const QuestionAnimeStudio = {
+export const QuestionAnimeStudio: AnimeQuestionGenerator = {
+  id: GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO,
   name: "Guess the anime's studio",
   create: async (
     count: number,

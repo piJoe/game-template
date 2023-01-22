@@ -133,6 +133,12 @@ class Socket {
           data as ServerPackets[ServerPacketType.GAME_PLAYERLIST]
         );
         break;
+      case ServerPacketType.GAME_SETTINGS:
+        this.callListeners(
+          ServerPacketType.GAME_SETTINGS,
+          data as ServerPackets[ServerPacketType.GAME_SETTINGS]
+        );
+        break;
       case ServerPacketType.GAME_QUESTION:
         this.callListeners(
           ServerPacketType.GAME_QUESTION,
@@ -157,6 +163,8 @@ class Socket {
           data as ServerPackets[ServerPacketType.ERROR]
         );
         break;
+      default:
+        throw Error("Not yet implemented" + type);
     }
   }
 }

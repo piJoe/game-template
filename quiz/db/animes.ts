@@ -1,4 +1,4 @@
-import { fixCharacterName } from "../common/uitls/animehelper.js";
+import { fixCharacterName } from "../common/utils/animehelper.js";
 import { queryAll } from "./db.mjs";
 
 export interface AnimeOptions {

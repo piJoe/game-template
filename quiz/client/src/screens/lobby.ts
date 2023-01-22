@@ -1,4 +1,9 @@
 import {
+  GameSettings,
+  GAME_AVAILABLE_QUESTION_ID,
+  GAME_SETTING,
+} from "../../../common/types/game";
+import {
   ClientPacketType,
   ServerPacketType,
 } from "../../../common/types/packets";
@@ -7,6 +12,7 @@ import {
   PLAYER_LEFT_REASON,
   SESSION_STATUS,
 } from "../../../common/types/session";
+import { getQuestionNameById } from "../../../common/utils/animehelper";
 import { globalState } from "../globalstate";
 import { showDialog } from "../overlay";
 import { socket } from "../websocket";
@@ -20,6 +26,7 @@ export class LobbyScreen extends DOMScreen {
   private currentLobbyStatus: SESSION_STATUS = null;
   private statusListener: number;
   private playerlistListener: number;
+  private gameSettingsListener: number;
   private questionListener: number;
   private questionActiveListener: number;
   private questionAnswersListener: number;
@@ -28,6 +35,7 @@ export class LobbyScreen extends DOMScreen {
   private scoreboardCloseCallback: () => void;
   private lobbyId = "";
   private readyButton: HTMLInputElement;
+  private lobbySettingsDom: HTMLElement;
   private selfReady = false;
   private playerlist: PlayerListEntry[] = [];
   private questions = new Map<number, QuestionScreen>();
@@ -48,6 +56,12 @@ export class LobbyScreen extends DOMScreen {
     const toggleSettingsButton = this.domRef.querySelector(
       "#toggle-lobby-settings"
     ) as HTMLInputElement;
+    const settingsContainer = this.domRef.querySelector(
+      ".settings-container"
+    ) as HTMLElement;
+    this.lobbySettingsDom = settingsContainer.querySelector(
+      ".lobby-settings"
+    ) as HTMLFormElement;
 
     const backToJoinButton = this.domRef.querySelector(
       "#lobby-back-button"
@@ -139,6 +153,13 @@ export class LobbyScreen extends DOMScreen {
       }
     );
 
+    this.gameSettingsListener = socket.on(
+      ServerPacketType.GAME_SETTINGS,
+      ({ currentSettings, availableQuestions }) => {
+        this.renderSettings(currentSettings, availableQuestions);
+      }
+    );
+
     this.questionListener = socket.on(
       ServerPacketType.GAME_QUESTION,
       ({ id, question }) => {
@@ -168,7 +189,6 @@ export class LobbyScreen extends DOMScreen {
     this.selfLeftListener = socket.on(
       ServerPacketType.ME_LEFT_GAME,
       ({ reason }) => {
-        console.log("CALLED SELF LEFT LISTENER");
         this.leaveLobby();
         if (reason === PLAYER_LEFT_REASON.KICKED_INACTIVITY) {
           showDialog(
@@ -192,26 +212,126 @@ export class LobbyScreen extends DOMScreen {
 
     toggleSettingsButton.addEventListener("click", (e) => {
       e.preventDefault();
-      showDialog("WIP", undefined, {
-        actions: [
-          {
-            title: "Cancel",
-            value: "cancel",
-            class: "button-outline",
-          },
-          {
-            title: "Ok!",
-            value: "ok",
-            class: "button-primary",
-          },
-        ],
-      });
+      settingsContainer.classList.toggle("settings-container--visible");
     });
 
     backToJoinButton.addEventListener("click", (e) => {
       e.preventDefault();
       socket.sendMsg(ClientPacketType.GAME_LEAVE);
     });
+
+    this.lobbySettingsDom.addEventListener("submit", (e) => {
+      e.preventDefault();
+      socket.sendMsg(ClientPacketType.GAME_SETTINGS, {
+        settings: {
+          [GAME_SETTING.QUESTION_COUNT]: parseInt(
+            (
+              this.lobbySettingsDom.querySelector(
+                `[name="${GAME_SETTING.QUESTION_COUNT}"]`
+              ) as HTMLInputElement
+            ).value
+          ),
+
+          [GAME_SETTING.ACTIVE_QUESTIONS]: Array.from(
+            this.lobbySettingsDom.querySelectorAll(
+              `[name="${GAME_SETTING.ACTIVE_QUESTIONS}"]:checked`
+            )
+          ).map((e: HTMLInputElement) => e.value as GAME_AVAILABLE_QUESTION_ID),
+
+          [GAME_SETTING.MAIN_ROLE_ONLY]: (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.MAIN_ROLE_ONLY}"]`
+            ) as HTMLInputElement
+          ).checked,
+
+          [GAME_SETTING.MIN_POPULARITY]: parseInt(
+            (
+              this.lobbySettingsDom.querySelector(
+                `[name="${GAME_SETTING.MIN_POPULARITY}"]`
+              ) as HTMLInputElement
+            ).value
+          ),
+
+          [GAME_SETTING.MAX_POPULARITY]: parseInt(
+            (
+              this.lobbySettingsDom.querySelector(
+                `[name="${GAME_SETTING.MAX_POPULARITY}"]`
+              ) as HTMLInputElement
+            ).value
+          ),
+        },
+      });
+    });
+
+    this.lobbySettingsDom.addEventListener("input", (e) => {
+      e.preventDefault();
+      this.lobbySettingsDom
+        .querySelector(".button[name=update-settings]")
+        .setAttribute("data-active", "true");
+    });
+  }
+
+  renderSettings(
+    settings: GameSettings,
+    availableQuestions: GAME_AVAILABLE_QUESTION_ID[]
+  ) {
+    this.lobbySettingsDom.innerHTML = `
+    <div class="game-setting-entry">
+      <label class="game-setting-title">No. of Questions:</label> 
+      <input type="number" name="${
+        GAME_SETTING.QUESTION_COUNT
+      }" autocomplete="off" min=3 max=50 required value="${
+      settings[GAME_SETTING.QUESTION_COUNT]
+    }">
+    </div>
+
+    <div class="game-setting-entry">
+      <label class="game-setting-title">Popularity:</label> 
+
+      <div class="game-setting-double">
+        <input type="number" name="${
+          GAME_SETTING.MIN_POPULARITY
+        }" autocomplete="off" min=-1 max=10000 required value="${
+      settings[GAME_SETTING.MIN_POPULARITY]
+    }">
+      -
+        <input type="number" name="${
+          GAME_SETTING.MAX_POPULARITY
+        }" autocomplete="off" min=-1 max=10000 required value="${
+      settings[GAME_SETTING.MAX_POPULARITY]
+    }">
+      </div>
+
+      <label class="game-setting-list-option" for="gs_mainOnly">
+          <input type="checkbox" id="gs_mainOnly" name="${
+            GAME_SETTING.MAIN_ROLE_ONLY
+          }" ${
+      settings[GAME_SETTING.MAIN_ROLE_ONLY] ? "checked" : ""
+    }> Main characters only
+      </label>
+    </div>
+
+          
+
+    <div class="game-setting-entry game-setting-list">
+      <label class="game-setting-title">Questions:</label> 
+      ${availableQuestions
+        .map((qId) => {
+          return `<label class="game-setting-list-option" for="q_${qId}">
+          <input type="checkbox" id="q_${qId}" name="${
+            GAME_SETTING.ACTIVE_QUESTIONS
+          }" value="${qId}" ${
+            settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
+              ? "checked"
+              : ""
+          }>
+          ${getQuestionNameById(qId)}
+        </label>`;
+        })
+        .join("")}
+    </div>
+    
+    <input type="submit" class="button button-outline" name="update-settings" value="Save">`;
   }
 
   updateReadyButton() {
@@ -243,8 +363,9 @@ export class LobbyScreen extends DOMScreen {
     <h1 class="title-h1">LOBBY</h1>
     <section class="lobby-wrapper">
       <div class="multiple-container-wrapper">
-        <div class="container" style="display:none;">
-          <div class="title-h2">TODO: SETTINGS</div>
+        <div class="container settings-container">
+          <div class="title-h2">SETTINGS</div>
+          <form class="lobby-settings"></form>
         </div>
 
         <div class="container lobby-container">
@@ -325,6 +446,7 @@ export class LobbyScreen extends DOMScreen {
     // unregister all listeners
     socket.off(ServerPacketType.GAME_STATUS, this.statusListener);
     socket.off(ServerPacketType.GAME_PLAYERLIST, this.playerlistListener);
+    socket.off(ServerPacketType.GAME_SETTINGS, this.gameSettingsListener);
     socket.off(ServerPacketType.GAME_QUESTION, this.questionListener);
     socket.off(
       ServerPacketType.GAME_QUESTION_ACTIVE,

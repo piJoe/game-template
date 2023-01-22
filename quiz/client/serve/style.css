@@ -83,7 +83,7 @@ body {
     border: var(--border-width-small) solid var(--color-white);
 }
 .button.button-outline[data-active=true] {
-    padding: 16px 36px;
+    padding: 14px 34px;
     border: none;
 }
 
@@ -150,6 +150,22 @@ input[type=number] {
     color: var(--color-black);
     padding: 10px 16px;
     text-transform: uppercase;
+}
+
+input[type=checkbox] {
+    appearance: none;
+    outline: none;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    background: transparent;
+    border: var(--border-width-small) solid var(--color-white-translucent);
+    border-radius: var(--border-radius-medium);
+    box-sizing: border-box;
+}
+input[type=checkbox]:checked {
+    background: var(--color-primary);
+    border: none;
 }
 
 .skewed-tag {
@@ -395,6 +411,52 @@ h1,h2,h3,h4,h5,h6 {
     display: flex;
 }
 
+.settings-container {
+    display: none;
+}
+.settings-container--visible {
+    display: flex;
+    flex-direction: column;
+}
+
+.lobby-settings {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.game-setting-entry {
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+
+.game-setting-title {
+    margin-bottom: 16px;
+}
+.game-setting-list > .game-setting-title {
+    margin-bottom: 8px;
+}
+.game-setting-list-option {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    cursor: pointer;
+    text-transform: none;
+    font-weight: 600;
+}
+.game-setting-list-option > input {
+    margin-right: 12px;
+}
+
+.game-setting-double {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+
 .lobby-container {
     display: flex;
     flex-direction: column;
@@ -409,7 +471,7 @@ h1,h2,h3,h4,h5,h6 {
 .playerlist {
     list-style: none;
     list-style-type: none;
-    margin: auto;
+    margin: 0 auto;
     padding: 0;
     min-width: 250px;
 }

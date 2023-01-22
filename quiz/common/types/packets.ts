@@ -1,4 +1,4 @@
-import { GameSetting, GameSettingInput } from "./game";
+import { GameSettings, GAME_AVAILABLE_QUESTION_ID } from "./game";
 import { ClientQuestion } from "./question";
 import { PlayerListEntry, PLAYER_LEFT_REASON, SESSION_STATUS } from "./session";
 
@@ -6,6 +6,7 @@ export enum ClientPacketType {
   GAME_CREATE = "game.create",
   GAME_JOIN = "game.join",
   GAME_LEAVE = "game.leave",
+  GAME_SETTINGS = "game.settings",
   GAME_QUESTION_ANSWER = "game.question.answer",
   ME_CHANGE_NAME = "me.change_name",
   ME_READY = "me.ready",
@@ -16,6 +17,9 @@ export type ClientPackets = {
     id: string;
   };
   [ClientPacketType.GAME_LEAVE]: undefined;
+  [ClientPacketType.GAME_SETTINGS]: {
+    settings: GameSettings;
+  };
   [ClientPacketType.ME_CHANGE_NAME]: {
     name: string;
   };
@@ -37,8 +41,7 @@ export enum ServerPacketType {
   GAME_QUESTION = "game.question",
   GAME_QUESTION_ACTIVE = "game.question.active",
   GAME_QUESTION_ANSWERS = "game.question.answers",
-  GAME_AVAILABLE_SETTINGS = "game.settings.available",
-  GAME_SETTINGS_CHANGE = "game.settings.change",
+  GAME_SETTINGS = "game.settings",
   ERROR = "generic.error",
 }
 export type ServerPackets = {
@@ -75,12 +78,9 @@ export type ServerPackets = {
       [key: string]: number;
     };
   };
-  [ServerPacketType.GAME_AVAILABLE_SETTINGS]: {
-    inputs: GameSettingInput[];
-    currentSettings: GameSetting[];
-  };
-  [ServerPacketType.GAME_SETTINGS_CHANGE]: {
-    settings: GameSetting[];
+  [ServerPacketType.GAME_SETTINGS]: {
+    currentSettings: GameSettings;
+    availableQuestions: GAME_AVAILABLE_QUESTION_ID[];
   };
   [ServerPacketType.ERROR]: {
     title: string;

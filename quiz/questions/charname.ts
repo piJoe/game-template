@@ -1,10 +1,15 @@
 import { shuffle } from "fast-shuffle";
 import { CharacterOptions, getRandomCharacters } from "../db/characters";
 import { ServerQuestion } from "../common/types/question";
+import {
+  AnimeQuestionGenerator,
+  GAME_AVAILABLE_QUESTION_ID,
+} from "../common/types/game";
 
 export interface QuestionCharacterOptions extends CharacterOptions {}
 
-export const QuestionCharName = {
+export const QuestionCharByPicture: AnimeQuestionGenerator = {
+  id: GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE,
   name: "What's the name of the anime char (by picture)?",
   create: async (
     count: number,
