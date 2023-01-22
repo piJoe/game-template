@@ -36,34 +36,6 @@ export class Game {
 
   async init() {
     this.status = GAME_STATUS.GENERATING;
-    // this.questions = shuffle([
-    //   // genre questions
-    //   ...(await QuestionAnimeGenre.create(QUESTION_AMOUNT)),
-    //   // studio questions
-    //   ...(await QuestionAnimeStudio.create(QUESTION_AMOUNT, {
-    //     maxPopularity: 300,
-    //   })),
-    //   // easy char questions
-    //   ...(await QuestionCharName.create(QUESTION_AMOUNT_EASY, {
-    //     mainRoleOnly: true,
-    //     maxPopularity: 100,
-    //   })),
-    //   // medium char questions
-    //   ...(await QuestionCharName.create(QUESTION_AMOUNT, {
-    //     maxPopularity: 500,
-    //   })),
-    //   // hard char questions
-    //   ...(await QuestionCharName.create(QUESTION_AMOUNT)),
-    //   // easyum
-    //   ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT_EASY, {
-    //     mainRoleOnly: true,
-    //     maxPopularity: 800,
-    //   })),
-    //   // hard
-    //   ...(await QuestionAnimeFromCharacter.create(QUESTION_AMOUNT, {
-    //     imageOnly: true,
-    //   })),
-    // ]);
 
     const options = {
       mainRoleOnly: this.settings?.mainRoleOnly ?? false,
@@ -76,8 +48,6 @@ export class Game {
           ? this.settings?.minPopularity
           : undefined,
     };
-
-    console.log("options", options);
 
     const questionCounts = distributeNumbers(
       this.settings.questionCount,

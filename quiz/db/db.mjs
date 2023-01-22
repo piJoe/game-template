@@ -18,10 +18,8 @@ export function queryFirst(query, ...params) {
 }
 
 export function queryAll(query, ...params) {
-  console.time("query");
   return new Promise((res, rej) => {
     db.all(query, params, (err, rows) => {
-      console.timeEnd("query");
       if (err) {
         return rej(err);
       }
