@@ -311,7 +311,7 @@
       case "charByPicture" /* CHAR_BY_PICTURE */:
         return "Guess character from picture";
       case "animeOpening" /* ANIME_OPENING */:
-        return "Guess anime from opening";
+        return "BETA: Guess anime from opening";
       default:
         throw Error("Id not recognized: " + qId);
     }
@@ -858,6 +858,14 @@
         this.audio.preload = "auto";
         this.audio.autoplay = false;
         this.audio.volume = globalState.settings.volume;
+        const slider = this.domRef.querySelector(
+          "#audio-volume"
+        );
+        slider.addEventListener("input", (e) => {
+          const val = parseInt(slider.value) / 100;
+          globalState.settings.volume = val;
+          this.audio.volume = globalState.settings.volume;
+        });
       }
       this.timerDOM = this.domRef.querySelector(".question-timer");
     }
@@ -926,6 +934,7 @@
       const question = this.question.question;
       const answers = this.question.answers;
       const hasImage = this.question.question.image ? true : false;
+      const hasAudio = this.question.question.audioUrl ? true : false;
       return `
     <div><!-- empty div for spacing --></div>
     <div class="question-wrapper">
@@ -935,6 +944,7 @@
             <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
             </div>` : ""}
         <div class="question-title title-h3">${(0, import_escape_html.default)(question.title)}</div>
+        ${hasAudio ? `<div class="question-audio-slider"><input type="range" min="1" max="100" value="${globalState.settings.volume * 100}" id="audio-volume"> </div>` : ""}
         <div class="question-timer"></div>
       </div>
       <ul class="answers">

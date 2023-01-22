@@ -55,6 +55,15 @@ export class QuestionScreen extends DOMScreen {
       this.audio.preload = "auto";
       this.audio.autoplay = false;
       this.audio.volume = globalState.settings.volume;
+
+      const slider = this.domRef.querySelector(
+        "#audio-volume"
+      ) as HTMLInputElement;
+      slider.addEventListener("input", (e) => {
+        const val = parseInt(slider.value) / 100;
+        globalState.settings.volume = val;
+        this.audio.volume = globalState.settings.volume;
+      });
     }
 
     this.timerDOM = this.domRef.querySelector(".question-timer");
@@ -159,6 +168,7 @@ export class QuestionScreen extends DOMScreen {
     const question = this.question.question;
     const answers = this.question.answers;
     const hasImage = this.question.question.image ? true : false;
+    const hasAudio = this.question.question.audioUrl ? true : false;
 
     return `
     <div><!-- empty div for spacing --></div>
@@ -177,6 +187,13 @@ export class QuestionScreen extends DOMScreen {
             : ""
         }
         <div class="question-title title-h3">${escapeHTML(question.title)}</div>
+        ${
+          hasAudio
+            ? `<div class="question-audio-slider"><input type="range" min="1" max="100" value="${
+                globalState.settings.volume * 100
+              }" id="audio-volume"> </div>`
+            : ""
+        }
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
