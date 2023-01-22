@@ -326,7 +326,7 @@ h1,h2,h3,h4,h5,h6 {
     padding: 60px;
 }
 .screen > .title-h1 {
-    margin-bottom: 1rem;
+    font-size: var(--h2-font-size);
 }
 .screen > .bottom-container {
     margin-top: auto;
