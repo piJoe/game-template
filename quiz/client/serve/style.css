@@ -686,3 +686,39 @@ h1,h2,h3,h4,h5,h6 {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/* mascot overlay */
+.mascot-overlay {
+    position: absolute;
+    display: flex;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.mascot {
+    background: url('/imgs/mascot.png');
+    background-size: contain;
+    width: 40vh;
+    height: 40vh;
+    margin: auto;
+    transform: translateY(100%);
+    animation: mascot-slide 2s 0.3s ease forwards;
+}
+
+@keyframes mascot-slide {
+    0% {
+        transform: translateY(100%);
+    }
+
+    30% {
+        transform: translateY(0);
+    }
+    70% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
