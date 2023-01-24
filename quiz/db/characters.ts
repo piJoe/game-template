@@ -38,7 +38,8 @@ export async function getRandomCharacters(
     LEFT JOIN 'animes' ON anime_characters.anime_id = animes.id`;
 
   // ignore any characters without proper image
-  query += ` WHERE characters.image IS NOT "https://cdn.myanimelist.net/images/questionmark_23.gif"`;
+  query += ` WHERE characters.image IS NOT ?`;
+  queryParams.push("https://cdn.myanimelist.net/images/questionmark_23.gif");
 
   // optional where clauses
   if (options.excludeChars) {
@@ -54,7 +55,8 @@ export async function getRandomCharacters(
     queryParams.push(...options.excludeAnimes);
   }
   if (options.mainRoleOnly) {
-    query += ` AND anime_characters.role = "Main"`;
+    query += ` AND anime_characters.role = ?`;
+    queryParams.push("Main");
   }
   if (options.maxPopularity) {
     query += ` AND animes.popularity <= ?`;
@@ -73,8 +75,6 @@ export async function getRandomCharacters(
   // limit by count
   query += ` LIMIT 0,?`;
   queryParams.push(count);
-
-  console.log("QUERY", query);
 
   // console.log("QUERY", query, queryParams);
   const res = await queryAll(query, ...queryParams);

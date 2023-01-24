@@ -1,30 +1,28 @@
-import sqlite3 from "sqlite3";
+import Database from "better-sqlite3";
 import flat from "flat";
-import fs from "fs";
 
-fs.copyFileSync("/animedb.sqlite", "/animedb_copy.sqlite");
-const db = new sqlite3.Database("/animedb_copy.sqlite", sqlite3.OPEN_READONLY);
+// fs.copyFileSync("/animedb.sqlite", "/animedb_copy.sqlite");
+const fileDB = new Database("/animedb.sqlite", {
+  readonly: true,
+});
+const buffer = fileDB.serialize();
+fileDB.close();
+const db = new Database(buffer);
+
+process.on("exit", () => db.close());
 
 export function queryFirst(query, ...params) {
   return new Promise((res, rej) => {
-    db.get(query, params, (err, singleRow) => {
-      if (err) {
-        return rej(err);
-      }
-
-      return res(flat.unflatten(singleRow));
-    });
+    const q = db.prepare(query);
+    const row = q.get(...params);
+    return res(flat.unflatten(row));
   });
 }
 
 export function queryAll(query, ...params) {
   return new Promise((res, rej) => {
-    db.all(query, params, (err, rows) => {
-      if (err) {
-        return rej(err);
-      }
-
-      return res(rows.map((r) => flat.unflatten(r)));
-    });
+    const q = db.prepare(query);
+    const rows = q.all(...params);
+    return res(flat.unflatten(rows));
   });
 }

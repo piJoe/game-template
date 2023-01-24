@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.3",
+    "better-sqlite3": "^8.0.1",
     "escape-html": "^1.0.3",
     "fast-shuffle": "^5.0.2",
     "flat": "^5.0.2",

@@ -1,22 +1,22 @@
-FROM node:19-alpine AS builder
+FROM node:19 AS builder
 
 WORKDIR /app
 
 COPY package.json ./
 COPY package-lock.json ./
-COPY tsconfig.json . /
-COPY quiz ./quiz
+COPY tsconfig.json ./
 
 RUN npm install
+
+COPY quiz ./quiz
 RUN npm run build-server
 Run npm prune --production
 
-FROM node:19-alpine
+FROM node:19
 
 WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/quiz/build/index.mjs ./
-# COPY quiz/animedb.sqlite /app/animedb.sqlite
 
 CMD ["node", "index.mjs"]

@@ -62,7 +62,8 @@ export async function getRandomAnimesWithCharacters(
     LEFT JOIN 'characters' ON anime_characters.character_id = characters.id`;
 
   // ignore any characters without proper image
-  query += ` WHERE characters.image IS NOT "https://cdn.myanimelist.net/images/questionmark_23.gif"`;
+  query += ` WHERE characters.image IS NOT ?`;
+  queryParams.push("https://cdn.myanimelist.net/images/questionmark_23.gif");
 
   // optional where clauses
   if (options.excludeChars) {
@@ -232,8 +233,9 @@ export async function getRandomAnimesWithOpenings(
   // optional where clauses
   let wheres = [
     `anime_openings.filename IS NOT NULL`,
-    `anime_openings.type = "OP"`,
+    `anime_openings.type = ?`,
   ];
+  queryParams.push("OP");
   if (options.excludeAnimes) {
     wheres.push(
       `animes.id NOT IN (${options.excludeAnimes.map((_) => "?").join(",")})`
