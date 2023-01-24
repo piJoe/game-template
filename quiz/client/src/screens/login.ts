@@ -33,7 +33,7 @@ export class LoginScreen extends DOMScreen {
   }
 
   setActive(): void {
-    super.setActive();
+    super.setActive("none");
     (
       this.domRef.querySelector("input[name=username]") as HTMLInputElement
     ).focus({ preventScroll: true });

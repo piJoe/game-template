@@ -23,22 +23,32 @@ export abstract class DOMScreen {
     return ``;
   }
 
-  setActive(direction: "left" | "right" = "right") {
+  setActive(direction: "left" | "right" | "none" = "right") {
     if (activeScreen) {
       activeScreen.setInactive(direction);
     }
-    this.domRef.setAttribute(
-      "data-screen-active",
-      direction == "right" ? "cur" : "cur-left"
-    );
+    let transition = "cur-none";
+    switch (direction) {
+      case "left":
+        transition = "cur-left";
+        break;
+      case "right":
+        transition = "cur";
+    }
+    this.domRef.setAttribute("data-screen-active", transition);
     activeScreen = this;
   }
 
-  setInactive(direction: "left" | "right" = "right") {
-    this.domRef.setAttribute(
-      "data-screen-active",
-      direction == "right" ? "prev" : "prev-left"
-    );
+  setInactive(direction: "left" | "right" | "none" = "right") {
+    let transition = "prev-none";
+    switch (direction) {
+      case "left":
+        transition = "prev-left";
+        break;
+      case "right":
+        transition = "prev";
+    }
+    this.domRef.setAttribute("data-screen-active", transition);
     if (this.killWhenInactive) {
       this.die();
     }

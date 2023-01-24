@@ -385,6 +385,24 @@ h1,h2,h3,h4,h5,h6 {
         transform: translateX(-100vw);
     }
 }
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
 
 /* specific implementations */
 
