@@ -115,8 +115,11 @@ export class LobbyScreen extends DOMScreen {
       ({ playerlist }) => {
         this.playerlist = playerlist;
 
-        // render playerlist ready states
-        playerListDom.innerHTML = [...this.playerlist]
+        const dummyFiller = new Array(
+          Math.max(6 - this.playerlist.length, 0)
+        ).fill(true);
+
+        const playerListHTML = [...this.playerlist]
           // .sort((a, b) => b.score - a.score)
           .map(
             (e) =>
@@ -130,13 +133,27 @@ export class LobbyScreen extends DOMScreen {
                   }
                 </div>
                 <div class="list-row-entry player-row-more">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+                  </svg>
                 </div>
               </li>`
           )
           .join("");
 
+        const dummyHTML = dummyFiller
+          .map(
+            (e) =>
+              `<li class="list-row">
+                <div class="list-row-entry player-row-entry player-row-entry-empty">
+                  <span class="player-name">Empty</span>
+                </div>
+                <div class="list-row-entry player-row-more"></div>
+              </li>`
+          )
+          .join("");
+        // render playerlist ready states
+        playerListDom.innerHTML = playerListHTML + dummyHTML;
         // render playerlist scoreboard
         this.scoreboardDom.innerHTML = [...this.playerlist]
           .sort((a, b) => b.score - a.score)
@@ -410,9 +427,9 @@ export class LobbyScreen extends DOMScreen {
     </div>
 
     <section class="content-wrapper" data-tab="overview">
-      <div class="multiple-container-wrapper">
+      <div class="multiple-container-wrapper lobby-container-wrapper">
 
-        <div class="container container-translucent container-sticky lobby-container">
+        <div class="container container-translucent lobby-container">
           <div class="title-h3 lobby-title">
             Lobby Code<br>
             <span class="title-h2">

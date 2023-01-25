@@ -1,7 +1,13 @@
+.lobby-container-wrapper {
+    height: 100%;
+    overflow: hidden;
+}
+
 .lobby-container {
     display: flex;
     flex-direction: column;
     text-align: left;
+    align-self: stretch;
 }
 
 .lobby-container > .lobby-title {
@@ -19,10 +25,15 @@
 .list.lobby-playerlist {
     max-width: 600px;
     margin: auto 0;
+    height: 100%;
+    overflow-y: auto;
 
     .player-row-entry {
         display: flex;
         justify-content: center;
+    }
+    .player-row-entry-empty {
+        color: var(--color-disabled);
     }
     .player-name {
         margin-right: auto;

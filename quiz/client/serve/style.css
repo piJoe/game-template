@@ -853,10 +853,16 @@ input[type=checkbox]:checked {
   text-overflow: ellipsis;
 }
 
+.lobby-container-wrapper {
+  height: 100%;
+  overflow: hidden;
+}
+
 .lobby-container {
   display: flex;
   flex-direction: column;
   text-align: left;
+  align-self: stretch;
 }
 
 .lobby-container > .lobby-title {
@@ -874,10 +880,15 @@ input[type=checkbox]:checked {
 .list.lobby-playerlist {
   max-width: 600px;
   margin: auto 0;
+  height: 100%;
+  overflow-y: auto;
 }
 .list.lobby-playerlist .player-row-entry {
   display: flex;
   justify-content: center;
+}
+.list.lobby-playerlist .player-row-entry-empty {
+  color: var(--color-disabled);
 }
 .list.lobby-playerlist .player-name {
   margin-right: auto;
