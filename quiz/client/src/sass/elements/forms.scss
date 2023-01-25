@@ -1,0 +1,12 @@
+.combined-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.combined-form > input[type="text"] {
+    padding-right: 48px;
+    max-width: 250px;
+}
+.combined-form > .button {
+    margin-left: -32px;
+}

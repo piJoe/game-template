@@ -1,0 +1,15 @@
+.title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: auto;
+}
+.title-bar > .title-h1 {
+    font-size: var(--h2-font-size);
+    flex: 1;
+    margin-left: auto;
+}
+.title-bar > .title-bar-spacer {
+    flex: 1;
+    margin-right: auto;
+}

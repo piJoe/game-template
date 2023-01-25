@@ -777,10 +777,11 @@
   var DOMScreen = class {
     constructor() {
       this.killWhenInactive = true;
+      this.additionalClasses = [];
     }
     setup() {
       this.domRef = document.createElement("div");
-      this.domRef.classList.add("screen");
+      this.domRef.classList.add("screen", ...this.additionalClasses);
       this.domRef.setAttribute("data-screen-active", "next");
     }
     render() {
@@ -974,6 +975,7 @@
     constructor() {
       super();
       this.killWhenInactive = false;
+      this.additionalClasses = ["lobby-screen"];
       this.currentLobbyStatus = null;
       this.lobbyId = "";
       this.selfReady = false;
@@ -987,9 +989,6 @@
       const copyIdButton = this.domRef.querySelector(
         "#copy-lobby-id"
       );
-      const toggleSettingsButton = this.domRef.querySelector(
-        "#toggle-lobby-settings"
-      );
       const settingsContainer = this.domRef.querySelector(
         ".settings-container"
       );
@@ -1001,7 +1000,7 @@
       );
       document.addEventListener("keydown", this.keydown.bind(this));
       document.addEventListener("keyup", this.keyup.bind(this));
-      const playerListDom = this.domRef.querySelector(".playerlist");
+      const playerListDom = this.domRef.querySelector(".lobby-playerlist");
       this.scoreboardDom = document.createElement("div");
       this.scoreboardDom.classList.add("playerlist", "playerlist-scoreboard");
       this.statusListener = socket.on(
@@ -1043,9 +1042,15 @@
         ({ playerlist }) => {
           this.playerlist = playerlist;
           playerListDom.innerHTML = [...this.playerlist].map(
-            (e) => `<li class="playerlist-entry">
-                ${e.name} <!-- (${e.score}) -->
-                ${e.ready ? `<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>` : `<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>`}
+            (e) => `<li class="list-row">
+                <div class="list-row-entry player-row-entry">
+                  <span class="player-name">${e.name}</span>
+                  ${e.ready ? `<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>` : `<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>`}
+                </div>
+                <div class="list-row-entry player-row-more">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" /></svg>
+                </div>
               </li>`
           ).join("");
           this.scoreboardDom.innerHTML = [...this.playerlist].sort((a, b) => b.score - a.score).map(
@@ -1054,6 +1059,10 @@
                 <div class="skewed-tag ${e.playerId === globalState.me.id ? "skewed-tag-primary" : ""} tag-score">${e.score}</div>
               </li>`
           ).join("");
+          const readyCount = this.playerlist.filter((e) => e.ready).length;
+          document.querySelector(
+            "#lobby-dd-ready"
+          ).innerHTML = `${readyCount}/${this.playerlist.length}`;
           const self2 = playerlist.find((e) => e.playerId === globalState.me.id);
           this.selfReady = self2 == null ? void 0 : self2.ready;
           this.updateReadyButton();
@@ -1063,6 +1072,7 @@
         "game.settings" /* GAME_SETTINGS */,
         ({ currentSettings, availableQuestions }) => {
           this.renderSettings(currentSettings, availableQuestions);
+          document.querySelector("#lobby-dd-question-amount").innerHTML = `${currentSettings["questionCount" /* QUESTION_COUNT */]}`;
         }
       );
       this.questionListener = socket.on(
@@ -1109,9 +1119,24 @@
         e.preventDefault();
         navigator.clipboard.writeText(this.lobbyId);
       });
-      toggleSettingsButton.addEventListener("click", (e) => {
+      const tabs = this.domRef.querySelectorAll(".content-wrapper[data-tab]");
+      const tabMenu = this.domRef.querySelector(".tab-menu");
+      tabMenu.addEventListener("click", (e) => {
         e.preventDefault();
-        settingsContainer.classList.toggle("settings-container--visible");
+        const domElem = e.target;
+        const targetTab = domElem.getAttribute("data-target-tab");
+        console.log(domElem, targetTab);
+        if (!targetTab) {
+          return;
+        }
+        tabMenu.querySelector("[data-active=true]").removeAttribute("data-active");
+        domElem.setAttribute("data-active", "true");
+        tabs.forEach((t) => {
+          t.setAttribute("data-inactive", "true");
+          if (t.getAttribute("data-tab") === targetTab) {
+            t.removeAttribute("data-inactive");
+          }
+        });
       });
       backToJoinButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -1209,17 +1234,21 @@
     }
     template() {
       return `
-    <h1 class="title-h1">LOBBY</h1>
-    <section class="lobby-wrapper">
-      <div class="multiple-container-wrapper">
-        <div class="container settings-container">
-          <div class="title-h2">SETTINGS</div>
-          <form class="lobby-settings"></form>
-        </div>
+    <div class="title-bar">
+      <h1 class="title-h1">LOBBY</h1>
+      <div class="tab-menu">
+        <div class="tab-menu-entry" data-active="true" data-target-tab="overview">Overview</div>
+        <div class="tab-menu-entry" data-target-tab="settings">Settings</div>
+      </div>
+      <div class="title-bar-spacer"></div>
+    </div>
 
-        <div class="container lobby-container">
+    <section class="content-wrapper" data-tab="overview">
+      <div class="multiple-container-wrapper">
+
+        <div class="container container-translucent container-sticky lobby-container">
           <div class="title-h3 lobby-title">
-            Lobby Code: <br>
+            Lobby Code<br>
             <span class="title-h2">
             <span id="lobby-id">${this.lobbyId}</span>&nbsp;
               <a id="copy-lobby-id" title="Copy Lobby ID" class="button button-outline button-icon-inline" style="vertical-align: middle; margin-top: -8px">
@@ -1229,20 +1258,35 @@
               </a>
             </span>
           </div>
-          <ul class="playerlist"></ul>
+
+          <dl>
+            <dt>Player Ready</dt>
+            <dd id="lobby-dd-ready">0/0</dd>
+
+            <dt>No. of Questions</dt>
+            <dd id="lobby-dd-question-amount">20</dd>
+
+            <dt>Host</dt>
+            <dd id="lobby-dd-host">-/-</dd>
+          </dl>
         </div>
-      </div>
-      <div class="lobby-action">
-        <a id="toggle-lobby-settings" class="button button-outline button-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22.77 19.32L21.7 18.5C21.72 18.33 21.74 18.17 21.74 18S21.73 17.67 21.7 17.5L22.76 16.68C22.85 16.6 22.88 16.47 22.82 16.36L21.82 14.63C21.76 14.5 21.63 14.5 21.5 14.5L20.27 15C20 14.82 19.73 14.65 19.42 14.53L19.23 13.21C19.22 13.09 19.11 13 19 13H17C16.87 13 16.76 13.09 16.74 13.21L16.55 14.53C16.25 14.66 15.96 14.82 15.7 15L14.46 14.5C14.35 14.5 14.22 14.5 14.15 14.63L13.15 16.36C13.09 16.47 13.11 16.6 13.21 16.68L14.27 17.5C14.25 17.67 14.24 17.83 14.24 18S14.25 18.33 14.27 18.5L13.21 19.32C13.12 19.4 13.09 19.53 13.15 19.64L14.15 21.37C14.21 21.5 14.34 21.5 14.46 21.5L15.7 21C15.96 21.18 16.24 21.35 16.55 21.47L16.74 22.79C16.76 22.91 16.86 23 17 23H19C19.11 23 19.22 22.91 19.24 22.79L19.43 21.47C19.73 21.34 20 21.18 20.27 21L21.5 21.5C21.63 21.5 21.76 21.5 21.83 21.37L22.83 19.64C22.89 19.53 22.86 19.4 22.77 19.32M18 19.5C17.16 19.5 16.5 18.83 16.5 18S17.17 16.5 18 16.5 19.5 17.17 19.5 18 18.83 19.5 18 19.5M3 3C2.78 3 2.57 3.08 2.38 3.22C1.95 3.56 1.87 4.19 2.21 4.62L7.97 12H8V17.87C7.96 18.16 8.06 18.47 8.29 18.7L10.3 20.71C10.65 21.06 11.19 21.08 11.58 20.8C11.2 19.91 11 18.96 11 18C11 16.73 11.35 15.5 12 14.4V12H12.03L17.79 4.62C18.13 4.19 18.05 3.56 17.62 3.22C17.43 3.08 17.22 3 17 3H3Z" />
-          </svg>
-        </a>
-        <input type="button" class="button button-primary" id="lobby-ready" value="Ready!" disabled=true>
+
+        <ul class="list lobby-playerlist">
+        </ul>
+
       </div>
     </section>
+
+    <section class="content-wrapper" data-tab="settings" data-inactive="true">
+      <div class="container settings-container">
+        <div class="title-h2">SETTINGS</div>
+        <form class="lobby-settings"></form>
+      </div>
+    </section>
+
     <div class="bottom-container">
-      <input type="button" id="lobby-back-button" class="button button-outline" value="Back">
+      <input type="button" id="lobby-back-button" class="button button-outline" value="Leave">
+      <input type="button" class="button button-primary" id="lobby-ready" value="Ready!" disabled=true>
     </div>`;
     }
     keydown(event) {
@@ -1384,7 +1428,7 @@
     }
     template() {
       return `
-    <h1 class="title-h1">Login</h1>
+    <h1 class="title-h1">otakuquiz.lol</h1>
     <div class="container">
       <div class="title-h2">Choose your username</div>
       <form class="combined-form" name="login">

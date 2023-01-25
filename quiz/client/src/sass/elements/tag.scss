@@ -1,0 +1,46 @@
+.skewed-tag {
+    display: inline-block;
+    position: relative;
+    padding: 4px 16px;
+    color: var(--color-black);
+    font-size: var(--small-font-size);
+    font-weight: 700;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    z-index: 0;
+}
+.skewed-tag:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--color-white);
+    border-radius: var(--border-radius-small);
+    transform: skewX(-7.5deg);
+    will-change: transform;
+    z-index: -1;
+}
+
+.skewed-tag.skewed-tag-big {
+    font-size: var(--base-font-size);
+    font-weight: 800;
+}
+
+.skewed-tag.skewed-tag-primary:before {
+    background: var(--color-primary);
+}
+
+.skewed-tag.skewed-tag-error {
+    color: var(--color-white);
+}
+.skewed-tag.skewed-tag-error:before {
+    background: var(--color-error);
+}
+
+.skewed-tag.tag-ready {
+    width: 120px;
+}

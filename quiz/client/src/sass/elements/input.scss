@@ -1,0 +1,31 @@
+input[type="text"],
+input[type="number"] {
+    appearance: none;
+    outline: none;
+    font-family: "Fira Sans", sans-serif;
+    font-weight: 800;
+    font-size: var(--base-font-size);
+    background: var(--color-white);
+    border: none;
+    border-radius: var(--border-radius-medium);
+    color: var(--color-black);
+    padding: 10px 16px;
+    text-transform: uppercase;
+    min-width: 0;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    outline: none;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    background: transparent;
+    border: var(--border-width-small) solid var(--color-white-translucent);
+    border-radius: var(--border-radius-medium);
+    box-sizing: border-box;
+}
+input[type="checkbox"]:checked {
+    background: var(--color-primary);
+    border: none;
+}

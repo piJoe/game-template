@@ -1,0 +1,129 @@
+.question-wrapper {
+    margin: auto;
+    max-width: 860px;
+}
+
+.container.question-container {
+    max-width: 860px;
+    width: 860px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.question-image-container {
+    overflow: hidden;
+    border-radius: var(--border-radius-medium);
+    margin: 12px 0 24px;
+    height: 300px;
+    /* background: var(--color-black); */
+}
+
+.question-image {
+    height: 300px;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    transform: scale(1);
+    opacity: 1;
+}
+.question-image[data-blurred="true"] {
+    /* filter: blur(100px); */
+    visibility: hidden;
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+.question-title {
+    margin-bottom: 16px;
+}
+
+.tag-question-number {
+    position: absolute;
+    top: -20px;
+}
+
+.question-timer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 16px;
+    background: var(--color-white);
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    list-style: none;
+    list-style-type: none;
+    margin: 24px 0 0 0;
+    padding: 0;
+    gap: 16px;
+}
+
+.answers > li {
+    display: flex;
+    position: relative;
+    align-items: center;
+    font-family: "Fira Sans", sans-serif;
+    font-weight: 800;
+    font-size: var(--base-font-size);
+    background: none;
+    border-radius: var(--border-radius-medium);
+    color: var(--color-white);
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 32px;
+    border: var(--border-width-medium) solid var(--color-white-translucent);
+}
+
+.answers > li[data-answer-selected="true"] {
+    border: none;
+    padding: 36px;
+    background: var(--color-white);
+    color: var(--color-black);
+}
+
+.answers > li[data-answer-correct="true"] {
+    border: none;
+    padding: 36px;
+    background: var(--color-primary);
+    color: var(--color-black);
+}
+
+.answers > li[data-answer-correct="false"] {
+    border: none;
+    padding: 36px;
+    background: var(--color-error);
+    color: var(--color-white);
+}
+
+.answer-others-container {
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0 16px;
+}
+
+.skewed-tag.answer-others {
+    max-width: 4rem;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+}
+
+.answer-others > span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

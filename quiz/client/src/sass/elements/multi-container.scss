@@ -1,0 +1,10 @@
+.multiple-container-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+.multiple-container-wrapper > .container,
+.multiple-container-wrapper > .list-container {
+    margin: 0;
+}

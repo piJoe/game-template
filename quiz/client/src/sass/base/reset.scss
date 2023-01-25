@@ -1,0 +1,49 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    user-select: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-size: var(--base-font-size);
+    font-family: "Fira Sans", sans-serif;
+    font-weight: 800;
+    background: var(--color-black);
+    color: var(--color-white);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+}
+
+dl {
+    margin: 0;
+    padding: 0;
+}
+
+dt {
+    text-transform: uppercase;
+    font-size: var(--small-font-size);
+    margin-top: 16px;
+}
+
+dd {
+    margin: 0;
+    padding: 0;
+}
+
+dt:first-child {
+    margin: 0;
+}

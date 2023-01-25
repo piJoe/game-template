@@ -1,0 +1,31 @@
+.list {
+    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    flex: 1;
+    gap: 8px;
+}
+
+.list .list-row {
+    display: flex;
+    gap: 8px;
+}
+
+.list-row-entry {
+    text-transform: uppercase;
+    text-align: left;
+    background: var(--color-black-translucent);
+    color: var(--color-white);
+    padding: 18px 32px;
+    flex: 1 1 auto;
+}
+
+.list-entry-label {
+    margin-right: auto;
+}

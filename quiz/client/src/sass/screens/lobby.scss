@@ -1,0 +1,119 @@
+.lobby-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.lobby-container > .lobby-title {
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    font-size: var(--base-font-size);
+    font-style: italic;
+    text-align: center;
+}
+
+.lobby-screen {
+    background: var(--gradient-blue-purple);
+}
+
+.list.lobby-playerlist {
+    max-width: 600px;
+    margin: auto 0;
+
+    .player-row-entry {
+        display: flex;
+        justify-content: center;
+    }
+    .player-name {
+        margin-right: auto;
+    }
+    .player-row-more {
+        flex: 0 1 64px;
+        width: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+
+        > svg {
+            width: 28px;
+            height: 28px;
+        }
+    }
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+}
+
+.lobby-settings {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.lobby-settings-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+.lobby-settings-column {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    flex: 0 0 50%;
+}
+.lobby-settings-actions {
+    margin: auto;
+}
+
+.game-setting-entry {
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+
+.game-setting-title {
+    margin-bottom: 16px;
+}
+.game-setting-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.game-setting-list::-webkit-scrollbar {
+    background: var(--color-black);
+    border-radius: var(--border-radius-medium);
+    width: 8px;
+}
+.game-setting-list::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: var(--border-radius-medium);
+}
+
+.game-setting-list > .game-setting-title {
+    margin-bottom: 8px;
+}
+.game-setting-list-option {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    cursor: pointer;
+    text-transform: none;
+    font-weight: 600;
+}
+.game-setting-list-option > input {
+    margin-right: 12px;
+}
+
+.game-setting-double {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+}
+.game-setting-double > input {
+    flex: 1 1 auto;
+}

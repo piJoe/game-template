@@ -1,0 +1,80 @@
+.button {
+    appearance: none;
+    outline: none;
+    display: inline-block;
+    font-family: "Fira Sans", sans-serif;
+    font-weight: 800;
+    font-size: var(--base-font-size);
+    background: none;
+    padding: 16px 36px;
+    border-radius: var(--border-radius-medium);
+    color: var(--color-white);
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.button:hover {
+    box-shadow: var(--hover-dark);
+}
+
+.button.button-outline {
+    padding: 12px 32px;
+    border: var(--border-width-small) solid var(--color-white-translucent);
+}
+.button.button-outline:hover {
+    padding: 12px 32px;
+    border: var(--border-width-small) solid var(--color-white);
+}
+.button.button-outline[data-active="true"] {
+    padding: 14px 34px;
+    border: none;
+}
+
+.button.button-primary {
+    border: none;
+    background: var(--color-primary);
+    color: var(--color-black);
+}
+.button.button-primary:hover {
+    box-shadow: var(--hover);
+}
+
+.button.button-error {
+    border: none;
+    background: var(--color-error);
+}
+.button.button-error:hover {
+    box-shadow: var(--hover-dark);
+}
+
+.button.button-icon {
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 59px;
+}
+
+.button.button-icon:hover {
+    padding: 0;
+}
+
+.button.button-icon-inline {
+    padding: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.button.button-icon-inline:hover {
+    padding: 8px;
+}
+
+.button[data-active="true"] {
+    background: var(--color-white);
+    color: var(--color-black);
+}
+.button:disabled {
+    background: var(--color-disabled);
+}
+.button:disabled:hover {
+    box-shadow: none;
+}

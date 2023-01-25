@@ -5,11 +5,12 @@ let activeScreen: DOMScreen = null;
 export abstract class DOMScreen {
   protected domRef: HTMLElement;
   protected killWhenInactive: boolean = true;
+  protected additionalClasses: string[] = [];
   constructor() {}
 
   private setup() {
     this.domRef = document.createElement("div");
-    this.domRef.classList.add("screen");
+    this.domRef.classList.add("screen", ...this.additionalClasses);
     this.domRef.setAttribute("data-screen-active", "next");
   }
   abstract init();

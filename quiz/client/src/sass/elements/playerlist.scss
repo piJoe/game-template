@@ -1,0 +1,27 @@
+.playerlist {
+    list-style: none;
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0;
+    min-width: 250px;
+}
+.playerlist-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    text-align: left;
+    margin-bottom: 12px;
+}
+.playerlist-entry .skewed-tag.tag-ready {
+    width: 120px;
+    margin-left: 12px;
+}
+
+.playerlist.playerlist-scoreboard {
+    min-width: 0;
+}
+.playerlist-entry .skewed-tag.tag-score {
+    width: 4rem;
+    margin-left: 16px;
+}

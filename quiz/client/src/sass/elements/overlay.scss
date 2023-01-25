@@ -1,0 +1,43 @@
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-black-translucent);
+    will-change: transform;
+    /* opacity: 0; */
+    display: none;
+}
+.overlay-container[data-active="true"] {
+    display: flex;
+    animation: fade-in-blur 0.2s ease forwards;
+}
+
+@keyframes fade-in-blur {
+    0% {
+        backdrop-filter: blur(0);
+        /* opacity: 0; */
+    }
+
+    100% {
+        backdrop-filter: blur(10px);
+        /* opacity: 1; */
+    }
+}
+
+@keyframes fade-in-from-below {
+    0% {
+        transform: translateY(10%) scale(0.925);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}

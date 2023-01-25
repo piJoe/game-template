@@ -1,0 +1,29 @@
+.container {
+    background: var(--gradient-blue-purple);
+    padding: 36px 48px;
+    border: var(--border-width-large) solid var(--color-white);
+    border-radius: var(--border-radius-large);
+    margin: auto;
+    max-width: 600px;
+    will-change: transform;
+    text-align: center;
+}
+.container.container-fadein {
+    opacity: 0;
+    animation: fade-in-from-below 0.25s 0.1s ease forwards;
+}
+.container.container-translucent {
+    border: none;
+    border-radius: 0;
+    background: var(--color-black-translucent);
+}
+
+.container.container-sticky {
+    align-self: flex-start;
+    position: sticky;
+    top: 0;
+}
+
+.container > .title-h2 {
+    margin-bottom: 40px;
+}

@@ -41,7 +41,7 @@ export class LoginScreen extends DOMScreen {
 
   template() {
     return `
-    <h1 class="title-h1">Login</h1>
+    <h1 class="title-h1">otakuquiz.lol</h1>
     <div class="container">
       <div class="title-h2">Choose your username</div>
       <form class="combined-form" name="login">

@@ -1,0 +1,36 @@
+:root {
+    /* colors */
+    --color-primary: rgba(236, 192, 60, 1);
+    --color-secondary: rgba(76, 16, 91, 1);
+    --color-error: rgba(126, 7, 21, 1);
+    --color-black: #181818;
+    --color-white: #e6e6e6;
+    --color-dark-blue: #0e1339;
+    --color-dark-purple: #2c0f34;
+    --color-disabled: #4d4d4d;
+    --color-white-translucent: rgba(230, 230, 230, 0.8);
+    --color-black-translucent: rgba(24, 24, 24, 0.8);
+
+    /* gradients */
+    --gradient-blue-purple: linear-gradient(180deg, var(--color-dark-blue) 0%, var(--color-dark-purple) 100%);
+
+    /* borders */
+    --border-radius-large: 10px;
+    --border-radius-medium: 5px;
+    --border-radius-small: 3px;
+
+    --border-width-large: 6px;
+    --border-width-medium: 4px;
+    --border-width-small: 2px;
+
+    /* font */
+    --base-font-size: 22px;
+    --small-font-size: 14px;
+    --h1-font-size: 82px;
+    --h2-font-size: 48px;
+    --h3-font-size: 36px;
+
+    /* todo: move hover fx into classes */
+    --hover: inset 0px -10px 20px rgba(255, 255, 255, 0.6);
+    --hover-dark: inset 0px -10px 20px rgba(255, 255, 255, 0.25);
+}
