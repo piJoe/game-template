@@ -32,6 +32,7 @@
 
 .list-row-entry {
     background: var(--color-black-translucent);
+    border-radius: var(--border-radius-medium);
     &.setting-row-entry {
         display: flex;
         align-items: center;

@@ -14,7 +14,7 @@
 }
 .container.container-translucent {
     border: none;
-    border-radius: 0;
+    border-radius: var(--border-radius-medium);
     background: var(--color-black-translucent);
 }
 
