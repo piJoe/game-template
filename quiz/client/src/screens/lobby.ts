@@ -37,6 +37,7 @@ export class LobbyScreen extends DOMScreen {
   private lobbyId = "";
   private readyButton: HTMLInputElement;
   private lobbySettingsDom: HTMLElement;
+  private settingsSubmitButton: HTMLInputElement;
   private selfReady = false;
   private playerlist: PlayerListEntry[] = [];
   private questions = new Map<number, QuestionScreen>();
@@ -54,10 +55,7 @@ export class LobbyScreen extends DOMScreen {
       "#copy-lobby-id"
     ) as HTMLInputElement;
 
-    const settingsContainer = this.domRef.querySelector(
-      ".settings-container"
-    ) as HTMLElement;
-    this.lobbySettingsDom = settingsContainer.querySelector(
+    this.lobbySettingsDom = this.domRef.querySelector(
       ".lobby-settings"
     ) as HTMLFormElement;
 
@@ -239,7 +237,7 @@ export class LobbyScreen extends DOMScreen {
       e.preventDefault();
       navigator.clipboard.writeText(this.lobbyId);
     });
-    const tabs = this.domRef.querySelectorAll(".content-wrapper[data-tab]");
+    const tabs = this.domRef.querySelectorAll("[data-tab]");
     const tabMenu = this.domRef.querySelector(".tab-menu");
     tabMenu.addEventListener("click", (e) => {
       e.preventDefault();
@@ -273,52 +271,16 @@ export class LobbyScreen extends DOMScreen {
 
     this.lobbySettingsDom.addEventListener("submit", (e) => {
       e.preventDefault();
-      socket.sendMsg(ClientPacketType.GAME_SETTINGS, {
-        settings: {
-          [GAME_SETTING.QUESTION_COUNT]: parseInt(
-            (
-              this.lobbySettingsDom.querySelector(
-                `[name="${GAME_SETTING.QUESTION_COUNT}"]`
-              ) as HTMLInputElement
-            ).value
-          ),
-
-          [GAME_SETTING.ACTIVE_QUESTIONS]: Array.from(
-            this.lobbySettingsDom.querySelectorAll(
-              `[name="${GAME_SETTING.ACTIVE_QUESTIONS}"]:checked`
-            )
-          ).map((e: HTMLInputElement) => e.value as GAME_AVAILABLE_QUESTION_ID),
-
-          [GAME_SETTING.MAIN_ROLE_ONLY]: (
-            this.lobbySettingsDom.querySelector(
-              `[name="${GAME_SETTING.MAIN_ROLE_ONLY}"]`
-            ) as HTMLInputElement
-          ).checked,
-
-          [GAME_SETTING.MIN_POPULARITY]: parseInt(
-            (
-              this.lobbySettingsDom.querySelector(
-                `[name="${GAME_SETTING.MIN_POPULARITY}"]`
-              ) as HTMLInputElement
-            ).value
-          ),
-
-          [GAME_SETTING.MAX_POPULARITY]: parseInt(
-            (
-              this.lobbySettingsDom.querySelector(
-                `[name="${GAME_SETTING.MAX_POPULARITY}"]`
-              ) as HTMLInputElement
-            ).value
-          ),
-        },
-      });
+      this.submitSettings();
     });
 
+    this.settingsSubmitButton = this.domRef.querySelector(
+      ".button[name=update-settings]"
+    );
     this.lobbySettingsDom.addEventListener("input", (e) => {
       e.preventDefault();
-      this.lobbySettingsDom
-        .querySelector(".button[name=update-settings]")
-        .setAttribute("data-active", "true");
+
+      this.settingsSubmitButton.setAttribute("data-active", "true");
     });
   }
 
@@ -326,69 +288,139 @@ export class LobbyScreen extends DOMScreen {
     settings: GameSettings,
     availableQuestions: GAME_AVAILABLE_QUESTION_ID[]
   ) {
-    this.lobbySettingsDom.innerHTML = `
-    <div class="lobby-settings-wrapper">
-      <div class="lobby-settings-column">
-          <div class="game-setting-entry">
-            <label class="game-setting-title">No. of Questions:</label> 
-            <input type="number" name="${
-              GAME_SETTING.QUESTION_COUNT
-            }" autocomplete="off" min=3 max=50 required value="${
-      settings[GAME_SETTING.QUESTION_COUNT]
-    }">
+    const entries = [
+      {
+        label: "No. of Questions",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.QUESTION_COUNT],
+            name: GAME_SETTING.QUESTION_COUNT,
+            type: "number",
+            min: 3,
+            max: 50,
+          },
+        ],
+      },
+      {
+        label: "Popularity",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.MIN_POPULARITY],
+            name: GAME_SETTING.MIN_POPULARITY,
+            type: "number",
+            min: -1,
+            max: 10000,
+          },
+          {
+            value: settings[GAME_SETTING.MAX_POPULARITY],
+            name: GAME_SETTING.MAX_POPULARITY,
+            type: "number",
+            min: -1,
+            max: 10000,
+          },
+        ],
+      },
+      {
+        label: "Main Role Only",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.MAIN_ROLE_ONLY],
+            checked: settings[GAME_SETTING.MAIN_ROLE_ONLY],
+            name: GAME_SETTING.MAIN_ROLE_ONLY,
+            type: "checkbox",
+          },
+        ],
+      },
+    ];
+
+    const filterSettings = entries
+      .map((e) => {
+        return `<div class="list-row">
+          <div class="list-row-entry setting-row-entry">
+            <span class="setting-row-entry-label">${e.label}</span>
+            ${e.inputs
+              .map(
+                (i) =>
+                  `<input name="${i.name}" type="${i.type}" ${
+                    i.type !== "checkbox" ? 'style="width:6rem"' : ""
+                  } value="${i.value}" ${i.min ? `min="${i.min}"` : ""} ${
+                    i.max ? `max="${i.max}"` : ""
+                  } ${i.checked ? `checked` : ""}>`
+              )
+              .join(" - ")}
           </div>
+        </div>`;
+      })
+      .join("");
 
-          <div class="game-setting-entry">
-              <label class="game-setting-title">Popularity:</label> 
+    const questionSettings = availableQuestions
+      .map((qId) => {
+        return `<div class="list-row">
+          <div class="list-row-entry setting-row-entry">
+            <span class="setting-row-entry-label">${getQuestionNameById(
+              qId
+            )}</span>
+            <input type="checkbox" id="q_${qId}" name="${
+          GAME_SETTING.ACTIVE_QUESTIONS
+        }" value="${qId}" ${
+          settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
+            ? "checked"
+            : ""
+        }>
+          </div>
+        </div>`;
+      })
+      .join("");
 
-              <div class="game-setting-double">
-                <input type="number" name="${
-                  GAME_SETTING.MIN_POPULARITY
-                }" autocomplete="off" min=-1 max=10000 required value="${
-      settings[GAME_SETTING.MIN_POPULARITY]
-    }">
-              -
-                <input type="number" name="${
-                  GAME_SETTING.MAX_POPULARITY
-                }" autocomplete="off" min=-1 max=10000 required value="${
-      settings[GAME_SETTING.MAX_POPULARITY]
-    }">
-              </div>
-
-              <label class="game-setting-list-option" for="gs_mainOnly">
-                  <input type="checkbox" id="gs_mainOnly" name="${
-                    GAME_SETTING.MAIN_ROLE_ONLY
-                  }" ${
-      settings[GAME_SETTING.MAIN_ROLE_ONLY] ? "checked" : ""
-    }> Main characters only
-              </label>
-            </div>
-      </div>
-
-      <div class="lobby-settings-column">
-        <div class="game-setting-entry game-setting-list">
-          <label class="game-setting-title">Questions:</label> 
-          ${availableQuestions
-            .map((qId) => {
-              return `<label class="game-setting-list-option" for="q_${qId}">
-              <input type="checkbox" id="q_${qId}" name="${
-                GAME_SETTING.ACTIVE_QUESTIONS
-              }" value="${qId}" ${
-                settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
-                  ? "checked"
-                  : ""
-              }>
-              ${getQuestionNameById(qId)}
-            </label>`;
-            })
-            .join("")}
-        </div>
-      </div>  
-    </div>
+    this.lobbySettingsDom.innerHTML = `<div class="list-row list-row-header">Filters</div>
+    ${filterSettings}
     
-    <div class="lobby-settings-actions">
-      <input type="submit" class="button button-outline" name="update-settings" value="Save">
-    </div>`;
+    <div class="list-row list-row-header">Questions</div>
+    ${questionSettings}`;
+
+    this.settingsSubmitButton.removeAttribute("data-active");
+  }
+
+  submitSettings() {
+    socket.sendMsg(ClientPacketType.GAME_SETTINGS, {
+      settings: {
+        [GAME_SETTING.QUESTION_COUNT]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.QUESTION_COUNT}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
+
+        [GAME_SETTING.ACTIVE_QUESTIONS]: Array.from(
+          this.lobbySettingsDom.querySelectorAll(
+            `[name="${GAME_SETTING.ACTIVE_QUESTIONS}"]:checked`
+          )
+        ).map((e: HTMLInputElement) => e.value as GAME_AVAILABLE_QUESTION_ID),
+
+        [GAME_SETTING.MAIN_ROLE_ONLY]: (
+          this.lobbySettingsDom.querySelector(
+            `[name="${GAME_SETTING.MAIN_ROLE_ONLY}"]`
+          ) as HTMLInputElement
+        ).checked,
+
+        [GAME_SETTING.MIN_POPULARITY]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.MIN_POPULARITY}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
+
+        [GAME_SETTING.MAX_POPULARITY]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.MAX_POPULARITY}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
+      },
+    });
   }
 
   updateReadyButton() {
@@ -461,15 +493,18 @@ export class LobbyScreen extends DOMScreen {
     </section>
 
     <section class="content-wrapper" data-tab="settings" data-inactive="true">
-      <div class="container settings-container">
-        <div class="title-h2">SETTINGS</div>
-        <form class="lobby-settings"></form>
+      <div class="container-wrapper">
+        <form class="lobby-settings list" id="lobby-settings"></form>
       </div>
     </section>
 
-    <div class="bottom-container">
+    <div class="bottom-container" data-tab="overview">
       <input type="button" id="lobby-back-button" class="button button-outline" value="Leave">
-      <input type="button" class="button button-primary" id="lobby-ready" value="Ready!" disabled=true>
+      <input type="button" class="button button-primary" id="lobby-ready" value="Ready" disabled=true>
+    </div>
+
+    <div class="bottom-container" data-tab="settings" data-inactive="true">
+      <input type="submit" class="button button-outline" name="update-settings" form="lobby-settings" value="Save">
     </div>`;
   }
 

@@ -24,6 +24,7 @@ input[type="checkbox"] {
     border: var(--border-width-small) solid var(--color-white-translucent);
     border-radius: var(--border-radius-medium);
     box-sizing: border-box;
+    cursor: pointer;
 }
 input[type="checkbox"]:checked {
     background: var(--color-primary);

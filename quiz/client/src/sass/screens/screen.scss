@@ -51,7 +51,7 @@
     margin: 24px 0;
 }
 
-.screen .content-wrapper[data-inactive="true"] {
+.screen [data-inactive="true"] {
     display: none;
 }
 

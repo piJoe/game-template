@@ -17,13 +17,31 @@
     gap: 8px;
 }
 
+.list-row-header,
 .list-row-entry {
     text-transform: uppercase;
     text-align: left;
-    background: var(--color-black-translucent);
     color: var(--color-white);
     padding: 18px 32px;
     flex: 1 1 auto;
+}
+
+.list-row-header:not(:first-child) {
+    margin-top: 32px;
+}
+
+.list-row-entry {
+    background: var(--color-black-translucent);
+    &.setting-row-entry {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 64px;
+
+        .setting-row-entry-label {
+            margin-right: auto;
+        }
+    }
 }
 
 .list-entry-label {
