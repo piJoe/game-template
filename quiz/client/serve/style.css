@@ -82,6 +82,7 @@
   --color-disabled: #4d4d4d;
   --color-white-translucent: rgba(230, 230, 230, 0.8);
   --color-black-translucent: rgba(0, 0, 0, 0.8);
+  --color-black-more-translucent: rgba(0, 0, 0, 0.2);
   /* gradients */
   --gradient-blue-purple: linear-gradient(180deg, var(--color-dark-blue) 0%, var(--color-dark-purple) 100%);
   /* borders */
@@ -120,6 +121,8 @@ body {
   font-weight: 800;
   background: var(--color-black);
   color: var(--color-white);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-black-translucent) var(--color-black-more-translucent);
 }
 
 h1,
@@ -150,6 +153,16 @@ dd {
 
 dt:first-child {
   margin: 0;
+}
+
+::-webkit-scrollbar {
+  background: var(--color-black-more-translucent);
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-black-translucent);
 }
 
 .title-h1 {
@@ -617,7 +630,7 @@ input[type=checkbox]:checked {
 }
 
 .list-row-header:not(:first-child) {
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 .list-row-entry {
@@ -903,7 +916,6 @@ input[type=checkbox]:checked {
 
 .list.lobby-playerlist {
   max-width: 600px;
-  margin: auto 0;
   height: 100%;
   overflow-y: auto;
 }

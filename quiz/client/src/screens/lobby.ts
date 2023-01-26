@@ -342,7 +342,7 @@ export class LobbyScreen extends DOMScreen {
               .map(
                 (i) =>
                   `<input name="${i.name}" type="${i.type}" ${
-                    i.type !== "checkbox" ? 'style="width:6rem"' : ""
+                    i.type !== "checkbox" ? 'style="width:6rem" required' : ""
                   } value="${i.value}" ${i.min ? `min="${i.min}"` : ""} ${
                     i.max ? `max="${i.max}"` : ""
                   } ${i.checked ? `checked` : ""}>`

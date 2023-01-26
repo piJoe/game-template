@@ -16,6 +16,9 @@ body {
     font-weight: 800;
     background: var(--color-black);
     color: var(--color-white);
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-black-translucent) var(--color-black-more-translucent);
 }
 
 h1,
@@ -46,4 +49,14 @@ dd {
 
 dt:first-child {
     margin: 0;
+}
+
+::-webkit-scrollbar {
+    background: var(--color-black-more-translucent);
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-black-translucent);
 }
