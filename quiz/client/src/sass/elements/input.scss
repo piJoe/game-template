@@ -25,6 +25,20 @@ input[type="checkbox"] {
     border-radius: var(--border-radius-medium);
     box-sizing: border-box;
     cursor: pointer;
+    position: relative;
+
+    // little hack to expand clickable zone
+    &:before {
+        content: " ";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: -16px;
+        border-radius: 100%;
+        background: none;
+    }
 }
 input[type="checkbox"]:checked {
     background: var(--color-primary);

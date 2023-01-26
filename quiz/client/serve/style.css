@@ -300,6 +300,18 @@ input[type=checkbox] {
   border-radius: var(--border-radius-medium);
   box-sizing: border-box;
   cursor: pointer;
+  position: relative;
+}
+input[type=checkbox]:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: -16px;
+  border-radius: 100%;
+  background: none;
 }
 
 input[type=checkbox]:checked {
