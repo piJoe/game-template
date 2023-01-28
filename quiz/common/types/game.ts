@@ -27,6 +27,8 @@ export enum GAME_SETTING {
   MAIN_ROLE_ONLY = "mainRoleOnly",
   MIN_POPULARITY = "minPopularity",
   MAX_POPULARITY = "maxPopularity",
+  MIN_YEAR = "minYear",
+  MAX_YEAR = "maxYear",
 }
 
 export type GameSettings = {

@@ -3,7 +3,4 @@ export const globalState = {
     id: "",
     name: "",
   },
-  settings: {
-    volume: 0.5,
-  },
 };

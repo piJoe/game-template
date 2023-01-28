@@ -3,8 +3,22 @@
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b ||= {})
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
@@ -93,9 +107,6 @@
     me: {
       id: "",
       name: ""
-    },
-    settings: {
-      volume: 0.5
     }
   };
 
@@ -112,13 +123,13 @@
     }
   });
   function closeDialog(id, value) {
-    var _a;
+    var _a2;
     const d = openDialogs.get(id);
     if (d) {
       overlay.removeChild(d.dom);
     }
     openDialogs.delete(id);
-    if ((_a = d.options) == null ? void 0 : _a.callback) {
+    if ((_a2 = d.options) == null ? void 0 : _a2.callback) {
       d.options.callback(value);
     }
     if (openDialogs.size < 1) {
@@ -772,6 +783,42 @@
   var toPairs = createToPairs_default(keys_default);
   var toPairs_default = toPairs;
 
+  // quiz/client/src/globalSettings.ts
+  var defaultSettings = {
+    volume: 1
+  };
+  var _a;
+  var settings = __spreadValues(__spreadValues({}, defaultSettings), JSON.parse((_a = localStorage.getItem("settings")) != null ? _a : "{}"));
+  var globalSettings = new Proxy(settings, {
+    set(obj, prop, val) {
+      console.log("GLOBAL STATE CHANGED!");
+      obj[prop] = val;
+      localStorage.setItem("settings", JSON.stringify(obj));
+      document.dispatchEvent(
+        new CustomEvent("globalSettingsChanged", {
+          detail: obj
+        })
+      );
+      return true;
+    }
+  });
+  var settingsDOM = document.querySelector(".settings-overlay");
+  function renderGlobalSettings() {
+    const dropdown = settingsDOM.querySelector(".settings-dropdown");
+    dropdown.innerHTML = `
+  <div class="settings-dropdown-entry settings-dropdown-entry-inverted">
+    <svg class="settings-dropdown-entry-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5,9V15H9L14,20V4L9,9M18.5,12C18.5,10.23 17.5,8.71 16,7.97V16C17.5,15.29 18.5,13.76 18.5,12Z" /></svg>
+    <input type="range" id="setting-audio-volume" min="1" max="100" value="${globalSettings.volume * 100}">
+  </div>`;
+    settingsDOM.querySelector("#setting-audio-volume").addEventListener("input", (e) => {
+      globalSettings.volume = parseInt(e.target.value) / 100;
+    });
+    settingsDOM.querySelector(".settings-button").addEventListener("click", (e) => {
+      dropdown.toggleAttribute("data-active");
+    });
+  }
+  renderGlobalSettings();
+
   // quiz/client/src/screens/screen.ts
   var activeScreen = null;
   var DOMScreen = class {
@@ -868,14 +915,9 @@
         this.audio = new Audio(this.question.question.audioUrl);
         this.audio.preload = "auto";
         this.audio.autoplay = false;
-        this.audio.volume = globalState.settings.volume;
-        const slider = this.domRef.querySelector(
-          "#audio-volume"
-        );
-        slider.addEventListener("input", (e) => {
-          const val = parseInt(slider.value) / 100;
-          globalState.settings.volume = val;
-          this.audio.volume = globalState.settings.volume;
+        this.audio.volume = globalSettings.volume;
+        document.addEventListener("globalSettingsChanged", (e) => {
+          this.audio.volume = e.detail.volume;
         });
       }
       this.timerDOM = this.domRef.querySelector(".question-timer");
@@ -955,7 +997,6 @@
             <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
             </div>` : ""}
         <div class="question-title title-h3">${(0, import_escape_html.default)(question.title)}</div>
-        ${hasAudio ? `<div class="question-audio-slider"><input type="range" min="1" max="100" value="${globalState.settings.volume * 100}" id="audio-volume"> </div>` : ""}
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
@@ -1037,7 +1078,7 @@
       this.playerlistListener = socket.on(
         "game.playerlist" /* GAME_PLAYERLIST */,
         ({ playerlist, host }) => {
-          var _a;
+          var _a2;
           this.playerlist = playerlist;
           this.lobbyHost = this.playerlist.find((e) => e.playerId === host);
           const dummyFiller = new Array(
@@ -1075,7 +1116,7 @@
           document.querySelector(
             "#lobby-dd-ready"
           ).innerHTML = `${readyCount}/${this.playerlist.length}`;
-          document.querySelector("#lobby-dd-host").innerHTML = (_a = this.lobbyHost) == null ? void 0 : _a.name;
+          document.querySelector("#lobby-dd-host").innerHTML = (_a2 = this.lobbyHost) == null ? void 0 : _a2.name;
           const self2 = playerlist.find((e) => e.playerId === globalState.me.id);
           this.selfReady = self2 == null ? void 0 : self2.ready;
           this.updateReadyButton();
@@ -1172,13 +1213,13 @@
         this.settingsSubmitButton.setAttribute("data-active", "true");
       });
     }
-    renderSettings(settings, availableQuestions) {
+    renderSettings(settings2, availableQuestions) {
       const entries = [
         {
           label: "No. of Questions",
           inputs: [
             {
-              value: settings["questionCount" /* QUESTION_COUNT */],
+              value: settings2["questionCount" /* QUESTION_COUNT */],
               name: "questionCount" /* QUESTION_COUNT */,
               type: "number",
               min: 3,
@@ -1190,14 +1231,14 @@
           label: "Popularity",
           inputs: [
             {
-              value: settings["minPopularity" /* MIN_POPULARITY */],
+              value: settings2["minPopularity" /* MIN_POPULARITY */],
               name: "minPopularity" /* MIN_POPULARITY */,
               type: "number",
               min: -1,
               max: 1e4
             },
             {
-              value: settings["maxPopularity" /* MAX_POPULARITY */],
+              value: settings2["maxPopularity" /* MAX_POPULARITY */],
               name: "maxPopularity" /* MAX_POPULARITY */,
               type: "number",
               min: -1,
@@ -1209,8 +1250,8 @@
           label: "Main Role Only",
           inputs: [
             {
-              value: settings["mainRoleOnly" /* MAIN_ROLE_ONLY */],
-              checked: settings["mainRoleOnly" /* MAIN_ROLE_ONLY */],
+              value: settings2["mainRoleOnly" /* MAIN_ROLE_ONLY */],
+              checked: settings2["mainRoleOnly" /* MAIN_ROLE_ONLY */],
               name: "mainRoleOnly" /* MAIN_ROLE_ONLY */,
               type: "checkbox"
             }
@@ -1241,7 +1282,7 @@
             <input type="checkbox" id="q_${qId}" 
             name="${"activeQuestions" /* ACTIVE_QUESTIONS */}" 
             value="${qId}" 
-            ${settings["activeQuestions" /* ACTIVE_QUESTIONS */].some((q) => qId === q) ? "checked" : ""}>
+            ${settings2["activeQuestions" /* ACTIVE_QUESTIONS */].some((q) => qId === q) ? "checked" : ""}>
           </div>
         </div>`;
       }).join("");

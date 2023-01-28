@@ -669,6 +669,64 @@ input[type=checkbox]:disabled {
   margin-right: auto;
 }
 
+.settings-overlay {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.settings-button {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  pointer-events: all;
+  cursor: pointer;
+}
+.settings-button:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: -8px;
+  border-radius: 100%;
+  background: none;
+}
+
+.settings-dropdown {
+  display: none;
+  border: var(--border-width-small) solid var(--color-white);
+  border-radius: var(--border-radius-medium);
+  pointer-events: all;
+  margin-top: 8px;
+}
+
+.settings-dropdown[data-active] {
+  display: block;
+}
+
+.settings-dropdown-entry {
+  padding: 8px;
+  display: flex;
+}
+
+.settings-dropdown-entry:hover,
+.settings-dropdown-entry.settings-dropdown-entry-inverted {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+.settings-dropdown-entry-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
 .screen-container {
   width: 100vw;
   height: 100vh;

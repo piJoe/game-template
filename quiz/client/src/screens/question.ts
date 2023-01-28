@@ -2,7 +2,7 @@ import escapeHTML from "escape-html";
 import { toPairs } from "lodash-es";
 import { ClientPacketType } from "../../../common/types/packets";
 import { ClientQuestion } from "../../../common/types/question";
-import { globalState } from "../globalstate";
+import { globalSettings } from "../globalSettings";
 import { socket } from "../websocket";
 import { LobbyScreen } from "./lobby";
 import { DOMScreen } from "./screen";
@@ -54,15 +54,10 @@ export class QuestionScreen extends DOMScreen {
       this.audio = new Audio(this.question.question.audioUrl);
       this.audio.preload = "auto";
       this.audio.autoplay = false;
-      this.audio.volume = globalState.settings.volume;
+      this.audio.volume = globalSettings.volume;
 
-      const slider = this.domRef.querySelector(
-        "#audio-volume"
-      ) as HTMLInputElement;
-      slider.addEventListener("input", (e) => {
-        const val = parseInt(slider.value) / 100;
-        globalState.settings.volume = val;
-        this.audio.volume = globalState.settings.volume;
+      document.addEventListener("globalSettingsChanged", (e: CustomEvent) => {
+        this.audio.volume = e.detail.volume;
       });
     }
 
@@ -187,13 +182,6 @@ export class QuestionScreen extends DOMScreen {
             : ""
         }
         <div class="question-title title-h3">${escapeHTML(question.title)}</div>
-        ${
-          hasAudio
-            ? `<div class="question-audio-slider"><input type="range" min="1" max="100" value="${
-                globalState.settings.volume * 100
-              }" id="audio-volume"> </div>`
-            : ""
-        }
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
