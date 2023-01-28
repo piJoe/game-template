@@ -7,6 +7,8 @@ export interface AnimeOptions {
   excludeAnimes?: number[];
   maxPopularity?: number;
   minPopularity?: number;
+  minYear?: number;
+  maxYear?: number;
 }
 
 export interface DBAnime {
@@ -86,6 +88,15 @@ export async function getRandomAnimesWithCharacters(
     query += ` AND animes.popularity >= ?`;
     queryParams.push(options.minPopularity);
   }
+  if (options.minYear) {
+    query += ` AND animes.year >= ?`;
+    queryParams.push(options.minYear);
+  }
+  if (options.maxYear) {
+    query += ` AND animes.year <= ?`;
+    queryParams.push(options.maxYear);
+  }
+
   // group by animes.id, preventing doubles
   query += ` GROUP BY animes.id`;
 
@@ -142,6 +153,14 @@ export async function getRandomAnimesWithGenres(
     wheres.push(`animes.popularity >= ?`);
     queryParams.push(options.minPopularity);
   }
+  if (options.minYear) {
+    wheres.push(`animes.year >= ?`);
+    queryParams.push(options.minYear);
+  }
+  if (options.maxYear) {
+    wheres.push(`animes.year <= ?`);
+    queryParams.push(options.maxYear);
+  }
 
   if (wheres.length > 0) {
     query += " WHERE " + wheres.join(" AND ");
@@ -194,6 +213,14 @@ export async function getRandomAnimesWithStudio(
   if (options.minPopularity) {
     wheres.push(`animes.popularity >= ?`);
     queryParams.push(options.minPopularity);
+  }
+  if (options.minYear) {
+    wheres.push(`animes.year >= ?`);
+    queryParams.push(options.minYear);
+  }
+  if (options.maxYear) {
+    wheres.push(`animes.year <= ?`);
+    queryParams.push(options.maxYear);
   }
 
   if (wheres.length > 0) {
@@ -257,6 +284,14 @@ export async function getRandomAnimesWithOpenings(
   if (options.minPopularity) {
     wheres.push(`animes.popularity >= ?`);
     queryParams.push(options.minPopularity);
+  }
+  if (options.minYear) {
+    wheres.push(`animes.year >= ?`);
+    queryParams.push(options.minYear);
+  }
+  if (options.maxYear) {
+    wheres.push(`animes.year <= ?`);
+    queryParams.push(options.maxYear);
   }
 
   if (wheres.length > 0) {

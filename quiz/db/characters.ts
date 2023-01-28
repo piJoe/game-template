@@ -7,6 +7,8 @@ export interface CharacterOptions {
   mainRoleOnly?: boolean;
   maxPopularity?: number;
   minPopularity?: number;
+  minYear?: number;
+  maxYear?: number;
 }
 
 export interface DBCharacter {
@@ -65,6 +67,14 @@ export async function getRandomCharacters(
   if (options.minPopularity) {
     query += ` AND animes.popularity >= ?`;
     queryParams.push(options.minPopularity);
+  }
+  if (options.minYear) {
+    query += ` AND animes.year >= ?`;
+    queryParams.push(options.minYear);
+  }
+  if (options.maxYear) {
+    query += ` AND animes.year <= ?`;
+    queryParams.push(options.maxYear);
   }
   // group by char.id, preventing doubles
   query += ` GROUP BY characters.id`;

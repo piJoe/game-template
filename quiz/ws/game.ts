@@ -48,30 +48,39 @@ export class Game {
         this.settings?.minPopularity > -1
           ? this.settings?.minPopularity
           : undefined,
+      minYear: this.settings?.minYear > -1 ? this.settings?.minYear : undefined,
+      maxYear: this.settings?.maxYear > -1 ? this.settings?.maxYear : undefined,
     };
 
     const questionCounts = distributeNumbers(
       this.settings.questionCount,
       this.settings.activeQuestions.length
     );
-    const questionPromises = this.settings.activeQuestions.map((id, i) => {
-      switch (id) {
-        case GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR:
-          return QuestionAnimeFromCharacter.create(questionCounts[i], options);
-        case GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE:
-          return QuestionAnimeGenre.create(questionCounts[i], options);
-        case GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO:
-          return QuestionAnimeStudio.create(questionCounts[i], options);
-        case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
-          return QuestionCharByPicture.create(questionCounts[i], options);
-        case GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING:
-          return QuestionAnimeOpening.create(questionCounts[i], options);
-        default:
-          throw new Error("No handler for Question " + id);
+    const questionPromises = shuffle(this.settings.activeQuestions).map(
+      (id, i) => {
+        switch (id) {
+          case GAME_AVAILABLE_QUESTION_ID.ANIME_FROM_CHAR:
+            return QuestionAnimeFromCharacter.create(
+              questionCounts[i],
+              options
+            );
+          case GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE:
+            return QuestionAnimeGenre.create(questionCounts[i], options);
+          case GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO:
+            return QuestionAnimeStudio.create(questionCounts[i], options);
+          case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
+            return QuestionCharByPicture.create(questionCounts[i], options);
+          case GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING:
+            return QuestionAnimeOpening.create(questionCounts[i], options);
+          default:
+            throw new Error("No handler for Question " + id);
+        }
       }
-    });
+    );
 
-    this.questions = shuffle(flatten(await Promise.all(questionPromises)));
+    this.questions = shuffle(flatten(await Promise.all(questionPromises)))
+      // TODO: rework this filter hotfix correctly; for now remove any question with less than 4 answers
+      .filter((q) => q.answers.all.length > 3);
     this.startGame();
   }
 

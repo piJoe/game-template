@@ -37,6 +37,8 @@ export type GameSettings = {
   [GAME_SETTING.MAIN_ROLE_ONLY]?: boolean;
   [GAME_SETTING.MIN_POPULARITY]?: number;
   [GAME_SETTING.MAX_POPULARITY]?: number;
+  [GAME_SETTING.MIN_YEAR]?: number;
+  [GAME_SETTING.MAX_YEAR]?: number;
 };
 
 // export interface GameSettingInput {

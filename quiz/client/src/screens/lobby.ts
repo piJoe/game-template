@@ -334,6 +334,25 @@ export class LobbyScreen extends DOMScreen {
         ],
       },
       {
+        label: "Year",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.MIN_YEAR],
+            name: GAME_SETTING.MIN_YEAR,
+            type: "number",
+            min: -1,
+            max: 10000,
+          },
+          {
+            value: settings[GAME_SETTING.MAX_YEAR],
+            name: GAME_SETTING.MAX_YEAR,
+            type: "number",
+            min: -1,
+            max: 10000,
+          },
+        ],
+      },
+      {
         label: "Main Role Only",
         inputs: [
           {
@@ -431,6 +450,22 @@ export class LobbyScreen extends DOMScreen {
           (
             this.lobbySettingsDom.querySelector(
               `[name="${GAME_SETTING.MAX_POPULARITY}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
+
+        [GAME_SETTING.MIN_YEAR]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.MIN_YEAR}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
+
+        [GAME_SETTING.MAX_YEAR]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.MAX_YEAR}"]`
             ) as HTMLInputElement
           ).value
         ),

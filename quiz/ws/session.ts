@@ -37,6 +37,8 @@ export class GameSession {
     [GAME_SETTING.MAIN_ROLE_ONLY]: false,
     [GAME_SETTING.MIN_POPULARITY]: -1,
     [GAME_SETTING.MAX_POPULARITY]: -1,
+    [GAME_SETTING.MIN_YEAR]: -1,
+    [GAME_SETTING.MAX_YEAR]: -1,
   };
 
   constructor() {
@@ -203,6 +205,22 @@ export class GameSession {
     );
     if (this.settings[GAME_SETTING.MAX_POPULARITY] < 1) {
       this.settings[GAME_SETTING.MAX_POPULARITY] = -1;
+    }
+
+    this.settings[GAME_SETTING.MIN_YEAR] = Math.min(
+      Math.max(-1, settings[GAME_SETTING.MIN_YEAR]),
+      2023
+    );
+    if (this.settings[GAME_SETTING.MIN_YEAR] < 1) {
+      this.settings[GAME_SETTING.MIN_YEAR] = -1;
+    }
+
+    this.settings[GAME_SETTING.MAX_YEAR] = Math.min(
+      Math.max(-1, settings[GAME_SETTING.MAX_YEAR]),
+      2023
+    );
+    if (this.settings[GAME_SETTING.MAX_YEAR] < 1) {
+      this.settings[GAME_SETTING.MAX_YEAR] = -1;
     }
 
     this.unreadyAllPlayers();
