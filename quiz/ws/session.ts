@@ -65,6 +65,7 @@ export class GameSession {
     });
     this.playerStates.delete(player.id);
     this.updateHost();
+    this.checkReadyStatus();
     this.sendPlayerlist();
 
     // destroy this game session, when no players left
@@ -81,19 +82,7 @@ export class GameSession {
     }
     playerState.ready = ready;
     this.sendPlayerlist();
-
-    // as long as there are players not ready (!s.ready) continue like normal
-    if ([...this.playerStates.values()].some((s) => !s.ready)) {
-      return;
-    }
-
-    // when we have every player ready, create and start the game
-    if (this.game) {
-      return;
-    }
-    this.game = new Game(this, this.settings);
-    this.updateStatus(SESSION_STATUS.IN_GAME);
-    console.log("GAME CREATED", this.id);
+    this.checkReadyStatus();
   }
 
   private updateHost(player?: Player) {
@@ -136,6 +125,22 @@ export class GameSession {
 
     this.updateHost(newHostState.player);
     this.sendPlayerlist();
+  }
+
+  checkReadyStatus() {
+    console.log("CHECK READY STATE");
+    // as long as there are players not ready (!s.ready) continue like normal
+    if ([...this.playerStates.values()].some((s) => !s.ready)) {
+      return;
+    }
+
+    // when we have every player ready, create and start the game
+    if (this.game) {
+      return;
+    }
+    this.game = new Game(this, this.settings);
+    this.updateStatus(SESSION_STATUS.IN_GAME);
+    console.log("GAME CREATED", this.id);
   }
 
   updateStatus(status: SESSION_STATUS) {
@@ -200,7 +205,13 @@ export class GameSession {
       this.settings[GAME_SETTING.MAX_POPULARITY] = -1;
     }
 
+    this.unreadyAllPlayers();
     this.sendGameSettings();
+  }
+
+  unreadyAllPlayers() {
+    this.playerStates.forEach((s) => (s.ready = false));
+    this.sendPlayerlist();
   }
 
   gameEnded() {
