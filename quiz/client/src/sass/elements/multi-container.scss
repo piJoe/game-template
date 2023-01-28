@@ -3,6 +3,8 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 32px;
+    max-width: 1000px;
+    margin: auto;
 }
 .multiple-container-wrapper > .container,
 .multiple-container-wrapper > .list-container {
