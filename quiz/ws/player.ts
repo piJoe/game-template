@@ -71,12 +71,17 @@ export class Player {
       case ClientPacketType.GAME_SETTINGS:
         const { settings } =
           data as ClientPackets[ClientPacketType.GAME_SETTINGS];
-        this.gameSession.updateGameSettings(settings);
+        this.gameSession.updateGameSettings(this, settings);
         break;
       case ClientPacketType.GAME_QUESTION_ANSWER:
         const { questionId, answer } =
           data as ClientPackets[ClientPacketType.GAME_QUESTION_ANSWER];
         this.answerQuestion(questionId, answer);
+        break;
+      case ClientPacketType.GAME_CHANGE_HOST:
+        const { newHost } =
+          data as ClientPackets[ClientPacketType.GAME_CHANGE_HOST];
+        this.gameSession.tryChangeHost(this, newHost);
         break;
       case ClientPacketType.ME_CHANGE_NAME:
         const { name } = data as ClientPackets[ClientPacketType.ME_CHANGE_NAME];

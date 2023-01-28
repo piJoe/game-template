@@ -12,6 +12,7 @@ export enum ClientPacketType {
   GAME_LEAVE = "game.leave",
   GAME_SETTINGS = "game.settings",
   GAME_QUESTION_ANSWER = "game.question.answer",
+  GAME_CHANGE_HOST = "game.change.host",
   PRELOAD_DONE = "preload.done",
   ME_CHANGE_NAME = "me.change_name",
   ME_READY = "me.ready",
@@ -37,6 +38,9 @@ export type ClientPackets = {
   [ClientPacketType.GAME_QUESTION_ANSWER]: {
     questionId: number;
     answer: number;
+  };
+  [ClientPacketType.GAME_CHANGE_HOST]: {
+    newHost: string;
   };
 };
 export type ClientPacketKey = keyof ClientPackets;
@@ -67,6 +71,7 @@ export type ServerPackets = {
   };
   [ServerPacketType.GAME_PLAYERLIST]: {
     playerlist: PlayerListEntry[];
+    host: string;
     count: number;
   };
   [ServerPacketType.GAME_QUESTION]: {

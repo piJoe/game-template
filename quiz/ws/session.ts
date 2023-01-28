@@ -28,6 +28,7 @@ export interface PlayerState {
 export class GameSession {
   public id = generateUniqueId(4, { lookupMap: allSessions });
   public playerStates = new Map<string, PlayerState>();
+  public sessionHost: Player;
   public status = SESSION_STATUS.LOBBY;
   public game: Game;
   private settings: GameSettings = {
@@ -46,6 +47,7 @@ export class GameSession {
   playerJoin(player: Player): boolean {
     if (this.status === SESSION_STATUS.LOBBY) {
       this.playerStates.set(player.id, { player, score: 0, ready: false });
+      this.updateHost();
       this.sendGameStatus();
       this.sendPlayerlist();
       this.sendGameSettings(player);
@@ -62,6 +64,7 @@ export class GameSession {
       reason,
     });
     this.playerStates.delete(player.id);
+    this.updateHost();
     this.sendPlayerlist();
 
     // destroy this game session, when no players left
@@ -93,12 +96,61 @@ export class GameSession {
     console.log("GAME CREATED", this.id);
   }
 
+  private updateHost(player?: Player) {
+    // if player is given, set them directly
+    if (player) {
+      this.sessionHost = player;
+      return;
+    }
+
+    // no given player, check if host is empty or the current host does
+    // no longer exist as a player, then make the first player
+    // in this.playerStates the new host
+    if (!this.sessionHost || !this.playerStates.has(this.sessionHost.id)) {
+      const newHostState: PlayerState = this.playerStates.values().next().value;
+
+      // if there are no more players left, do nothing
+      if (!newHostState) {
+        this.sessionHost = undefined;
+        return;
+      }
+      this.sessionHost = newHostState.player;
+    }
+  }
+
+  tryChangeHost(player: Player, newHostId: string) {
+    if (this.sessionHost !== player) {
+      player.sendMsg(ServerPacketType.ERROR, {
+        title: "Only the current host can determine the new host.",
+      });
+      return;
+    }
+
+    const newHostState = this.playerStates.get(newHostId);
+    if (!newHostState) {
+      player.sendMsg(ServerPacketType.ERROR, {
+        title: `There is no Player with ID ${newHostId} in this Lobby.`,
+      });
+      return;
+    }
+
+    this.updateHost(newHostState.player);
+    this.sendPlayerlist();
+  }
+
   updateStatus(status: SESSION_STATUS) {
     this.status = status;
     this.sendGameStatus();
   }
 
-  updateGameSettings(settings: GameSettings) {
+  updateGameSettings(player: Player, settings: GameSettings) {
+    if (this.sessionHost !== player) {
+      player.sendMsg(ServerPacketType.ERROR, {
+        title: "Only the host can change settigns.",
+      });
+      return;
+    }
+
     if (typeof settings[GAME_SETTING.QUESTION_COUNT] !== "number") {
       console.error("failed to validate settings");
       return;
@@ -185,7 +237,11 @@ export class GameSession {
   sendPlayerlist() {
     const playerlist = this.playerList;
     const count = this.playerCount;
-    this.sendMsg(ServerPacketType.GAME_PLAYERLIST, { playerlist, count });
+    this.sendMsg(ServerPacketType.GAME_PLAYERLIST, {
+      playerlist,
+      count,
+      host: this.sessionHost?.id ?? "",
+    });
   }
 
   sendGameSettings(player?: Player) {

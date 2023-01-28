@@ -39,8 +39,13 @@ input[type="checkbox"] {
         border-radius: 100%;
         background: none;
     }
-}
-input[type="checkbox"]:checked {
-    background: var(--color-primary);
-    border: none;
+
+    &:checked {
+        background: var(--color-primary);
+        border: none;
+    }
+
+    &:disabled {
+        cursor: default;
+    }
 }

@@ -36,10 +36,11 @@ export class LobbyScreen extends DOMScreen {
   private scoreboardCloseCallback: () => void;
   private lobbyId = "";
   private readyButton: HTMLInputElement;
-  private lobbySettingsDom: HTMLElement;
+  private lobbySettingsDom: HTMLFormElement;
   private settingsSubmitButton: HTMLInputElement;
   private selfReady = false;
   private playerlist: PlayerListEntry[] = [];
+  private lobbyHost: PlayerListEntry;
   private questions = new Map<number, QuestionScreen>();
 
   constructor() {
@@ -110,8 +111,9 @@ export class LobbyScreen extends DOMScreen {
 
     this.playerlistListener = socket.on(
       ServerPacketType.GAME_PLAYERLIST,
-      ({ playerlist }) => {
+      ({ playerlist, host }) => {
         this.playerlist = playerlist;
+        this.lobbyHost = this.playerlist.find((e) => e.playerId === host);
 
         const dummyFiller = new Array(
           Math.max(6 - this.playerlist.length, 0)
@@ -152,6 +154,7 @@ export class LobbyScreen extends DOMScreen {
           .join("");
         // render playerlist ready states
         playerListDom.innerHTML = playerListHTML + dummyHTML;
+
         // render playerlist scoreboard
         this.scoreboardDom.innerHTML = [...this.playerlist]
           .sort((a, b) => b.score - a.score)
@@ -171,9 +174,13 @@ export class LobbyScreen extends DOMScreen {
           "#lobby-dd-ready"
         ).innerHTML = `${readyCount}/${this.playerlist.length}`;
 
+        document.querySelector("#lobby-dd-host").innerHTML =
+          this.lobbyHost?.name;
+
         const self = playerlist.find((e) => e.playerId === globalState.me.id);
         this.selfReady = self?.ready;
         this.updateReadyButton();
+        this.updateSaveSettingsButton();
       }
     );
 
@@ -280,6 +287,12 @@ export class LobbyScreen extends DOMScreen {
     this.lobbySettingsDom.addEventListener("input", (e) => {
       e.preventDefault();
 
+      // cancel any inputs if we're not host
+      if (!this.selfIsHost()) {
+        this.lobbySettingsDom.reset();
+        return;
+      }
+
       this.settingsSubmitButton.setAttribute("data-active", "true");
     });
   }
@@ -341,11 +354,12 @@ export class LobbyScreen extends DOMScreen {
             ${e.inputs
               .map(
                 (i) =>
-                  `<input name="${i.name}" type="${i.type}" ${
-                    i.type !== "checkbox" ? 'style="width:6rem" required' : ""
-                  } value="${i.value}" ${i.min ? `min="${i.min}"` : ""} ${
-                    i.max ? `max="${i.max}"` : ""
-                  } ${i.checked ? `checked` : ""}>`
+                  `<input name="${i.name}" type="${i.type}" 
+                  ${i.type !== "checkbox" ? 'style="width:6rem" required' : ""} 
+                  value="${i.value}" 
+                  ${i.min ? `min="${i.min}"` : ""} 
+                  ${i.max ? `max="${i.max}"` : ""} 
+                  ${i.checked ? `checked` : ""}>`
               )
               .join(" - ")}
           </div>
@@ -360,13 +374,14 @@ export class LobbyScreen extends DOMScreen {
             <span class="setting-row-entry-label">${getQuestionNameById(
               qId
             )}</span>
-            <input type="checkbox" id="q_${qId}" name="${
-          GAME_SETTING.ACTIVE_QUESTIONS
-        }" value="${qId}" ${
-          settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
-            ? "checked"
-            : ""
-        }>
+            <input type="checkbox" id="q_${qId}" 
+            name="${GAME_SETTING.ACTIVE_QUESTIONS}" 
+            value="${qId}" 
+            ${
+              settings[GAME_SETTING.ACTIVE_QUESTIONS].some((q) => qId === q)
+                ? "checked"
+                : ""
+            }>
           </div>
         </div>`;
       })
@@ -436,6 +451,19 @@ export class LobbyScreen extends DOMScreen {
       this.currentLobbyStatus === SESSION_STATUS.IN_GAME;
   }
 
+  updateSaveSettingsButton() {
+    const button = this.domRef.querySelector(
+      "#update-settings-button"
+    ) as HTMLButtonElement;
+    if (this.selfIsHost()) {
+      button.value = "Save";
+      button.disabled = false;
+    } else {
+      button.value = "Only host can save";
+      button.disabled = true;
+    }
+  }
+
   getPlayerEntryById(id: string): PlayerListEntry {
     return this.playerlist.find((e) => {
       return e.playerId === id;
@@ -445,6 +473,10 @@ export class LobbyScreen extends DOMScreen {
   leaveLobby() {
     DOMScreen.spawnScreen(new JoinScreen()).setActive("left");
     this.die();
+  }
+
+  selfIsHost() {
+    return this.lobbyHost && this.lobbyHost.playerId === globalState.me.id;
   }
 
   template() {
@@ -504,7 +536,7 @@ export class LobbyScreen extends DOMScreen {
     </div>
 
     <div class="bottom-container" data-tab="settings" data-inactive="true">
-      <input type="submit" class="button button-outline" name="update-settings" form="lobby-settings" value="Save">
+      <input type="submit" class="button button-outline" name="update-settings" id="update-settings-button" form="lobby-settings" value="Save">
     </div>`;
   }
 
