@@ -813,8 +813,16 @@
     settingsDOM.querySelector("#setting-audio-volume").addEventListener("input", (e) => {
       globalSettings.volume = parseInt(e.target.value) / 100;
     });
-    settingsDOM.querySelector(".settings-button").addEventListener("click", (e) => {
-      dropdown.toggleAttribute("data-active");
+    const menuButton = settingsDOM.querySelector(".settings-button");
+    document.addEventListener("click", (e) => {
+      if (e.target === menuButton) {
+        dropdown.toggleAttribute("data-active");
+        return;
+      }
+      if (!dropdown.contains(e.target)) {
+        dropdown.toggleAttribute("data-active", false);
+        return;
+      }
     });
   }
   renderGlobalSettings();

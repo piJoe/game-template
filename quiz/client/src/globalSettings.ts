@@ -42,11 +42,18 @@ export function renderGlobalSettings() {
         parseInt((e.target as HTMLInputElement).value) / 100.0;
     });
 
-  settingsDOM
-    .querySelector(".settings-button")
-    .addEventListener("click", (e) => {
+  const menuButton = settingsDOM.querySelector(".settings-button");
+  document.addEventListener("click", (e) => {
+    if (e.target === menuButton) {
       dropdown.toggleAttribute("data-active");
-    });
+      return;
+    }
+
+    if (!dropdown.contains(e.target as Node)) {
+      dropdown.toggleAttribute("data-active", false);
+      return;
+    }
+  });
 }
 
 renderGlobalSettings();
