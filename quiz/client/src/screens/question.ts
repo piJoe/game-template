@@ -11,8 +11,17 @@ import { globalSettings } from "../globalSettings";
 import { socket } from "../websocket";
 import { LobbyScreen } from "./lobby";
 import { DOMScreen } from "./screen";
+import { GlobalDropdownOption } from "../types/globalDropdown";
+import { showDialog } from "../overlay";
 
 export class QuestionScreen extends DOMScreen {
+  public readonly globalDropdownOptions: GlobalDropdownOption[] = [
+    {
+      svgPath: `<path d="M19,3H5C3.89,3 3,3.89 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M10.08,15.58L11.5,17L16.5,12L11.5,7L10.08,8.41L12.67,11H3V13H12.67L10.08,15.58Z" />`,
+      title: "Leave Session",
+      callback: this.leaveGameGuarded.bind(this),
+    },
+  ];
   private lobby: LobbyScreen;
   private questionId: number = null;
   private question: ClientQuestion;
@@ -163,6 +172,32 @@ export class QuestionScreen extends DOMScreen {
     });
 
     this.questionDone = true;
+  }
+
+  leaveGameGuarded() {
+    showDialog(
+      "Are you sure?",
+      "You cannot join again as long as the game is running.",
+      {
+        actions: [
+          {
+            class: "button-outline",
+            title: "Cancel",
+            value: "cancel",
+          },
+          {
+            class: "button-error",
+            title: "Leave Game",
+            value: "leave",
+          },
+        ],
+        callback: (val) => {
+          if (val === "leave") {
+            socket.sendMsg(ClientPacketType.GAME_LEAVE);
+          }
+        },
+      }
+    );
   }
 
   setInactive(direction?: "left" | "right"): void {

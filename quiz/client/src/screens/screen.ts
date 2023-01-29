@@ -1,11 +1,14 @@
 import { initialize } from "esbuild";
+import { GlobalDropdownOption } from "../types/globalDropdown";
 
 let activeScreen: DOMScreen = null;
+const screenStack: DOMScreen[] = [];
 
 export abstract class DOMScreen {
   protected domRef: HTMLElement;
   protected killWhenInactive: boolean = true;
   protected additionalClasses: string[] = [];
+  public readonly globalDropdownOptions: GlobalDropdownOption[] = null;
   constructor() {}
 
   private setup() {
@@ -41,6 +44,10 @@ export abstract class DOMScreen {
         break;
     }
 
+    DOMScreen.pushScreenStack(this);
+
+    document.dispatchEvent(new CustomEvent("screenChanged"));
+
     // if we're displaying the screen as overlay, do not update `activeScreen`
     // and never call `setInactive` on the current screen.
     if (asOverlay) {
@@ -73,6 +80,9 @@ export abstract class DOMScreen {
     if (this.killWhenInactive) {
       this.die();
     }
+
+    DOMScreen.popScreenStack(this);
+    document.dispatchEvent(new CustomEvent("screenChanged"));
   }
 
   die() {
@@ -89,5 +99,19 @@ export abstract class DOMScreen {
     s.render();
     s.init();
     return s;
+  }
+
+  static pushScreenStack(screen: DOMScreen) {
+    DOMScreen.popScreenStack(screen);
+    screenStack.push(screen);
+  }
+  static popScreenStack(screen: DOMScreen) {
+    if (screenStack.includes(screen)) {
+      screenStack.splice(screenStack.indexOf(screen), 1);
+    }
+  }
+
+  static getCurrentScreen(): DOMScreen {
+    return screenStack.at(-1);
   }
 }
