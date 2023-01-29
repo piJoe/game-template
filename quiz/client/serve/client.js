@@ -1031,6 +1031,11 @@
       return renderAnimeTitle(value);
     }).join("");
   }
+  var canvasContext = document.createElement("canvas").getContext("2d");
+  function calcStringWidth(str, font = "800 22px Fira Sans, sans-serif") {
+    canvasContext.font = font;
+    return canvasContext.measureText(str).width;
+  }
 
   // quiz/client/src/screens/question.ts
   var QuestionScreen = class extends DOMScreen {
@@ -1070,6 +1075,15 @@
           this.settingsChanged.bind(this)
         );
       }
+      const answerContainers = this.domRef.querySelectorAll(".answers > li");
+      answerContainers.forEach((a) => {
+        const containerWidth = a.getBoundingClientRect().width - 64;
+        const stringWidth = calcStringWidth(a.getAttribute("data-str-val"));
+        a.style.fontSize = `${Math.min(
+          Math.max(22 * (containerWidth / stringWidth), 16),
+          22
+        )}px`;
+      });
       this.timerDOM = this.domRef.querySelector(".question-timer");
     }
     setActive() {
@@ -1159,12 +1173,13 @@
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
-        ${answers.map(
-        (a, idx) => `<li data-answer="${idx}">
-            ${(0, import_escape_html.default)(renderAnimeTitle(a))}
+        ${answers.map((a, idx) => {
+        const str = (0, import_escape_html.default)(renderAnimeTitle(a));
+        return `<li data-answer="${idx}" data-str-val="${str}">
+            ${str}
             <div class="answer-others-container"></div>
-          </li>`
-      ).join("")}
+          </li>`;
+      }).join("")}
       </ul>
     </div>`;
     }

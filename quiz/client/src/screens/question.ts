@@ -2,7 +2,11 @@ import escapeHTML from "escape-html";
 import { toPairs } from "lodash-es";
 import { ClientPacketType } from "../../../common/types/packets";
 import { ClientQuestion } from "../../../common/types/question";
-import { renderAnimeTitle, renderTemplate } from "../utils/titles";
+import {
+  calcStringWidth,
+  renderAnimeTitle,
+  renderTemplate,
+} from "../utils/titles";
 import { globalSettings } from "../globalSettings";
 import { socket } from "../websocket";
 import { LobbyScreen } from "./lobby";
@@ -50,7 +54,7 @@ export class QuestionScreen extends DOMScreen {
       elem.setAttribute("data-answer-selected", "true");
     });
 
-    //preload audio, if exists
+    // preload audio, if exists
     if (this.question.question.audioUrl) {
       this.audio = new Audio(this.question.question.audioUrl);
       this.audio.preload = "auto";
@@ -62,6 +66,18 @@ export class QuestionScreen extends DOMScreen {
         this.settingsChanged.bind(this)
       );
     }
+
+    // scale font for answers
+    const answerContainers = this.domRef.querySelectorAll(".answers > li");
+    answerContainers.forEach((a: HTMLElement) => {
+      const containerWidth = a.getBoundingClientRect().width - 64;
+      const stringWidth = calcStringWidth(a.getAttribute("data-str-val"));
+
+      a.style.fontSize = `${Math.min(
+        Math.max(22 * (containerWidth / stringWidth), 16),
+        22
+      )}px`;
+    });
 
     this.timerDOM = this.domRef.querySelector(".question-timer");
   }
@@ -193,12 +209,14 @@ export class QuestionScreen extends DOMScreen {
       </div>
       <ul class="answers">
         ${answers
-          .map(
-            (a, idx) => `<li data-answer="${idx}">
-            ${escapeHTML(renderAnimeTitle(a))}
+          .map((a, idx) => {
+            const str = escapeHTML(renderAnimeTitle(a));
+
+            return `<li data-answer="${idx}" data-str-val="${str}">
+            ${str}
             <div class="answer-others-container"></div>
-          </li>`
-          )
+          </li>`;
+          })
           .join("")}
       </ul>
     </div>`;
