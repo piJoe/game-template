@@ -40,10 +40,10 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
         process.env["MEDIA_SERVER"]
       ).toString();
 
-      const correctAnswers: string[] = [a.title];
-      const wrongAnswers: string[] = otherAnimes
+      const correctAnswers = [a.alternative_titles];
+      const wrongAnswers = otherAnimes
         .slice(i * 3, i * 3 + 3)
-        .map((a) => a.title);
+        .map((a) => a.alternative_titles);
 
       const allAnswers = shuffle([...wrongAnswers, ...correctAnswers]);
 
@@ -52,7 +52,9 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
 
       return {
         question: {
-          title: `What anime is this opening from?`,
+          title: {
+            template: ["What anime is this opening from?"],
+          },
           image: a.image,
           imageBlurred: true,
           audioUrl: openingUrl,

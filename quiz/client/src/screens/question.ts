@@ -2,6 +2,7 @@ import escapeHTML from "escape-html";
 import { toPairs } from "lodash-es";
 import { ClientPacketType } from "../../../common/types/packets";
 import { ClientQuestion } from "../../../common/types/question";
+import { renderAnimeTitle, renderTemplate } from "../utils/titles";
 import { globalSettings } from "../globalSettings";
 import { socket } from "../websocket";
 import { LobbyScreen } from "./lobby";
@@ -56,9 +57,10 @@ export class QuestionScreen extends DOMScreen {
       this.audio.autoplay = false;
       this.audio.volume = globalSettings.volume;
 
-      document.addEventListener("globalSettingsChanged", (e: CustomEvent) => {
-        this.audio.volume = e.detail.volume;
-      });
+      document.addEventListener(
+        "globalSettingsChanged",
+        this.settingsChanged.bind(this)
+      );
     }
 
     this.timerDOM = this.domRef.querySelector(".question-timer");
@@ -76,6 +78,10 @@ export class QuestionScreen extends DOMScreen {
     window.requestAnimationFrame(() => {
       this.updateTimer();
     });
+  }
+
+  settingsChanged(e: CustomEvent) {
+    this.audio.volume = e.detail.volume;
   }
 
   updateTimer() {
@@ -141,12 +147,6 @@ export class QuestionScreen extends DOMScreen {
     });
 
     this.questionDone = true;
-
-    // // stop audio, if exists
-    // if (this.audio) {
-    //   this.audio.pause();
-    //   this.audio.remove();
-    // }
   }
 
   setInactive(direction?: "left" | "right"): void {
@@ -157,6 +157,11 @@ export class QuestionScreen extends DOMScreen {
       this.audio.pause();
       this.audio.remove();
     }
+  }
+
+  die() {
+    super.die();
+    document.removeEventListener("globalSettingsChanged", this.settingsChanged);
   }
 
   template(): string {
@@ -181,14 +186,16 @@ export class QuestionScreen extends DOMScreen {
             </div>`
             : ""
         }
-        <div class="question-title title-h3">${escapeHTML(question.title)}</div>
+        <div class="question-title title-h3">${escapeHTML(
+          renderTemplate(question.title)
+        )}</div>
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
         ${answers
           .map(
             (a, idx) => `<li data-answer="${idx}">
-            ${escapeHTML(a)}
+            ${escapeHTML(renderAnimeTitle(a))}
             <div class="answer-others-container"></div>
           </li>`
           )

@@ -42,13 +42,16 @@ export const QuestionAnimeGenre: AnimeQuestionGenerator = {
       const wrongIds = wrongAnswers.map((a) => allAnswers.indexOf(a));
       const correctIds = [allAnswers.indexOf(singleCorrectAnswer)];
 
-      // TODO: find better names (if original name is too long, try an `alternative_titles` with type `Synonym`)
-      // also somehow enable to transmit multiple titles, so we can display the alternatives via tooltip?
       return {
         question: {
-          title: `What genre is ${
-            options.imageOnly ? "this anime" : `"${a.title}"`
-          }?`,
+          title: {
+            template: [`What genre is "`, "$animeTitle", `"?`],
+            data: {
+              $animeTitle: options.imageOnly
+                ? "this anime"
+                : a.alternative_titles,
+            },
+          },
           image: a.image,
         },
         answers: {

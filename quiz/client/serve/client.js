@@ -1,68 +1,1546 @@
-(()=>{var rt=Object.create;var K=Object.defineProperty;var at=Object.getOwnPropertyDescriptor;var ot=Object.getOwnPropertyNames,se=Object.getOwnPropertySymbols,st=Object.getPrototypeOf,ne=Object.prototype.hasOwnProperty,it=Object.prototype.propertyIsEnumerable;var ie=(t,r,e)=>r in t?K(t,r,{enumerable:!0,configurable:!0,writable:!0,value:e}):t[r]=e,X=(t,r)=>{for(var e in r||={})ne.call(r,e)&&ie(t,e,r[e]);if(se)for(var e of se(r))it.call(r,e)&&ie(t,e,r[e]);return t};var nt=(t,r)=>()=>(r||t((r={exports:{}}).exports,r),r.exports);var lt=(t,r,e,a)=>{if(r&&typeof r=="object"||typeof r=="function")for(let o of ot(r))!ne.call(t,o)&&o!==e&&K(t,o,{get:()=>r[o],enumerable:!(a=at(r,o))||a.enumerable});return t};var ut=(t,r,e)=>(e=t!=null?rt(st(t)):{},lt(r||!t||!t.__esModule?K(e,"default",{value:t,enumerable:!0}):e,t));var M=(t,r,e)=>new Promise((a,o)=>{var l=i=>{try{s(e.next(i))}catch(u){o(u)}},d=i=>{try{s(e.throw(i))}catch(u){o(u)}},s=i=>i.done?a(i.value):Promise.resolve(i.value).then(l,d);s((e=e.apply(t,r)).next())});var de=nt((Ga,fe)=>{"use strict";var dt=/["'&<>]/;fe.exports=mt;function mt(t){var r=""+t,e=dt.exec(r);if(!e)return r;var a,o="",l=0,d=0;for(l=e.index;l<r.length;l++){switch(r.charCodeAt(l)){case 34:a="&quot;";break;case 38:a="&amp;";break;case 39:a="&#39;";break;case 60:a="&lt;";break;case 62:a="&gt;";break;default:continue}d!==l&&(o+=r.substring(d,l)),d=l+1,o+=a}return d!==l?o+r.substring(d,l):o}});var h={me:{id:"",name:""}};var L=document.querySelector(".overlay-container"),k=new Map,ft=0;L.addEventListener("click",t=>{let r=t.target;if(r.hasAttribute("data-popup-id")){let e=r.getAttribute("data-popup-id"),a=r.getAttribute("data-value");le(e,a)}});function le(t,r){var a;let e=k.get(t);e&&L.removeChild(e.dom),k.delete(t),(a=e.options)!=null&&a.callback&&e.options.callback(r),k.size<1&&L.setAttribute("data-active","false")}function g(t,r,e){let a=(ft++).toString(),o=document.createElement("div");o.classList.add("container","container-fadein");let l=[];e!=null&&e.actions?l.push(...e.actions.map(d=>`<input type="button" data-popup-id="${a}" data-value="${d.value}" class="button ${d.class}" value="${d.title}">`)):l.push(`<input type="button" data-popup-id="${a}" data-value="ok" class="button button-outline" value="OK">`),o.innerHTML=`
-    <div class="title-h2">${t}</div>
-    <div class="dialog-content">${r&&r.length>0?`${r}`:""}</div>
-    <div class="dialog-actions">${l.join("")}</div>`,e!=null&&e.alternativeContentDom&&o.querySelector(".dialog-content").appendChild(e.alternativeContentDom),k.set(a,{dom:o,options:e}),L.setAttribute("data-active","true"),L.appendChild(o),e!=null&&e.closeDialogPromise&&e.closeDialogPromise.then(()=>{le(a)})}var z=class{constructor(){this.ws=null;this.listener=new Map;this.listenerId=0}open(){if(this.ws)throw new Error("Socket is already open??");return this.ws=new WebSocket(`${location.protocol==="http:"?"ws:":"wss:"}//${location.host}/`),this.ws.addEventListener("message",r=>{let{type:e,data:a}=JSON.parse(r.data);this.handleMessage(e,a)}),this.ws.addEventListener("close",()=>{g("You were disconnected","The session was closed by the server.",{callback:()=>{location.reload()}})}),new Promise(r=>{this.ws.addEventListener("open",()=>{r()},{once:!0})})}isOpen(){return this.ws!==null}sendMsg(r,e){this.ws.send(JSON.stringify({type:r,data:e}))}on(r,e,a=!1){this.listener.has(r)||this.listener.set(r,[]);let o=this.listenerId++;return this.listener.get(r).push({callback:e,once:a,id:o}),o}once(r,e){return this.on(r,e,!0)}callListeners(r,e){let a=this.listener.get(r);a&&[...a].forEach((o,l)=>{o.callback(e),o.once&&a.splice(l,1)})}off(r,e){let a=this.listener.get(r);if(!a)return;let o=a.findIndex(l=>l.id===e);o>-1&&a.splice(o,1)}handleMessage(r,e){switch(r){case"me":this.callListeners("me",e);break;case"me.game.left":this.callListeners("me.game.left",e);break;case"game.status":this.callListeners("game.status",e);break;case"game.playerlist":this.callListeners("game.playerlist",e);break;case"game.settings":this.callListeners("game.settings",e);break;case"game.question":this.callListeners("game.question",e);break;case"game.question.active":this.callListeners("game.question.active",e);break;case"game.question.answers":this.callListeners("game.question.answers",e);break;case"generic.error":this.callListeners("generic.error",e);break;default:throw Error("Not yet implemented"+r)}}},n=new z;function ue(t){switch(t){case"animeFromChar":return"Guess anime title by character";case"animeGenre":return"Guess the anime's genre";case"animeStudio":return"Guess the anime's studio";case"charByPicture":return"Guess character from picture";case"animeOpening":return"BETA: Guess anime from opening";default:throw Error("Id not recognized: "+t)}}var Q=ut(de(),1);var pt=typeof global=="object"&&global&&global.Object===Object&&global,R=pt;var ct=typeof self=="object"&&self&&self.Object===Object&&self,bt=R||ct||Function("return this")(),m=bt;var yt=m.Symbol,A=yt;var me=Object.prototype,xt=me.hasOwnProperty,vt=me.toString,w=A?A.toStringTag:void 0;function gt(t){var r=xt.call(t,w),e=t[w];try{t[w]=void 0;var a=!0}catch{}var o=vt.call(t);return a&&(r?t[w]=e:delete t[w]),o}var pe=gt;var ht=Object.prototype,Et=ht.toString;function At(t){return Et.call(t)}var ce=At;var St="[object Null]",Tt="[object Undefined]",be=A?A.toStringTag:void 0;function It(t){return t==null?t===void 0?Tt:St:be&&be in Object(t)?pe(t):ce(t)}var y=It;function Mt(t){return t!=null&&typeof t=="object"}var S=Mt;function Lt(t,r){for(var e=-1,a=t==null?0:t.length,o=Array(a);++e<a;)o[e]=r(t[e],e,t);return o}var ye=Lt;var wt=Array.isArray,xe=wt;function _t(t){var r=typeof t;return t!=null&&(r=="object"||r=="function")}var P=_t;var Ot="[object AsyncFunction]",kt="[object Function]",Nt="[object GeneratorFunction]",Rt="[object Proxy]";function Pt(t){if(!P(t))return!1;var r=y(t);return r==kt||r==Nt||r==Ot||r==Rt}var C=Pt;var Ct=m["__core-js_shared__"],G=Ct;var ve=function(){var t=/[^.]+$/.exec(G&&G.keys&&G.keys.IE_PROTO||"");return t?"Symbol(src)_1."+t:""}();function Gt(t){return!!ve&&ve in t}var ge=Gt;var qt=Function.prototype,Dt=qt.toString;function jt(t){if(t!=null){try{return Dt.call(t)}catch{}try{return t+""}catch{}}return""}var x=jt;var Ut=/[\\^$.*+?()[\]{}|]/g,Bt=/^\[object .+?Constructor\]$/,Ht=Function.prototype,$t=Object.prototype,Qt=Ht.toString,Yt=$t.hasOwnProperty,Vt=RegExp("^"+Qt.call(Yt).replace(Ut,"\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g,"$1.*?")+"$");function Wt(t){if(!P(t)||ge(t))return!1;var r=C(t)?Vt:Bt;return r.test(x(t))}var he=Wt;function Ft(t,r){return t?.[r]}var Ee=Ft;function Kt(t,r){var e=Ee(t,r);return he(e)?e:void 0}var b=Kt;var Xt=b(m,"WeakMap"),q=Xt;var zt=9007199254740991,Jt=/^(?:0|[1-9]\d*)$/;function Zt(t,r){var e=typeof t;return r=r??zt,!!r&&(e=="number"||e!="symbol"&&Jt.test(t))&&t>-1&&t%1==0&&t<r}var Ae=Zt;var er=9007199254740991;function tr(t){return typeof t=="number"&&t>-1&&t%1==0&&t<=er}var D=tr;function rr(t){return t!=null&&D(t.length)&&!C(t)}var Se=rr;var ar=Object.prototype;function or(t){var r=t&&t.constructor,e=typeof r=="function"&&r.prototype||ar;return t===e}var Te=or;function sr(t,r){for(var e=-1,a=Array(t);++e<t;)a[e]=r(e);return a}var Ie=sr;var ir="[object Arguments]";function nr(t){return S(t)&&y(t)==ir}var J=nr;var Me=Object.prototype,lr=Me.hasOwnProperty,ur=Me.propertyIsEnumerable,fr=J(function(){return arguments}())?J:function(t){return S(t)&&lr.call(t,"callee")&&!ur.call(t,"callee")},Le=fr;function dr(){return!1}var we=dr;var ke=typeof exports=="object"&&exports&&!exports.nodeType&&exports,_e=ke&&typeof module=="object"&&module&&!module.nodeType&&module,mr=_e&&_e.exports===ke,Oe=mr?m.Buffer:void 0,pr=Oe?Oe.isBuffer:void 0,cr=pr||we,Ne=cr;var br="[object Arguments]",yr="[object Array]",xr="[object Boolean]",vr="[object Date]",gr="[object Error]",hr="[object Function]",Er="[object Map]",Ar="[object Number]",Sr="[object Object]",Tr="[object RegExp]",Ir="[object Set]",Mr="[object String]",Lr="[object WeakMap]",wr="[object ArrayBuffer]",_r="[object DataView]",Or="[object Float32Array]",kr="[object Float64Array]",Nr="[object Int8Array]",Rr="[object Int16Array]",Pr="[object Int32Array]",Cr="[object Uint8Array]",Gr="[object Uint8ClampedArray]",qr="[object Uint16Array]",Dr="[object Uint32Array]",f={};f[Or]=f[kr]=f[Nr]=f[Rr]=f[Pr]=f[Cr]=f[Gr]=f[qr]=f[Dr]=!0;f[br]=f[yr]=f[wr]=f[xr]=f[_r]=f[vr]=f[gr]=f[hr]=f[Er]=f[Ar]=f[Sr]=f[Tr]=f[Ir]=f[Mr]=f[Lr]=!1;function jr(t){return S(t)&&D(t.length)&&!!f[y(t)]}var Re=jr;function Ur(t){return function(r){return t(r)}}var Pe=Ur;var Ce=typeof exports=="object"&&exports&&!exports.nodeType&&exports,_=Ce&&typeof module=="object"&&module&&!module.nodeType&&module,Br=_&&_.exports===Ce,Z=Br&&R.process,Hr=function(){try{var t=_&&_.require&&_.require("util").types;return t||Z&&Z.binding&&Z.binding("util")}catch{}}(),ee=Hr;var Ge=ee&&ee.isTypedArray,$r=Ge?Pe(Ge):Re,qe=$r;var Qr=Object.prototype,Yr=Qr.hasOwnProperty;function Vr(t,r){var e=xe(t),a=!e&&Le(t),o=!e&&!a&&Ne(t),l=!e&&!a&&!o&&qe(t),d=e||a||o||l,s=d?Ie(t.length,String):[],i=s.length;for(var u in t)(r||Yr.call(t,u))&&!(d&&(u=="length"||o&&(u=="offset"||u=="parent")||l&&(u=="buffer"||u=="byteLength"||u=="byteOffset")||Ae(u,i)))&&s.push(u);return s}var De=Vr;function Wr(t,r){return function(e){return t(r(e))}}var je=Wr;var Fr=je(Object.keys,Object),Ue=Fr;var Kr=Object.prototype,Xr=Kr.hasOwnProperty;function zr(t){if(!Te(t))return Ue(t);var r=[];for(var e in Object(t))Xr.call(t,e)&&e!="constructor"&&r.push(e);return r}var Be=zr;function Jr(t){return Se(t)?De(t):Be(t)}var He=Jr;var Zr=b(m,"Map"),j=Zr;var ea=b(m,"DataView"),U=ea;var ta=b(m,"Promise"),B=ta;var ra=b(m,"Set"),H=ra;var $e="[object Map]",aa="[object Object]",Qe="[object Promise]",Ye="[object Set]",Ve="[object WeakMap]",We="[object DataView]",oa=x(U),sa=x(j),ia=x(B),na=x(H),la=x(q),E=y;(U&&E(new U(new ArrayBuffer(1)))!=We||j&&E(new j)!=$e||B&&E(B.resolve())!=Qe||H&&E(new H)!=Ye||q&&E(new q)!=Ve)&&(E=function(t){var r=y(t),e=r==aa?t.constructor:void 0,a=e?x(e):"";if(a)switch(a){case oa:return We;case sa:return $e;case ia:return Qe;case na:return Ye;case la:return Ve}return r});var Fe=E;function ua(t){var r=-1,e=Array(t.size);return t.forEach(function(a,o){e[++r]=[o,a]}),e}var Ke=ua;function fa(t,r){return ye(r,function(e){return[e,t[e]]})}var Xe=fa;function da(t){var r=-1,e=Array(t.size);return t.forEach(function(a){e[++r]=[a,a]}),e}var ze=da;var ma="[object Map]",pa="[object Set]";function ca(t){return function(r){var e=Fe(r);return e==ma?Ke(r):e==pa?ze(r):Xe(r,t(r))}}var Je=ca;var ba=Je(He),te=ba;var ya={volume:1},Ze,xa=X(X({},ya),JSON.parse((Ze=localStorage.getItem("settings"))!=null?Ze:"{}")),$=new Proxy(xa,{set(t,r,e){return console.log("GLOBAL STATE CHANGED!"),t[r]=e,localStorage.setItem("settings",JSON.stringify(t)),document.dispatchEvent(new CustomEvent("globalSettingsChanged",{detail:t})),!0}}),re=document.querySelector(".settings-overlay");function va(){let t=re.querySelector(".settings-dropdown");t.innerHTML=`
+(() => {
+  var __create = Object.create;
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b ||= {})
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+  var __commonJS = (cb, mod) => function __require() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
+
+  // node_modules/escape-html/index.js
+  var require_escape_html = __commonJS({
+    "node_modules/escape-html/index.js"(exports2, module2) {
+      "use strict";
+      var matchHtmlRegExp = /["'&<>]/;
+      module2.exports = escapeHtml;
+      function escapeHtml(string) {
+        var str = "" + string;
+        var match = matchHtmlRegExp.exec(str);
+        if (!match) {
+          return str;
+        }
+        var escape;
+        var html = "";
+        var index = 0;
+        var lastIndex = 0;
+        for (index = match.index; index < str.length; index++) {
+          switch (str.charCodeAt(index)) {
+            case 34:
+              escape = "&quot;";
+              break;
+            case 38:
+              escape = "&amp;";
+              break;
+            case 39:
+              escape = "&#39;";
+              break;
+            case 60:
+              escape = "&lt;";
+              break;
+            case 62:
+              escape = "&gt;";
+              break;
+            default:
+              continue;
+          }
+          if (lastIndex !== index) {
+            html += str.substring(lastIndex, index);
+          }
+          lastIndex = index + 1;
+          html += escape;
+        }
+        return lastIndex !== index ? html + str.substring(lastIndex, index) : html;
+      }
+    }
+  });
+
+  // quiz/client/src/globalstate.ts
+  var globalState = {
+    me: {
+      id: "",
+      name: ""
+    }
+  };
+
+  // quiz/client/src/overlay.ts
+  var overlay = document.querySelector(".overlay-container");
+  var openDialogs = /* @__PURE__ */ new Map();
+  var dialogId = 0;
+  overlay.addEventListener("click", (e) => {
+    const target = e.target;
+    if (target.hasAttribute("data-popup-id")) {
+      const id = target.getAttribute("data-popup-id");
+      const value = target.getAttribute("data-value");
+      closeDialog(id, value);
+    }
+  });
+  function closeDialog(id, value) {
+    var _a2;
+    const d = openDialogs.get(id);
+    if (d) {
+      overlay.removeChild(d.dom);
+    }
+    openDialogs.delete(id);
+    if ((_a2 = d.options) == null ? void 0 : _a2.callback) {
+      d.options.callback(value);
+    }
+    if (openDialogs.size < 1) {
+      overlay.setAttribute("data-active", "false");
+    }
+  }
+  function showDialog(title, msg, options) {
+    const id = (dialogId++).toString();
+    const container = document.createElement("div");
+    container.classList.add("container", "container-fadein");
+    const actions = [];
+    if (!(options == null ? void 0 : options.actions)) {
+      actions.push(
+        `<input type="button" data-popup-id="${id}" data-value="ok" class="button button-outline" value="OK">`
+      );
+    } else {
+      actions.push(
+        ...options.actions.map(
+          (a) => `<input type="button" data-popup-id="${id}" data-value="${a.value}" class="button ${a.class}" value="${a.title}">`
+        )
+      );
+    }
+    container.innerHTML = `
+    <div class="title-h2">${title}</div>
+    <div class="dialog-content">${msg && msg.length > 0 ? `${msg}` : ""}</div>
+    <div class="dialog-actions">${actions.join("")}</div>`;
+    if (options == null ? void 0 : options.alternativeContentDom) {
+      container.querySelector(".dialog-content").appendChild(options.alternativeContentDom);
+    }
+    openDialogs.set(id, { dom: container, options });
+    overlay.setAttribute("data-active", "true");
+    overlay.appendChild(container);
+    if (options == null ? void 0 : options.closeDialogPromise) {
+      options.closeDialogPromise.then(() => {
+        closeDialog(id);
+      });
+    }
+  }
+
+  // quiz/client/src/websocket.ts
+  var Socket = class {
+    constructor() {
+      this.ws = null;
+      this.listener = /* @__PURE__ */ new Map();
+      this.listenerId = 0;
+    }
+    open() {
+      if (this.ws) {
+        throw new Error("Socket is already open??");
+      }
+      this.ws = new WebSocket(
+        `${location.protocol === "http:" ? "ws:" : "wss:"}//${location.host}/`
+      );
+      this.ws.addEventListener("message", (m) => {
+        const { type, data } = JSON.parse(m.data);
+        this.handleMessage(type, data);
+      });
+      this.ws.addEventListener("close", () => {
+        showDialog(
+          "You were disconnected",
+          "The session was closed by the server.",
+          {
+            callback: () => {
+              location.reload();
+            }
+          }
+        );
+      });
+      return new Promise((res) => {
+        this.ws.addEventListener(
+          "open",
+          () => {
+            res();
+          },
+          { once: true }
+        );
+      });
+    }
+    isOpen() {
+      return this.ws !== null;
+    }
+    sendMsg(type, data) {
+      this.ws.send(JSON.stringify({ type, data }));
+    }
+    on(type, callback, once = false) {
+      if (!this.listener.has(type)) {
+        this.listener.set(type, []);
+      }
+      const id = this.listenerId++;
+      this.listener.get(type).push({ callback, once, id });
+      return id;
+    }
+    once(type, callback) {
+      return this.on(type, callback, true);
+    }
+    callListeners(type, data) {
+      const listeners = this.listener.get(type);
+      if (!listeners) {
+        return;
+      }
+      [...listeners].forEach((l, i) => {
+        l.callback(data);
+        if (l.once) {
+          listeners.splice(i, 1);
+        }
+      });
+    }
+    off(type, id) {
+      const listeners = this.listener.get(type);
+      if (!listeners) {
+        return;
+      }
+      const idx = listeners.findIndex((o) => o.id === id);
+      if (idx > -1) {
+        listeners.splice(idx, 1);
+      }
+    }
+    handleMessage(type, data) {
+      switch (type) {
+        case "me" /* ME */:
+          this.callListeners(
+            "me" /* ME */,
+            data
+          );
+          break;
+        case "me.game.left" /* ME_LEFT_GAME */:
+          this.callListeners(
+            "me.game.left" /* ME_LEFT_GAME */,
+            data
+          );
+          break;
+        case "game.status" /* GAME_STATUS */:
+          this.callListeners(
+            "game.status" /* GAME_STATUS */,
+            data
+          );
+          break;
+        case "game.playerlist" /* GAME_PLAYERLIST */:
+          this.callListeners(
+            "game.playerlist" /* GAME_PLAYERLIST */,
+            data
+          );
+          break;
+        case "game.settings" /* GAME_SETTINGS */:
+          this.callListeners(
+            "game.settings" /* GAME_SETTINGS */,
+            data
+          );
+          break;
+        case "game.question" /* GAME_QUESTION */:
+          this.callListeners(
+            "game.question" /* GAME_QUESTION */,
+            data
+          );
+          break;
+        case "game.question.active" /* GAME_QUESTION_ACTIVE */:
+          this.callListeners(
+            "game.question.active" /* GAME_QUESTION_ACTIVE */,
+            data
+          );
+          break;
+        case "game.question.answers" /* GAME_QUESTION_ANSWERS */:
+          this.callListeners(
+            "game.question.answers" /* GAME_QUESTION_ANSWERS */,
+            data
+          );
+          break;
+        case "generic.error" /* ERROR */:
+          this.callListeners(
+            "generic.error" /* ERROR */,
+            data
+          );
+          break;
+        default:
+          throw Error("Not yet implemented" + type);
+      }
+    }
+  };
+  var socket = new Socket();
+
+  // quiz/common/utils/animehelper.ts
+  function getQuestionNameById(qId) {
+    switch (qId) {
+      case "animeFromChar" /* ANIME_FROM_CHAR */:
+        return "Guess anime title by character";
+      case "animeGenre" /* ANIME_GENRE */:
+        return "Guess the anime's genre";
+      case "animeStudio" /* ANIME_STUDIO */:
+        return "Guess the anime's studio";
+      case "charByPicture" /* CHAR_BY_PICTURE */:
+        return "Guess character from picture";
+      case "animeOpening" /* ANIME_OPENING */:
+        return "BETA: Guess anime from opening";
+      default:
+        throw Error("Id not recognized: " + qId);
+    }
+  }
+
+  // quiz/client/src/screens/question.ts
+  var import_escape_html = __toESM(require_escape_html(), 1);
+
+  // node_modules/lodash-es/_freeGlobal.js
+  var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
+  var freeGlobal_default = freeGlobal;
+
+  // node_modules/lodash-es/_root.js
+  var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+  var root = freeGlobal_default || freeSelf || Function("return this")();
+  var root_default = root;
+
+  // node_modules/lodash-es/_Symbol.js
+  var Symbol2 = root_default.Symbol;
+  var Symbol_default = Symbol2;
+
+  // node_modules/lodash-es/_getRawTag.js
+  var objectProto = Object.prototype;
+  var hasOwnProperty = objectProto.hasOwnProperty;
+  var nativeObjectToString = objectProto.toString;
+  var symToStringTag = Symbol_default ? Symbol_default.toStringTag : void 0;
+  function getRawTag(value) {
+    var isOwn = hasOwnProperty.call(value, symToStringTag), tag = value[symToStringTag];
+    try {
+      value[symToStringTag] = void 0;
+      var unmasked = true;
+    } catch (e) {
+    }
+    var result = nativeObjectToString.call(value);
+    if (unmasked) {
+      if (isOwn) {
+        value[symToStringTag] = tag;
+      } else {
+        delete value[symToStringTag];
+      }
+    }
+    return result;
+  }
+  var getRawTag_default = getRawTag;
+
+  // node_modules/lodash-es/_objectToString.js
+  var objectProto2 = Object.prototype;
+  var nativeObjectToString2 = objectProto2.toString;
+  function objectToString(value) {
+    return nativeObjectToString2.call(value);
+  }
+  var objectToString_default = objectToString;
+
+  // node_modules/lodash-es/_baseGetTag.js
+  var nullTag = "[object Null]";
+  var undefinedTag = "[object Undefined]";
+  var symToStringTag2 = Symbol_default ? Symbol_default.toStringTag : void 0;
+  function baseGetTag(value) {
+    if (value == null) {
+      return value === void 0 ? undefinedTag : nullTag;
+    }
+    return symToStringTag2 && symToStringTag2 in Object(value) ? getRawTag_default(value) : objectToString_default(value);
+  }
+  var baseGetTag_default = baseGetTag;
+
+  // node_modules/lodash-es/isObjectLike.js
+  function isObjectLike(value) {
+    return value != null && typeof value == "object";
+  }
+  var isObjectLike_default = isObjectLike;
+
+  // node_modules/lodash-es/_arrayMap.js
+  function arrayMap(array, iteratee) {
+    var index = -1, length = array == null ? 0 : array.length, result = Array(length);
+    while (++index < length) {
+      result[index] = iteratee(array[index], index, array);
+    }
+    return result;
+  }
+  var arrayMap_default = arrayMap;
+
+  // node_modules/lodash-es/isArray.js
+  var isArray = Array.isArray;
+  var isArray_default = isArray;
+
+  // node_modules/lodash-es/isObject.js
+  function isObject(value) {
+    var type = typeof value;
+    return value != null && (type == "object" || type == "function");
+  }
+  var isObject_default = isObject;
+
+  // node_modules/lodash-es/isFunction.js
+  var asyncTag = "[object AsyncFunction]";
+  var funcTag = "[object Function]";
+  var genTag = "[object GeneratorFunction]";
+  var proxyTag = "[object Proxy]";
+  function isFunction(value) {
+    if (!isObject_default(value)) {
+      return false;
+    }
+    var tag = baseGetTag_default(value);
+    return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
+  }
+  var isFunction_default = isFunction;
+
+  // node_modules/lodash-es/_coreJsData.js
+  var coreJsData = root_default["__core-js_shared__"];
+  var coreJsData_default = coreJsData;
+
+  // node_modules/lodash-es/_isMasked.js
+  var maskSrcKey = function() {
+    var uid = /[^.]+$/.exec(coreJsData_default && coreJsData_default.keys && coreJsData_default.keys.IE_PROTO || "");
+    return uid ? "Symbol(src)_1." + uid : "";
+  }();
+  function isMasked(func) {
+    return !!maskSrcKey && maskSrcKey in func;
+  }
+  var isMasked_default = isMasked;
+
+  // node_modules/lodash-es/_toSource.js
+  var funcProto = Function.prototype;
+  var funcToString = funcProto.toString;
+  function toSource(func) {
+    if (func != null) {
+      try {
+        return funcToString.call(func);
+      } catch (e) {
+      }
+      try {
+        return func + "";
+      } catch (e) {
+      }
+    }
+    return "";
+  }
+  var toSource_default = toSource;
+
+  // node_modules/lodash-es/_baseIsNative.js
+  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+  var funcProto2 = Function.prototype;
+  var objectProto3 = Object.prototype;
+  var funcToString2 = funcProto2.toString;
+  var hasOwnProperty2 = objectProto3.hasOwnProperty;
+  var reIsNative = RegExp(
+    "^" + funcToString2.call(hasOwnProperty2).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
+  );
+  function baseIsNative(value) {
+    if (!isObject_default(value) || isMasked_default(value)) {
+      return false;
+    }
+    var pattern = isFunction_default(value) ? reIsNative : reIsHostCtor;
+    return pattern.test(toSource_default(value));
+  }
+  var baseIsNative_default = baseIsNative;
+
+  // node_modules/lodash-es/_getValue.js
+  function getValue(object, key) {
+    return object == null ? void 0 : object[key];
+  }
+  var getValue_default = getValue;
+
+  // node_modules/lodash-es/_getNative.js
+  function getNative(object, key) {
+    var value = getValue_default(object, key);
+    return baseIsNative_default(value) ? value : void 0;
+  }
+  var getNative_default = getNative;
+
+  // node_modules/lodash-es/_WeakMap.js
+  var WeakMap = getNative_default(root_default, "WeakMap");
+  var WeakMap_default = WeakMap;
+
+  // node_modules/lodash-es/_isIndex.js
+  var MAX_SAFE_INTEGER = 9007199254740991;
+  var reIsUint = /^(?:0|[1-9]\d*)$/;
+  function isIndex(value, length) {
+    var type = typeof value;
+    length = length == null ? MAX_SAFE_INTEGER : length;
+    return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+  }
+  var isIndex_default = isIndex;
+
+  // node_modules/lodash-es/isLength.js
+  var MAX_SAFE_INTEGER2 = 9007199254740991;
+  function isLength(value) {
+    return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER2;
+  }
+  var isLength_default = isLength;
+
+  // node_modules/lodash-es/isArrayLike.js
+  function isArrayLike(value) {
+    return value != null && isLength_default(value.length) && !isFunction_default(value);
+  }
+  var isArrayLike_default = isArrayLike;
+
+  // node_modules/lodash-es/_isPrototype.js
+  var objectProto4 = Object.prototype;
+  function isPrototype(value) {
+    var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto4;
+    return value === proto;
+  }
+  var isPrototype_default = isPrototype;
+
+  // node_modules/lodash-es/_baseTimes.js
+  function baseTimes(n, iteratee) {
+    var index = -1, result = Array(n);
+    while (++index < n) {
+      result[index] = iteratee(index);
+    }
+    return result;
+  }
+  var baseTimes_default = baseTimes;
+
+  // node_modules/lodash-es/_baseIsArguments.js
+  var argsTag = "[object Arguments]";
+  function baseIsArguments(value) {
+    return isObjectLike_default(value) && baseGetTag_default(value) == argsTag;
+  }
+  var baseIsArguments_default = baseIsArguments;
+
+  // node_modules/lodash-es/isArguments.js
+  var objectProto5 = Object.prototype;
+  var hasOwnProperty3 = objectProto5.hasOwnProperty;
+  var propertyIsEnumerable = objectProto5.propertyIsEnumerable;
+  var isArguments = baseIsArguments_default(function() {
+    return arguments;
+  }()) ? baseIsArguments_default : function(value) {
+    return isObjectLike_default(value) && hasOwnProperty3.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
+  };
+  var isArguments_default = isArguments;
+
+  // node_modules/lodash-es/stubFalse.js
+  function stubFalse() {
+    return false;
+  }
+  var stubFalse_default = stubFalse;
+
+  // node_modules/lodash-es/isBuffer.js
+  var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
+  var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+  var Buffer2 = moduleExports ? root_default.Buffer : void 0;
+  var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
+  var isBuffer = nativeIsBuffer || stubFalse_default;
+  var isBuffer_default = isBuffer;
+
+  // node_modules/lodash-es/_baseIsTypedArray.js
+  var argsTag2 = "[object Arguments]";
+  var arrayTag = "[object Array]";
+  var boolTag = "[object Boolean]";
+  var dateTag = "[object Date]";
+  var errorTag = "[object Error]";
+  var funcTag2 = "[object Function]";
+  var mapTag = "[object Map]";
+  var numberTag = "[object Number]";
+  var objectTag = "[object Object]";
+  var regexpTag = "[object RegExp]";
+  var setTag = "[object Set]";
+  var stringTag = "[object String]";
+  var weakMapTag = "[object WeakMap]";
+  var arrayBufferTag = "[object ArrayBuffer]";
+  var dataViewTag = "[object DataView]";
+  var float32Tag = "[object Float32Array]";
+  var float64Tag = "[object Float64Array]";
+  var int8Tag = "[object Int8Array]";
+  var int16Tag = "[object Int16Array]";
+  var int32Tag = "[object Int32Array]";
+  var uint8Tag = "[object Uint8Array]";
+  var uint8ClampedTag = "[object Uint8ClampedArray]";
+  var uint16Tag = "[object Uint16Array]";
+  var uint32Tag = "[object Uint32Array]";
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag2] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag2] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+  function baseIsTypedArray(value) {
+    return isObjectLike_default(value) && isLength_default(value.length) && !!typedArrayTags[baseGetTag_default(value)];
+  }
+  var baseIsTypedArray_default = baseIsTypedArray;
+
+  // node_modules/lodash-es/_baseUnary.js
+  function baseUnary(func) {
+    return function(value) {
+      return func(value);
+    };
+  }
+  var baseUnary_default = baseUnary;
+
+  // node_modules/lodash-es/_nodeUtil.js
+  var freeExports2 = typeof exports == "object" && exports && !exports.nodeType && exports;
+  var freeModule2 = freeExports2 && typeof module == "object" && module && !module.nodeType && module;
+  var moduleExports2 = freeModule2 && freeModule2.exports === freeExports2;
+  var freeProcess = moduleExports2 && freeGlobal_default.process;
+  var nodeUtil = function() {
+    try {
+      var types = freeModule2 && freeModule2.require && freeModule2.require("util").types;
+      if (types) {
+        return types;
+      }
+      return freeProcess && freeProcess.binding && freeProcess.binding("util");
+    } catch (e) {
+    }
+  }();
+  var nodeUtil_default = nodeUtil;
+
+  // node_modules/lodash-es/isTypedArray.js
+  var nodeIsTypedArray = nodeUtil_default && nodeUtil_default.isTypedArray;
+  var isTypedArray = nodeIsTypedArray ? baseUnary_default(nodeIsTypedArray) : baseIsTypedArray_default;
+  var isTypedArray_default = isTypedArray;
+
+  // node_modules/lodash-es/_arrayLikeKeys.js
+  var objectProto6 = Object.prototype;
+  var hasOwnProperty4 = objectProto6.hasOwnProperty;
+  function arrayLikeKeys(value, inherited) {
+    var isArr = isArray_default(value), isArg = !isArr && isArguments_default(value), isBuff = !isArr && !isArg && isBuffer_default(value), isType = !isArr && !isArg && !isBuff && isTypedArray_default(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes_default(value.length, String) : [], length = result.length;
+    for (var key in value) {
+      if ((inherited || hasOwnProperty4.call(value, key)) && !(skipIndexes && (key == "length" || isBuff && (key == "offset" || key == "parent") || isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || isIndex_default(key, length)))) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var arrayLikeKeys_default = arrayLikeKeys;
+
+  // node_modules/lodash-es/_overArg.js
+  function overArg(func, transform) {
+    return function(arg) {
+      return func(transform(arg));
+    };
+  }
+  var overArg_default = overArg;
+
+  // node_modules/lodash-es/_nativeKeys.js
+  var nativeKeys = overArg_default(Object.keys, Object);
+  var nativeKeys_default = nativeKeys;
+
+  // node_modules/lodash-es/_baseKeys.js
+  var objectProto7 = Object.prototype;
+  var hasOwnProperty5 = objectProto7.hasOwnProperty;
+  function baseKeys(object) {
+    if (!isPrototype_default(object)) {
+      return nativeKeys_default(object);
+    }
+    var result = [];
+    for (var key in Object(object)) {
+      if (hasOwnProperty5.call(object, key) && key != "constructor") {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+  var baseKeys_default = baseKeys;
+
+  // node_modules/lodash-es/keys.js
+  function keys(object) {
+    return isArrayLike_default(object) ? arrayLikeKeys_default(object) : baseKeys_default(object);
+  }
+  var keys_default = keys;
+
+  // node_modules/lodash-es/_Map.js
+  var Map2 = getNative_default(root_default, "Map");
+  var Map_default = Map2;
+
+  // node_modules/lodash-es/_DataView.js
+  var DataView = getNative_default(root_default, "DataView");
+  var DataView_default = DataView;
+
+  // node_modules/lodash-es/_Promise.js
+  var Promise2 = getNative_default(root_default, "Promise");
+  var Promise_default = Promise2;
+
+  // node_modules/lodash-es/_Set.js
+  var Set = getNative_default(root_default, "Set");
+  var Set_default = Set;
+
+  // node_modules/lodash-es/_getTag.js
+  var mapTag2 = "[object Map]";
+  var objectTag2 = "[object Object]";
+  var promiseTag = "[object Promise]";
+  var setTag2 = "[object Set]";
+  var weakMapTag2 = "[object WeakMap]";
+  var dataViewTag2 = "[object DataView]";
+  var dataViewCtorString = toSource_default(DataView_default);
+  var mapCtorString = toSource_default(Map_default);
+  var promiseCtorString = toSource_default(Promise_default);
+  var setCtorString = toSource_default(Set_default);
+  var weakMapCtorString = toSource_default(WeakMap_default);
+  var getTag = baseGetTag_default;
+  if (DataView_default && getTag(new DataView_default(new ArrayBuffer(1))) != dataViewTag2 || Map_default && getTag(new Map_default()) != mapTag2 || Promise_default && getTag(Promise_default.resolve()) != promiseTag || Set_default && getTag(new Set_default()) != setTag2 || WeakMap_default && getTag(new WeakMap_default()) != weakMapTag2) {
+    getTag = function(value) {
+      var result = baseGetTag_default(value), Ctor = result == objectTag2 ? value.constructor : void 0, ctorString = Ctor ? toSource_default(Ctor) : "";
+      if (ctorString) {
+        switch (ctorString) {
+          case dataViewCtorString:
+            return dataViewTag2;
+          case mapCtorString:
+            return mapTag2;
+          case promiseCtorString:
+            return promiseTag;
+          case setCtorString:
+            return setTag2;
+          case weakMapCtorString:
+            return weakMapTag2;
+        }
+      }
+      return result;
+    };
+  }
+  var getTag_default = getTag;
+
+  // node_modules/lodash-es/_mapToArray.js
+  function mapToArray(map) {
+    var index = -1, result = Array(map.size);
+    map.forEach(function(value, key) {
+      result[++index] = [key, value];
+    });
+    return result;
+  }
+  var mapToArray_default = mapToArray;
+
+  // node_modules/lodash-es/_baseToPairs.js
+  function baseToPairs(object, props) {
+    return arrayMap_default(props, function(key) {
+      return [key, object[key]];
+    });
+  }
+  var baseToPairs_default = baseToPairs;
+
+  // node_modules/lodash-es/_setToPairs.js
+  function setToPairs(set) {
+    var index = -1, result = Array(set.size);
+    set.forEach(function(value) {
+      result[++index] = [value, value];
+    });
+    return result;
+  }
+  var setToPairs_default = setToPairs;
+
+  // node_modules/lodash-es/_createToPairs.js
+  var mapTag3 = "[object Map]";
+  var setTag3 = "[object Set]";
+  function createToPairs(keysFunc) {
+    return function(object) {
+      var tag = getTag_default(object);
+      if (tag == mapTag3) {
+        return mapToArray_default(object);
+      }
+      if (tag == setTag3) {
+        return setToPairs_default(object);
+      }
+      return baseToPairs_default(object, keysFunc(object));
+    };
+  }
+  var createToPairs_default = createToPairs;
+
+  // node_modules/lodash-es/toPairs.js
+  var toPairs = createToPairs_default(keys_default);
+  var toPairs_default = toPairs;
+
+  // quiz/client/src/screens/screen.ts
+  var activeScreen = null;
+  var DOMScreen = class {
+    constructor() {
+      this.killWhenInactive = true;
+      this.additionalClasses = [];
+    }
+    setup() {
+      this.domRef = document.createElement("div");
+      this.domRef.classList.add("screen", ...this.additionalClasses);
+      this.domRef.setAttribute("data-screen-active", "next");
+    }
+    render() {
+      this.domRef.innerHTML = this.template();
+      document.body.querySelector(".screen-container").appendChild(this.domRef);
+    }
+    template() {
+      return ``;
+    }
+    setActive(direction = "right", asOverlay) {
+      let transition = "cur-none";
+      switch (direction) {
+        case "left":
+          transition = "cur-left";
+          break;
+        case "right":
+          transition = "cur";
+          break;
+        case "fade":
+          transition = "cur-fade";
+          break;
+      }
+      if (asOverlay) {
+        this.domRef.setAttribute("data-screen-active", transition);
+        this.domRef.setAttribute("data-screen-overlay", "true");
+        return;
+      }
+      if (activeScreen) {
+        activeScreen.setInactive(direction);
+      }
+      this.domRef.setAttribute("data-screen-active", transition);
+      activeScreen = this;
+    }
+    setInactive(direction = "right") {
+      let transition = "prev-none";
+      switch (direction) {
+        case "left":
+          transition = "prev-left";
+          break;
+        case "right":
+          transition = "prev";
+          break;
+        case "fade":
+          transition = "prev-fade";
+          break;
+      }
+      this.domRef.setAttribute("data-screen-active", transition);
+      if (this.killWhenInactive) {
+        this.die();
+      }
+    }
+    die() {
+      if (activeScreen === this) {
+        activeScreen = null;
+      }
+      window.setTimeout(() => {
+        this.domRef.remove();
+      }, 1e3);
+    }
+    static spawnScreen(s) {
+      s.setup();
+      s.render();
+      s.init();
+      return s;
+    }
+  };
+
+  // quiz/client/src/screens/settings.ts
+  var SettingsScreen = class extends DOMScreen {
+    constructor() {
+      super();
+      this.killWhenInactive = false;
+      this.additionalClasses = ["gradient-bg-screen"];
+    }
+    init() {
+      this.domRef.querySelector("#settings-close").addEventListener("click", (e) => {
+        this.setInactive("fade");
+      });
+      const form = this.domRef.querySelector("form");
+      form.addEventListener("input", (e) => {
+        const elements = form.elements;
+        const animeTitleLanguage = elements.namedItem("anime-title-language").value;
+        globalSettings.languagePreference = animeTitleLanguage;
+      });
+    }
+    setActive() {
+      super.setActive("fade", true);
+    }
+    template() {
+      return `
+    <div class="title-bar">
+      <h1 class="title-h1">SETTINGS</h1>
+      <div class="tab-menu">
+        <div class="tab-menu-entry" data-active="true" data-target-tab="general">General</div>
+        <!--<div class="tab-menu-entry" data-target-tab="audio">Audio</div>-->
+      </div>
+      <div class="title-bar-spacer"></div>
+    </div>
+
+    <section class="content-wrapper" data-tab="general">
+      <div class="container-wrapper">
+        <form class="list">
+          <div class="list-row">
+            <div class="list-row-entry setting-row-entry">
+              <span class="setting-row-entry-label">Anime Title Language</span>
+              <select name="anime-title-language">
+                ${[
+        "Default" /* DEFAULT */,
+        "Shortest" /* SHORTEST */,
+        "English" /* ENGLISH */,
+        "Japanese" /* JAPANESE */,
+        "German" /* GERMAN */,
+        "Spanish" /* SPANISH */,
+        "French" /* FRENCH */
+      ].map(
+        (l) => `<option 
+                      value="${l}" 
+                      ${globalSettings.languagePreference === l ? "selected" : ""}>${l}</option>`
+      )}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+    
+    <div class="bottom-container" data-tab="general">
+      <input type="button" class="button button-outline" id="settings-close" value="Back">
+    </div>`;
+    }
+  };
+
+  // quiz/client/src/globalSettings.ts
+  var defaultSettings = {
+    volume: 1,
+    languagePreference: "Default" /* DEFAULT */
+  };
+  var _a;
+  var settings = __spreadValues(__spreadValues({}, defaultSettings), JSON.parse((_a = localStorage.getItem("settings")) != null ? _a : "{}"));
+  var globalSettings = new Proxy(settings, {
+    set(obj, prop, val) {
+      obj[prop] = val;
+      localStorage.setItem("settings", JSON.stringify(obj));
+      document.dispatchEvent(
+        new CustomEvent("globalSettingsChanged", {
+          detail: obj
+        })
+      );
+      return true;
+    }
+  });
+  var settingsDOM = document.querySelector(".settings-overlay");
+  var settingsScreen = DOMScreen.spawnScreen(new SettingsScreen());
+  function renderGlobalSettings() {
+    const dropdown = settingsDOM.querySelector(".settings-dropdown");
+    dropdown.innerHTML = `
   <div class="settings-dropdown-entry settings-dropdown-entry-inverted">
     <svg class="settings-dropdown-entry-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5,9V15H9L14,20V4L9,9M18.5,12C18.5,10.23 17.5,8.71 16,7.97V16C17.5,15.29 18.5,13.76 18.5,12Z" /></svg>
-    <input type="range" id="setting-audio-volume" min="1" max="100" value="${$.volume*100}">
-  </div>`,re.querySelector("#setting-audio-volume").addEventListener("input",e=>{$.volume=parseInt(e.target.value)/100});let r=re.querySelector(".settings-button");document.addEventListener("click",e=>{if(e.target===r){t.toggleAttribute("data-active");return}if(!t.contains(e.target)){t.toggleAttribute("data-active",!1);return}})}va();var O=null,p=class{constructor(){this.killWhenInactive=!0;this.additionalClasses=[]}setup(){this.domRef=document.createElement("div"),this.domRef.classList.add("screen",...this.additionalClasses),this.domRef.setAttribute("data-screen-active","next")}render(){this.domRef.innerHTML=this.template(),document.body.querySelector(".screen-container").appendChild(this.domRef)}template(){return""}setActive(r="right"){O&&O.setInactive(r);let e="cur-none";switch(r){case"left":e="cur-left";break;case"right":e="cur"}this.domRef.setAttribute("data-screen-active",e),O=this}setInactive(r="right"){let e="prev-none";switch(r){case"left":e="prev-left";break;case"right":e="prev"}this.domRef.setAttribute("data-screen-active",e),this.killWhenInactive&&this.die()}die(){O===this&&(O=null),window.setTimeout(()=>{this.domRef.remove()},1e3)}static spawnScreen(r){return r.setup(),r.render(),r.init(),r}};var Y=class extends p{constructor(e,a,o){super();this.questionId=null;this.ownAnwser=null;this.questionDone=!1;this.lobby=e,this.questionId=a,this.question=o}init(){this.domRef.addEventListener("click",e=>{let a=e.target;if(!a.hasAttribute("data-answer"))return;let o=a.getAttribute("data-answer");this.ownAnwser=parseInt(o),n.sendMsg("game.question.answer",{questionId:this.questionId,answer:this.ownAnwser}),this.domRef.querySelectorAll("[data-answer-selected=true]").forEach(l=>{l.removeAttribute("data-answer-selected")}),a.setAttribute("data-answer-selected","true")}),this.question.question.audioUrl&&(this.audio=new Audio(this.question.question.audioUrl),this.audio.preload="auto",this.audio.autoplay=!1,this.audio.volume=$.volume,document.addEventListener("globalSettingsChanged",e=>{this.audio.volume=e.detail.volume})),this.timerDOM=this.domRef.querySelector(".question-timer")}setActive(){super.setActive(),this.timerStarted=Date.now(),this.audio&&this.audio.play(),window.requestAnimationFrame(()=>{this.updateTimer()})}updateTimer(){let e=this.question.timeoutMs-500,a=Math.ceil((this.timerStarted+e-Date.now())/1e3),o=Math.max(1-(Date.now()-this.timerStarted)/e,0);this.questionDone&&(o=0),this.timerDOM.style.transform=`scaleX(${o})`,(a>0||!this.questionDone)&&window.requestAnimationFrame(()=>{this.updateTimer()})}showAnswers(e,a){let{correct:o,wrong:l}=e,d=te(a);o.forEach(s=>{this.domRef.querySelector(`li[data-answer="${s}"]`).setAttribute("data-answer-correct","true")}),l.includes(this.ownAnwser)&&this.domRef.querySelector(`li[data-answer="${this.ownAnwser}"]`).setAttribute("data-answer-correct","false"),this.question.question.image&&this.domRef.querySelector(".question-image").removeAttribute("data-blurred"),d.forEach(([s,i])=>{let u=this.lobby.getPlayerEntryById(s).name,v=this.domRef.querySelector(`li[data-answer="${i}"] > .answer-others-container`),I=document.createElement("div");I.classList.add("answer-others","skewed-tag"),I.innerHTML=`<span>${u}</span>`,v.appendChild(I)}),this.questionDone=!0}setInactive(e){super.setInactive(e),this.audio&&(this.audio.pause(),this.audio.remove())}template(){let e=this.question.question,a=this.question.answers,o=!!this.question.question.image,l=!!this.question.question.audioUrl;return`
+    <input type="range" id="setting-audio-volume" min="1" max="100" value="${globalSettings.volume * 100}">
+  </div>
+  <div class="settings-dropdown-entry" data-link="settings-screen">
+    <svg class="settings-dropdown-entry-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" /></svg>
+    Settings
+  </div>`;
+    settingsDOM.querySelector("#setting-audio-volume").addEventListener("input", (e) => {
+      globalSettings.volume = parseInt(e.target.value) / 100;
+    });
+    const menuButton = settingsDOM.querySelector(".settings-button");
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      if (target === menuButton) {
+        dropdown.toggleAttribute("data-active");
+        return;
+      }
+      if (dropdown.contains(target)) {
+        const link = target.closest("[data-link]");
+        if (!link) {
+          return;
+        }
+        switch (link.getAttribute("data-link")) {
+          case "settings-screen":
+            settingsScreen.setActive();
+            break;
+        }
+      }
+      dropdown.toggleAttribute("data-active", false);
+    });
+  }
+  renderGlobalSettings();
+
+  // quiz/client/src/utils/titles.ts
+  function renderAnimeTitle(titles) {
+    var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+    if (typeof titles === "string") {
+      return titles;
+    }
+    const defaultTitle = (_b = (_a2 = titles.find((t) => t.type === "Default" /* DEFAULT */)) == null ? void 0 : _a2.title) != null ? _b : titles.at(0).title;
+    switch (globalSettings.languagePreference) {
+      case "Default" /* DEFAULT */:
+        return defaultTitle;
+        break;
+      case "Shortest" /* SHORTEST */:
+        return (_d = (_c = titles.filter(
+          (t) => ["Default" /* DEFAULT */, "Synonym" /* SYNONYM */].includes(t.type)
+        ).sort((a, b) => a.title.length - b.title.length).at(0)) == null ? void 0 : _c.title) != null ? _d : defaultTitle;
+        break;
+      case "English" /* ENGLISH */:
+        return (_f = (_e = titles.find((t) => t.type === "English" /* ENGLISH */)) == null ? void 0 : _e.title) != null ? _f : defaultTitle;
+        break;
+      case "Japanese" /* JAPANESE */:
+        return (_h = (_g = titles.find((t) => t.type === "Japanese" /* JAPANESE */)) == null ? void 0 : _g.title) != null ? _h : defaultTitle;
+        break;
+      case "German" /* GERMAN */:
+        return (_j = (_i = titles.find((t) => t.type === "German" /* GERMAN */)) == null ? void 0 : _i.title) != null ? _j : defaultTitle;
+        break;
+      case "Spanish" /* SPANISH */:
+        return (_l = (_k = titles.find((t) => t.type === "Spanish" /* SPANISH */)) == null ? void 0 : _k.title) != null ? _l : defaultTitle;
+        break;
+      case "French" /* FRENCH */:
+        return (_n = (_m = titles.find((t) => t.type === "French" /* FRENCH */)) == null ? void 0 : _m.title) != null ? _n : defaultTitle;
+        break;
+    }
+    return defaultTitle;
+  }
+  function renderTemplate(template) {
+    var _a2;
+    const data = (_a2 = template == null ? void 0 : template.data) != null ? _a2 : {};
+    return template.template.map((s) => {
+      const value = data[s];
+      if (!value) {
+        return s;
+      }
+      if (typeof value === "string") {
+        return value;
+      }
+      return renderAnimeTitle(value);
+    }).join("");
+  }
+
+  // quiz/client/src/screens/question.ts
+  var QuestionScreen = class extends DOMScreen {
+    constructor(lobby, questionId, question) {
+      super();
+      this.questionId = null;
+      this.ownAnwser = null;
+      this.questionDone = false;
+      this.lobby = lobby;
+      this.questionId = questionId;
+      this.question = question;
+    }
+    init() {
+      this.domRef.addEventListener("click", (e) => {
+        const elem = e.target;
+        if (!elem.hasAttribute("data-answer")) {
+          return;
+        }
+        const val = elem.getAttribute("data-answer");
+        this.ownAnwser = parseInt(val);
+        socket.sendMsg("game.question.answer" /* GAME_QUESTION_ANSWER */, {
+          questionId: this.questionId,
+          answer: this.ownAnwser
+        });
+        this.domRef.querySelectorAll("[data-answer-selected=true]").forEach((e2) => {
+          e2.removeAttribute("data-answer-selected");
+        });
+        elem.setAttribute("data-answer-selected", "true");
+      });
+      if (this.question.question.audioUrl) {
+        this.audio = new Audio(this.question.question.audioUrl);
+        this.audio.preload = "auto";
+        this.audio.autoplay = false;
+        this.audio.volume = globalSettings.volume;
+        document.addEventListener(
+          "globalSettingsChanged",
+          this.settingsChanged.bind(this)
+        );
+      }
+      this.timerDOM = this.domRef.querySelector(".question-timer");
+    }
+    setActive() {
+      super.setActive();
+      this.timerStarted = Date.now();
+      if (this.audio) {
+        this.audio.play();
+      }
+      window.requestAnimationFrame(() => {
+        this.updateTimer();
+      });
+    }
+    settingsChanged(e) {
+      this.audio.volume = e.detail.volume;
+    }
+    updateTimer() {
+      const timeoutMs = this.question.timeoutMs - 500;
+      const timeLeftSeconds = Math.ceil(
+        (this.timerStarted + timeoutMs - Date.now()) / 1e3
+      );
+      let timePercentage = Math.max(
+        1 - (Date.now() - this.timerStarted) / timeoutMs,
+        0
+      );
+      if (this.questionDone) {
+        timePercentage = 0;
+      }
+      this.timerDOM.style.transform = `scaleX(${timePercentage})`;
+      if (timeLeftSeconds > 0 || !this.questionDone) {
+        window.requestAnimationFrame(() => {
+          this.updateTimer();
+        });
+      }
+    }
+    showAnswers(answers, playerAnswers) {
+      const { correct, wrong } = answers;
+      const otherAnswers = toPairs_default(playerAnswers);
+      correct.forEach((a) => {
+        this.domRef.querySelector(`li[data-answer="${a}"]`).setAttribute("data-answer-correct", "true");
+      });
+      if (wrong.includes(this.ownAnwser)) {
+        this.domRef.querySelector(`li[data-answer="${this.ownAnwser}"]`).setAttribute("data-answer-correct", "false");
+      }
+      if (this.question.question.image) {
+        const img = this.domRef.querySelector(".question-image");
+        img.removeAttribute("data-blurred");
+      }
+      otherAnswers.forEach(([playerId, answerId]) => {
+        const playerName = this.lobby.getPlayerEntryById(playerId).name;
+        const answerContainer = this.domRef.querySelector(
+          `li[data-answer="${answerId}"] > .answer-others-container`
+        );
+        const tag = document.createElement("div");
+        tag.classList.add("answer-others", "skewed-tag");
+        tag.innerHTML = `<span>${playerName}</span>`;
+        answerContainer.appendChild(tag);
+      });
+      this.questionDone = true;
+    }
+    setInactive(direction) {
+      super.setInactive(direction);
+      if (this.audio) {
+        this.audio.pause();
+        this.audio.remove();
+      }
+    }
+    die() {
+      super.die();
+      document.removeEventListener("globalSettingsChanged", this.settingsChanged);
+    }
+    template() {
+      const question = this.question.question;
+      const answers = this.question.answers;
+      const hasImage = this.question.question.image ? true : false;
+      const hasAudio = this.question.question.audioUrl ? true : false;
+      return `
     <div><!-- empty div for spacing --></div>
     <div class="question-wrapper">
       <div class="container question-container">
-      <div class="skewed-tag skewed-tag-big tag-question-number">${this.questionId+1}</div>
-        ${o?`<div class="question-image-container">
-            <img class="question-image" ${e.imageBlurred?"data-blurred=true":""} src="${(0,Q.default)(e.image)}">
-            </div>`:""}
-        <div class="question-title title-h3">${(0,Q.default)(e.title)}</div>
+      <div class="skewed-tag skewed-tag-big tag-question-number">${this.questionId + 1}</div>
+        ${hasImage ? `<div class="question-image-container">
+            <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
+            </div>` : ""}
+        <div class="question-title title-h3">${(0, import_escape_html.default)(
+        renderTemplate(question.title)
+      )}</div>
         <div class="question-timer"></div>
       </div>
       <ul class="answers">
-        ${a.map((d,s)=>`<li data-answer="${s}">
-            ${(0,Q.default)(d)}
+        ${answers.map(
+        (a, idx) => `<li data-answer="${idx}">
+            ${(0, import_escape_html.default)(renderAnimeTitle(a))}
             <div class="answer-others-container"></div>
-          </li>`).join("")}
+          </li>`
+      ).join("")}
       </ul>
-    </div>`}};var V=class extends p{constructor(){super();this.killWhenInactive=!1;this.additionalClasses=["lobby-screen"];this.currentLobbyStatus=null;this.lobbyId="";this.selfReady=!1;this.playerlist=[];this.questions=new Map}init(){this.readyButton=this.domRef.querySelector("#lobby-ready");let e=this.domRef.querySelector("#copy-lobby-id");this.lobbySettingsDom=this.domRef.querySelector(".lobby-settings");let a=this.domRef.querySelector("#lobby-back-button");document.addEventListener("keydown",this.keydown.bind(this)),document.addEventListener("keyup",this.keyup.bind(this));let o=this.domRef.querySelector(".lobby-playerlist");this.scoreboardDom=document.createElement("div"),this.scoreboardDom.classList.add("playerlist","playerlist-scoreboard"),this.statusListener=n.on("game.status",({id:s,status:i})=>{if(this.lobbyId=s,this.domRef.querySelector("#lobby-id").innerHTML=s,this.currentLobbyStatus&&this.currentLobbyStatus!==i)switch(i){case"IN_GAME":break;case"LOBBY":this.scoreboardCloseCallback&&(this.scoreboardCloseCallback(),this.scoreboardCloseCallback=null),g("Final Scoreboard",void 0,{actions:[{title:"Back to Lobby",value:"back",class:"button-outline"}],alternativeContentDom:this.scoreboardDom,callback:()=>{this.setActive()}});break}this.currentLobbyStatus=i,this.updateReadyButton()}),this.playerlistListener=n.on("game.playerlist",({playerlist:s,host:i})=>{var oe;this.playerlist=s,this.lobbyHost=this.playerlist.find(c=>c.playerId===i);let u=new Array(Math.max(6-this.playerlist.length,0)).fill(!0),v=[...this.playerlist].map(c=>`<li class="list-row">
+    </div>`;
+    }
+  };
+
+  // quiz/client/src/screens/lobby.ts
+  var LobbyScreen = class extends DOMScreen {
+    constructor() {
+      super();
+      this.killWhenInactive = false;
+      this.additionalClasses = ["gradient-bg-screen"];
+      this.currentLobbyStatus = null;
+      this.lobbyId = "";
+      this.selfReady = false;
+      this.playerlist = [];
+      this.questions = /* @__PURE__ */ new Map();
+    }
+    init() {
+      this.readyButton = this.domRef.querySelector(
+        "#lobby-ready"
+      );
+      const copyIdButton = this.domRef.querySelector(
+        "#copy-lobby-id"
+      );
+      this.lobbySettingsDom = this.domRef.querySelector(
+        ".lobby-settings"
+      );
+      const backToJoinButton = this.domRef.querySelector(
+        "#lobby-back-button"
+      );
+      document.addEventListener("keydown", this.keydown.bind(this));
+      document.addEventListener("keyup", this.keyup.bind(this));
+      const playerListDom = this.domRef.querySelector(".lobby-playerlist");
+      this.scoreboardDom = document.createElement("div");
+      this.scoreboardDom.classList.add("playerlist", "playerlist-scoreboard");
+      this.statusListener = socket.on(
+        "game.status" /* GAME_STATUS */,
+        ({ id, status }) => {
+          this.lobbyId = id;
+          this.domRef.querySelector("#lobby-id").innerHTML = id;
+          if (this.currentLobbyStatus && this.currentLobbyStatus !== status) {
+            switch (status) {
+              case "IN_GAME" /* IN_GAME */:
+                break;
+              case "LOBBY" /* LOBBY */:
+                if (this.scoreboardCloseCallback) {
+                  this.scoreboardCloseCallback();
+                  this.scoreboardCloseCallback = null;
+                }
+                showDialog("Final Scoreboard", void 0, {
+                  actions: [
+                    {
+                      title: "Back to Lobby",
+                      value: "back",
+                      class: "button-outline"
+                    }
+                  ],
+                  alternativeContentDom: this.scoreboardDom,
+                  callback: () => {
+                    this.setActive();
+                  }
+                });
+                break;
+            }
+          }
+          this.currentLobbyStatus = status;
+          this.updateReadyButton();
+        }
+      );
+      this.playerlistListener = socket.on(
+        "game.playerlist" /* GAME_PLAYERLIST */,
+        ({ playerlist, host }) => {
+          var _a2;
+          this.playerlist = playerlist;
+          this.lobbyHost = this.playerlist.find((e) => e.playerId === host);
+          const dummyFiller = new Array(
+            Math.max(6 - this.playerlist.length, 0)
+          ).fill(true);
+          const playerListHTML = [...this.playerlist].map(
+            (e) => `<li class="list-row">
                 <div class="list-row-entry player-row-entry">
-                  <span class="player-name">${c.name}</span>
-                  ${c.ready?'<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>':'<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>'}
+                  <span class="player-name">${e.name}</span>
+                  ${e.ready ? `<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>` : `<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>`}
                 </div>
                 <div class="list-row-entry player-row-more">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
                   </svg>
                 </div>
-              </li>`).join(""),I=u.map(c=>`<li class="list-row">
+              </li>`
+          ).join("");
+          const dummyHTML = dummyFiller.map(
+            (e) => `<li class="list-row">
                 <div class="list-row-entry player-row-entry player-row-entry-empty">
                   <span class="player-name">Empty</span>
                 </div>
                 <div class="list-row-entry player-row-more"></div>
-              </li>`).join("");o.innerHTML=v+I,this.scoreboardDom.innerHTML=[...this.playerlist].sort((c,tt)=>tt.score-c.score).map(c=>`<li class="playerlist-entry">
-                ${c.name}
-                <div class="skewed-tag ${c.playerId===h.me.id?"skewed-tag-primary":""} tag-score">${c.score}</div>
-              </li>`).join("");let et=this.playerlist.filter(c=>c.ready).length;document.querySelector("#lobby-dd-ready").innerHTML=`${et}/${this.playerlist.length}`,document.querySelector("#lobby-dd-host").innerHTML=(oe=this.lobbyHost)==null?void 0:oe.name;let F=s.find(c=>c.playerId===h.me.id);this.selfReady=F==null?void 0:F.ready,this.updateReadyButton(),this.updateSaveSettingsButton()}),this.gameSettingsListener=n.on("game.settings",({currentSettings:s,availableQuestions:i})=>{this.renderSettings(s,i),document.querySelector("#lobby-dd-question-amount").innerHTML=`${s["questionCount"]}`}),this.questionListener=n.on("game.question",({id:s,question:i})=>{let u=p.spawnScreen(new Y(this,s,i));this.questions.set(s,u)}),this.questionActiveListener=n.on("game.question.active",({id:s})=>{this.questions.get(s).setActive()}),this.questionAnswersListener=n.on("game.question.answers",({id:s,answers:i,playerAnswers:u})=>{this.questions.get(s).showAnswers(i,u)}),this.selfLeftListener=n.on("me.game.left",({reason:s})=>{this.leaveLobby(),s==="KICKED_INACTIVITY"&&g("You were kicked","You were kicked from the game due to inactivity.")}),this.readyButton.addEventListener("click",s=>{this.selfReady=!this.selfReady,n.sendMsg("me.ready",{ready:this.selfReady}),this.updateReadyButton()}),e.addEventListener("click",s=>{s.preventDefault(),navigator.clipboard.writeText(this.lobbyId)});let l=this.domRef.querySelectorAll("[data-tab]"),d=this.domRef.querySelector(".tab-menu");d.addEventListener("click",s=>{s.preventDefault();let i=s.target,u=i.getAttribute("data-target-tab");console.log(i,u),u&&(d.querySelector("[data-active=true]").removeAttribute("data-active"),i.setAttribute("data-active","true"),l.forEach(v=>{v.setAttribute("data-inactive","true"),v.getAttribute("data-tab")===u&&v.removeAttribute("data-inactive")}))}),a.addEventListener("click",s=>{s.preventDefault(),n.sendMsg("game.leave")}),this.lobbySettingsDom.addEventListener("submit",s=>{s.preventDefault(),this.submitSettings()}),this.settingsSubmitButton=this.domRef.querySelector(".button[name=update-settings]"),this.lobbySettingsDom.addEventListener("input",s=>{if(s.preventDefault(),!this.selfIsHost()){this.lobbySettingsDom.reset();return}this.settingsSubmitButton.setAttribute("data-active","true")})}renderSettings(e,a){let l=[{label:"No. of Questions",inputs:[{value:e["questionCount"],name:"questionCount",type:"number",min:3,max:50}]},{label:"Popularity",inputs:[{value:e["minPopularity"],name:"minPopularity",type:"number",min:-1,max:1e4},{value:e["maxPopularity"],name:"maxPopularity",type:"number",min:-1,max:1e4}]},{label:"Year",inputs:[{value:e["minYear"],name:"minYear",type:"number",min:-1,max:1e4},{value:e["maxYear"],name:"maxYear",type:"number",min:-1,max:1e4}]},{label:"Main Role Only",inputs:[{value:e["mainRoleOnly"],checked:e["mainRoleOnly"],name:"mainRoleOnly",type:"checkbox"}]}].map(s=>`<div class="list-row">
+              </li>`
+          ).join("");
+          playerListDom.innerHTML = playerListHTML + dummyHTML;
+          this.scoreboardDom.innerHTML = [...this.playerlist].sort((a, b) => b.score - a.score).map(
+            (e) => `<li class="playerlist-entry">
+                ${e.name}
+                <div class="skewed-tag ${e.playerId === globalState.me.id ? "skewed-tag-primary" : ""} tag-score">${e.score}</div>
+              </li>`
+          ).join("");
+          const readyCount = this.playerlist.filter((e) => e.ready).length;
+          document.querySelector(
+            "#lobby-dd-ready"
+          ).innerHTML = `${readyCount}/${this.playerlist.length}`;
+          document.querySelector("#lobby-dd-host").innerHTML = (_a2 = this.lobbyHost) == null ? void 0 : _a2.name;
+          const self2 = playerlist.find((e) => e.playerId === globalState.me.id);
+          this.selfReady = self2 == null ? void 0 : self2.ready;
+          this.updateReadyButton();
+          this.updateSaveSettingsButton();
+        }
+      );
+      this.gameSettingsListener = socket.on(
+        "game.settings" /* GAME_SETTINGS */,
+        ({ currentSettings, availableQuestions }) => {
+          this.renderSettings(currentSettings, availableQuestions);
+          document.querySelector("#lobby-dd-question-amount").innerHTML = `${currentSettings["questionCount" /* QUESTION_COUNT */]}`;
+        }
+      );
+      this.questionListener = socket.on(
+        "game.question" /* GAME_QUESTION */,
+        ({ id, question }) => {
+          const screen = DOMScreen.spawnScreen(
+            new QuestionScreen(this, id, question)
+          );
+          this.questions.set(id, screen);
+        }
+      );
+      this.questionActiveListener = socket.on(
+        "game.question.active" /* GAME_QUESTION_ACTIVE */,
+        ({ id }) => {
+          const q = this.questions.get(id);
+          q.setActive();
+        }
+      );
+      this.questionAnswersListener = socket.on(
+        "game.question.answers" /* GAME_QUESTION_ANSWERS */,
+        ({ id, answers, playerAnswers }) => {
+          const q = this.questions.get(id);
+          q.showAnswers(answers, playerAnswers);
+        }
+      );
+      this.selfLeftListener = socket.on(
+        "me.game.left" /* ME_LEFT_GAME */,
+        ({ reason }) => {
+          this.leaveLobby();
+          if (reason === "KICKED_INACTIVITY" /* KICKED_INACTIVITY */) {
+            showDialog(
+              "You were kicked",
+              "You were kicked from the game due to inactivity."
+            );
+          }
+        }
+      );
+      this.readyButton.addEventListener("click", (e) => {
+        this.selfReady = !this.selfReady;
+        socket.sendMsg("me.ready" /* ME_READY */, { ready: this.selfReady });
+        this.updateReadyButton();
+      });
+      copyIdButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(this.lobbyId);
+      });
+      const tabs = this.domRef.querySelectorAll("[data-tab]");
+      const tabMenu = this.domRef.querySelector(".tab-menu");
+      tabMenu.addEventListener("click", (e) => {
+        e.preventDefault();
+        const domElem = e.target;
+        const targetTab = domElem.getAttribute("data-target-tab");
+        console.log(domElem, targetTab);
+        if (!targetTab) {
+          return;
+        }
+        tabMenu.querySelector("[data-active=true]").removeAttribute("data-active");
+        domElem.setAttribute("data-active", "true");
+        tabs.forEach((t) => {
+          t.setAttribute("data-inactive", "true");
+          if (t.getAttribute("data-tab") === targetTab) {
+            t.removeAttribute("data-inactive");
+          }
+        });
+      });
+      backToJoinButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        socket.sendMsg("game.leave" /* GAME_LEAVE */);
+      });
+      this.lobbySettingsDom.addEventListener("submit", (e) => {
+        e.preventDefault();
+        this.submitSettings();
+      });
+      this.settingsSubmitButton = this.domRef.querySelector(
+        ".button[name=update-settings]"
+      );
+      this.lobbySettingsDom.addEventListener("input", (e) => {
+        e.preventDefault();
+        if (!this.selfIsHost()) {
+          this.lobbySettingsDom.reset();
+          return;
+        }
+        this.settingsSubmitButton.setAttribute("data-active", "true");
+      });
+    }
+    renderSettings(settings2, availableQuestions) {
+      const entries = [
+        {
+          label: "No. of Questions",
+          inputs: [
+            {
+              value: settings2["questionCount" /* QUESTION_COUNT */],
+              name: "questionCount" /* QUESTION_COUNT */,
+              type: "number",
+              min: 3,
+              max: 50
+            }
+          ]
+        },
+        {
+          label: "Popularity",
+          inputs: [
+            {
+              value: settings2["minPopularity" /* MIN_POPULARITY */],
+              name: "minPopularity" /* MIN_POPULARITY */,
+              type: "number",
+              min: -1,
+              max: 1e4
+            },
+            {
+              value: settings2["maxPopularity" /* MAX_POPULARITY */],
+              name: "maxPopularity" /* MAX_POPULARITY */,
+              type: "number",
+              min: -1,
+              max: 1e4
+            }
+          ]
+        },
+        {
+          label: "Year",
+          inputs: [
+            {
+              value: settings2["minYear" /* MIN_YEAR */],
+              name: "minYear" /* MIN_YEAR */,
+              type: "number",
+              min: -1,
+              max: 1e4
+            },
+            {
+              value: settings2["maxYear" /* MAX_YEAR */],
+              name: "maxYear" /* MAX_YEAR */,
+              type: "number",
+              min: -1,
+              max: 1e4
+            }
+          ]
+        },
+        {
+          label: "Main Role Only",
+          inputs: [
+            {
+              value: settings2["mainRoleOnly" /* MAIN_ROLE_ONLY */],
+              checked: settings2["mainRoleOnly" /* MAIN_ROLE_ONLY */],
+              name: "mainRoleOnly" /* MAIN_ROLE_ONLY */,
+              type: "checkbox"
+            }
+          ]
+        }
+      ];
+      const filterSettings = entries.map((e) => {
+        return `<div class="list-row">
           <div class="list-row-entry setting-row-entry">
-            <span class="setting-row-entry-label">${s.label}</span>
-            ${s.inputs.map(i=>`<input name="${i.name}" type="${i.type}" 
-                  ${i.type!=="checkbox"?'style="width:6rem" required':""} 
+            <span class="setting-row-entry-label">${e.label}</span>
+            ${e.inputs.map(
+          (i) => `<input name="${i.name}" type="${i.type}" 
+                  ${i.type !== "checkbox" ? 'style="width:6rem" required' : ""} 
                   value="${i.value}" 
-                  ${i.min?`min="${i.min}"`:""} 
-                  ${i.max?`max="${i.max}"`:""} 
-                  ${i.checked?"checked":""}>`).join(" - ")}
+                  ${i.min ? `min="${i.min}"` : ""} 
+                  ${i.max ? `max="${i.max}"` : ""} 
+                  ${i.checked ? `checked` : ""}>`
+        ).join(" - ")}
           </div>
-        </div>`).join(""),d=a.map(s=>`<div class="list-row">
+        </div>`;
+      }).join("");
+      const questionSettings = availableQuestions.map((qId) => {
+        return `<div class="list-row">
           <div class="list-row-entry setting-row-entry">
-            <span class="setting-row-entry-label">${ue(s)}</span>
-            <input type="checkbox" id="q_${s}" 
-            name="${"activeQuestions"}" 
-            value="${s}" 
-            ${e["activeQuestions"].some(i=>s===i)?"checked":""}>
+            <span class="setting-row-entry-label">${getQuestionNameById(
+          qId
+        )}</span>
+            <input type="checkbox" id="q_${qId}" 
+            name="${"activeQuestions" /* ACTIVE_QUESTIONS */}" 
+            value="${qId}" 
+            ${settings2["activeQuestions" /* ACTIVE_QUESTIONS */].some((q) => qId === q) ? "checked" : ""}>
           </div>
-        </div>`).join("");this.lobbySettingsDom.innerHTML=`<div class="list-row list-row-header">Filters</div>
-    ${l}
+        </div>`;
+      }).join("");
+      this.lobbySettingsDom.innerHTML = `<div class="list-row list-row-header">Filters</div>
+    ${filterSettings}
     
     <div class="list-row list-row-header">Questions</div>
-    ${d}`,this.settingsSubmitButton.removeAttribute("data-active")}submitSettings(){n.sendMsg("game.settings",{settings:{["questionCount"]:parseInt(this.lobbySettingsDom.querySelector(`[name="${"questionCount"}"]`).value),["activeQuestions"]:Array.from(this.lobbySettingsDom.querySelectorAll(`[name="${"activeQuestions"}"]:checked`)).map(e=>e.value),["mainRoleOnly"]:this.lobbySettingsDom.querySelector(`[name="${"mainRoleOnly"}"]`).checked,["minPopularity"]:parseInt(this.lobbySettingsDom.querySelector(`[name="${"minPopularity"}"]`).value),["maxPopularity"]:parseInt(this.lobbySettingsDom.querySelector(`[name="${"maxPopularity"}"]`).value),["minYear"]:parseInt(this.lobbySettingsDom.querySelector(`[name="${"minYear"}"]`).value),["maxYear"]:parseInt(this.lobbySettingsDom.querySelector(`[name="${"maxYear"}"]`).value)}})}updateReadyButton(){this.readyButton.value=this.currentLobbyStatus==="IN_GAME"?"GAME STARTING":this.selfReady?"NOT Ready":"READY",this.readyButton.setAttribute("data-active",this.selfReady+""),this.readyButton.disabled=this.currentLobbyStatus==="IN_GAME"}updateSaveSettingsButton(){let e=this.domRef.querySelector("#update-settings-button");this.selfIsHost()?(e.value="Save",e.disabled=!1):(e.value="Only host can save",e.disabled=!0)}getPlayerEntryById(e){return this.playerlist.find(a=>a.playerId===e)}leaveLobby(){p.spawnScreen(new T).setActive("left"),this.die()}selfIsHost(){return this.lobbyHost&&this.lobbyHost.playerId===h.me.id}template(){return`
+    ${questionSettings}`;
+      this.settingsSubmitButton.removeAttribute("data-active");
+    }
+    submitSettings() {
+      socket.sendMsg("game.settings" /* GAME_SETTINGS */, {
+        settings: {
+          ["questionCount" /* QUESTION_COUNT */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"questionCount" /* QUESTION_COUNT */}"]`
+            ).value
+          ),
+          ["activeQuestions" /* ACTIVE_QUESTIONS */]: Array.from(
+            this.lobbySettingsDom.querySelectorAll(
+              `[name="${"activeQuestions" /* ACTIVE_QUESTIONS */}"]:checked`
+            )
+          ).map((e) => e.value),
+          ["mainRoleOnly" /* MAIN_ROLE_ONLY */]: this.lobbySettingsDom.querySelector(
+            `[name="${"mainRoleOnly" /* MAIN_ROLE_ONLY */}"]`
+          ).checked,
+          ["minPopularity" /* MIN_POPULARITY */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"minPopularity" /* MIN_POPULARITY */}"]`
+            ).value
+          ),
+          ["maxPopularity" /* MAX_POPULARITY */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"maxPopularity" /* MAX_POPULARITY */}"]`
+            ).value
+          ),
+          ["minYear" /* MIN_YEAR */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"minYear" /* MIN_YEAR */}"]`
+            ).value
+          ),
+          ["maxYear" /* MAX_YEAR */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"maxYear" /* MAX_YEAR */}"]`
+            ).value
+          )
+        }
+      });
+    }
+    updateReadyButton() {
+      this.readyButton.value = this.currentLobbyStatus === "IN_GAME" /* IN_GAME */ ? "GAME STARTING" : this.selfReady ? "NOT Ready" : "READY";
+      this.readyButton.setAttribute("data-active", this.selfReady + "");
+      this.readyButton.disabled = this.currentLobbyStatus === "IN_GAME" /* IN_GAME */;
+    }
+    updateSaveSettingsButton() {
+      const button = this.domRef.querySelector(
+        "#update-settings-button"
+      );
+      if (this.selfIsHost()) {
+        button.value = "Save";
+        button.disabled = false;
+      } else {
+        button.value = "Only host can save";
+        button.disabled = true;
+      }
+    }
+    getPlayerEntryById(id) {
+      return this.playerlist.find((e) => {
+        return e.playerId === id;
+      });
+    }
+    leaveLobby() {
+      DOMScreen.spawnScreen(new JoinScreen()).setActive("left");
+      this.die();
+    }
+    selfIsHost() {
+      return this.lobbyHost && this.lobbyHost.playerId === globalState.me.id;
+    }
+    template() {
+      return `
     <div class="title-bar">
       <h1 class="title-h1">LOBBY</h1>
       <div class="tab-menu">
@@ -119,7 +1597,106 @@
 
     <div class="bottom-container" data-tab="settings" data-inactive="true">
       <input type="submit" class="button button-outline" name="update-settings" id="update-settings-button" form="lobby-settings" value="Save">
-    </div>`}keydown(e){if(this.currentLobbyStatus!=="IN_GAME"||e.key!=="Tab"||(e.preventDefault(),e.stopPropagation(),e.repeat))return;this.scoreboardCloseCallback&&(e.preventDefault(),this.scoreboardCloseCallback(),this.scoreboardCloseCallback=null);let a=new Promise(o=>{this.scoreboardCloseCallback=o});g("Scoreboard",void 0,{actions:[],closeDialogPromise:a,alternativeContentDom:this.scoreboardDom})}keyup(e){e.key==="Tab"&&this.scoreboardCloseCallback&&(e.preventDefault(),this.scoreboardCloseCallback(),this.scoreboardCloseCallback=null)}die(){super.die(),n.off("game.status",this.statusListener),n.off("game.playerlist",this.playerlistListener),n.off("game.settings",this.gameSettingsListener),n.off("game.question",this.questionListener),n.off("game.question.active",this.questionActiveListener),n.off("game.question.answers",this.questionAnswersListener),n.off("me.game.left",this.selfLeftListener),this.questions.forEach(e=>{e.die()}),document.removeEventListener("keydown",this.keydown),document.removeEventListener("keyup",this.keyup)}};var T=class extends p{init(){this.domRef.querySelector("form[name=create]").addEventListener("submit",a=>M(this,null,function*(){a.preventDefault(),this.submitDisabled(!0),n.sendMsg("game.create")})),this.domRef.querySelector("form[name=join]").addEventListener("submit",a=>M(this,null,function*(){a.preventDefault(),document.activeElement.blur();let o=a.target["lobby-id"].value;this.submitDisabled(!0),n.sendMsg("game.join",{id:o})})),this.errListener=n.on("generic.error",({title:a})=>{console.log("called err"),g(a),this.submitDisabled(!1)});let e=p.spawnScreen(new V);this.joinedListener=n.once("game.status",({id:a,status:o})=>{n.off("generic.error",this.errListener),e.setActive()})}submitDisabled(e){this.domRef.querySelectorAll("input[type=submit]").forEach(a=>a.disabled=e)}die(){super.die(),n.off("generic.error",this.errListener),n.off("game.status",this.joinedListener)}template(){return`
+    </div>`;
+    }
+    keydown(event) {
+      if (this.currentLobbyStatus !== "IN_GAME" /* IN_GAME */) {
+        return;
+      }
+      if (event.key !== "Tab") {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.repeat) {
+        return;
+      }
+      if (this.scoreboardCloseCallback) {
+        event.preventDefault();
+        this.scoreboardCloseCallback();
+        this.scoreboardCloseCallback = null;
+      }
+      const scoreboardClosePromise = new Promise((res) => {
+        this.scoreboardCloseCallback = res;
+      });
+      showDialog("Scoreboard", void 0, {
+        actions: [],
+        closeDialogPromise: scoreboardClosePromise,
+        alternativeContentDom: this.scoreboardDom
+      });
+    }
+    keyup(event) {
+      if (event.key !== "Tab") {
+        return;
+      }
+      if (this.scoreboardCloseCallback) {
+        event.preventDefault();
+        this.scoreboardCloseCallback();
+        this.scoreboardCloseCallback = null;
+      }
+    }
+    die() {
+      super.die();
+      socket.off("game.status" /* GAME_STATUS */, this.statusListener);
+      socket.off("game.playerlist" /* GAME_PLAYERLIST */, this.playerlistListener);
+      socket.off("game.settings" /* GAME_SETTINGS */, this.gameSettingsListener);
+      socket.off("game.question" /* GAME_QUESTION */, this.questionListener);
+      socket.off(
+        "game.question.active" /* GAME_QUESTION_ACTIVE */,
+        this.questionActiveListener
+      );
+      socket.off(
+        "game.question.answers" /* GAME_QUESTION_ANSWERS */,
+        this.questionAnswersListener
+      );
+      socket.off("me.game.left" /* ME_LEFT_GAME */, this.selfLeftListener);
+      this.questions.forEach((q) => {
+        q.die();
+      });
+      document.removeEventListener("keydown", this.keydown);
+      document.removeEventListener("keyup", this.keyup);
+    }
+  };
+
+  // quiz/client/src/screens/join.ts
+  var JoinScreen = class extends DOMScreen {
+    init() {
+      this.domRef.querySelector("form[name=create]").addEventListener("submit", (e) => __async(this, null, function* () {
+        e.preventDefault();
+        this.submitDisabled(true);
+        socket.sendMsg("game.create" /* GAME_CREATE */);
+      }));
+      this.domRef.querySelector("form[name=join]").addEventListener("submit", (e) => __async(this, null, function* () {
+        e.preventDefault();
+        document.activeElement.blur();
+        const joinId = e.target["lobby-id"].value;
+        this.submitDisabled(true);
+        socket.sendMsg("game.join" /* GAME_JOIN */, { id: joinId });
+      }));
+      this.errListener = socket.on("generic.error" /* ERROR */, ({ title }) => {
+        console.log("called err");
+        showDialog(title);
+        this.submitDisabled(false);
+      });
+      const lobby = DOMScreen.spawnScreen(new LobbyScreen());
+      this.joinedListener = socket.once(
+        "game.status" /* GAME_STATUS */,
+        ({ id, status }) => {
+          socket.off("generic.error" /* ERROR */, this.errListener);
+          lobby.setActive();
+        }
+      );
+    }
+    submitDisabled(d) {
+      this.domRef.querySelectorAll("input[type=submit]").forEach((i) => i.disabled = d);
+    }
+    die() {
+      super.die();
+      socket.off("generic.error" /* ERROR */, this.errListener);
+      socket.off("game.status" /* GAME_STATUS */, this.joinedListener);
+    }
+    template() {
+      return `
     <h1 class="title-h1">PLAY</h1>
     <section class="multiple-container-wrapper">
       <div class="container">
@@ -136,7 +1713,31 @@
           <input type="submit" class="button button-primary" name="join" value="Join">
         </form>
       </label>
-    </section>`}};var W=class extends p{init(){this.domRef.querySelector("form").addEventListener("submit",e=>M(this,null,function*(){e.preventDefault();let a=e.target.submit;a.disabled=!0;let o=e.target.username.value;n.isOpen()||(yield n.open()),n.sendMsg("me.change_name",{name:o}),p.spawnScreen(new T).setActive()}))}setActive(){super.setActive("none"),this.domRef.querySelector("input[name=username]").focus({preventScroll:!0})}template(){return`
+    </section>`;
+    }
+  };
+
+  // quiz/client/src/screens/login.ts
+  var LoginScreen = class extends DOMScreen {
+    init() {
+      this.domRef.querySelector("form").addEventListener("submit", (e) => __async(this, null, function* () {
+        e.preventDefault();
+        const submitButton = e.target["submit"];
+        submitButton.disabled = true;
+        const name = e.target["username"].value;
+        if (!socket.isOpen()) {
+          yield socket.open();
+        }
+        socket.sendMsg("me.change_name" /* ME_CHANGE_NAME */, { name });
+        DOMScreen.spawnScreen(new JoinScreen()).setActive();
+      }));
+    }
+    setActive() {
+      super.setActive("none");
+      this.domRef.querySelector("input[name=username]").focus({ preventScroll: true });
+    }
+    template() {
+      return `
     <h1 class="title-h1">otakuquiz.lol</h1>
     <div class="container">
       <div class="title-h2">Choose your username</div>
@@ -144,7 +1745,22 @@
         <input type="text" name="username" autocomplete="off" minlength=3 maxlength=12 required placeholder="username">
         <input type="submit" class="button button-primary" name="submit" value="Connect!">
       </form>
-    </div>`}die(){super.die(),n.off("generic.error",this.errListener)}};n.on("me",t=>{h.me.id=t.id,h.me.name=t.name});var ga=p.spawnScreen(new W);ga.setActive();})();
+    </div>`;
+    }
+    die() {
+      super.die();
+      socket.off("generic.error" /* ERROR */, this.errListener);
+    }
+  };
+
+  // quiz/client/src/client.ts
+  socket.on("me" /* ME */, (me) => {
+    globalState.me.id = me.id;
+    globalState.me.name = me.name;
+  });
+  var login = DOMScreen.spawnScreen(new LoginScreen());
+  login.setActive();
+})();
 /*! Bundled license information:
 
 escape-html/index.js:

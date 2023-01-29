@@ -1,3 +1,4 @@
+import { AnimeTitleType } from "../common/types/question.js";
 import { fixCharacterName } from "../common/utils/animehelper.js";
 import { queryAll } from "./db.mjs";
 
@@ -20,9 +21,9 @@ export interface DBCharacter {
     id: string;
     title: string;
     alternative_titles: {
-      type: string;
+      type: AnimeTitleType;
       title: string;
-    };
+    }[];
   }[];
 }
 

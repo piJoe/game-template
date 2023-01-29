@@ -22,7 +22,7 @@ import { DOMScreen } from "./screen";
 
 export class LobbyScreen extends DOMScreen {
   protected killWhenInactive = false;
-  protected additionalClasses = ["lobby-screen"];
+  protected additionalClasses = ["gradient-bg-screen"];
 
   private currentLobbyStatus: SESSION_STATUS = null;
   private statusListener: number;

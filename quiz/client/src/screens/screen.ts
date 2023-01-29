@@ -24,10 +24,10 @@ export abstract class DOMScreen {
     return ``;
   }
 
-  setActive(direction: "left" | "right" | "none" = "right") {
-    if (activeScreen) {
-      activeScreen.setInactive(direction);
-    }
+  setActive(
+    direction: "left" | "right" | "none" | "fade" = "right",
+    asOverlay?: boolean
+  ) {
     let transition = "cur-none";
     switch (direction) {
       case "left":
@@ -35,12 +35,28 @@ export abstract class DOMScreen {
         break;
       case "right":
         transition = "cur";
+        break;
+      case "fade":
+        transition = "cur-fade";
+        break;
+    }
+
+    // if we're displaying the screen as overlay, do not update `activeScreen`
+    // and never call `setInactive` on the current screen.
+    if (asOverlay) {
+      this.domRef.setAttribute("data-screen-active", transition);
+      this.domRef.setAttribute("data-screen-overlay", "true");
+      return;
+    }
+
+    if (activeScreen) {
+      activeScreen.setInactive(direction);
     }
     this.domRef.setAttribute("data-screen-active", transition);
     activeScreen = this;
   }
 
-  setInactive(direction: "left" | "right" | "none" = "right") {
+  setInactive(direction: "left" | "right" | "none" | "fade" = "right") {
     let transition = "prev-none";
     switch (direction) {
       case "left":
@@ -48,6 +64,10 @@ export abstract class DOMScreen {
         break;
       case "right":
         transition = "prev";
+        break;
+      case "fade":
+        transition = "prev-fade";
+        break;
     }
     this.domRef.setAttribute("data-screen-active", transition);
     if (this.killWhenInactive) {

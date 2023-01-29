@@ -32,18 +32,27 @@
 
 .settings-dropdown {
     display: none;
+    background: var(--color-black);
     border: var(--border-width-small) solid var(--color-white);
     border-radius: var(--border-radius-medium);
     pointer-events: all;
     margin-top: 8px;
+    text-transform: uppercase;
+    font-size: var(--small-font-size);
+    font-weight: 600;
 }
 .settings-dropdown[data-active] {
     display: block;
 }
 
 .settings-dropdown-entry {
-    padding: 8px;
+    padding: 12px;
     display: flex;
+    align-items: center;
+
+    &[data-link] {
+        cursor: pointer;
+    }
 }
 .settings-dropdown-entry:hover,
 .settings-dropdown-entry.settings-dropdown-entry-inverted {
@@ -52,7 +61,7 @@
 }
 
 .settings-dropdown-entry-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
 }

@@ -43,7 +43,16 @@ export const QuestionCharByPicture: AnimeQuestionGenerator = {
       // also somehow enable to transmit multiple titles, so we can display the alternatives via tooltip?
       return {
         question: {
-          title: `What's the name of this character from "${c.animes[0].title}"?`,
+          title: {
+            template: [
+              `What's the name of this character from "`,
+              "$animeTitle",
+              `"?`,
+            ],
+            data: {
+              $animeTitle: c.animes[0].alternative_titles,
+            },
+          },
           image: c.image,
         },
         answers: {

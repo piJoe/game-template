@@ -43,9 +43,18 @@ export const QuestionAnimeStudio: AnimeQuestionGenerator = {
       // also somehow enable to transmit multiple titles, so we can display the alternatives via tooltip?
       return {
         question: {
-          title: `What's the name of the studio that made ${
-            options.imageOnly ? "this anime" : `"${a.title}"`
-          }?`,
+          title: {
+            template: [
+              `What's the name of the studio that made "`,
+              "$animeTitle",
+              `"?`,
+            ],
+            data: {
+              $animeTitle: options.imageOnly
+                ? "this anime"
+                : a.alternative_titles,
+            },
+          },
           image: a.image,
         },
         answers: {

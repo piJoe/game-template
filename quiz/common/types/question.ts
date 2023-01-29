@@ -1,28 +1,44 @@
-export interface ServerQuestion {
+export enum AnimeTitleType {
+  DEFAULT = "Default",
+  SYNONYM = "Synonym",
+  ENGLISH = "English",
+  JAPANESE = "Japanese",
+  GERMAN = "German",
+  SPANISH = "Spanish",
+  FRENCH = "French",
+}
+
+export interface AnimeTitle {
+  type: AnimeTitleType;
+  title: string;
+}
+
+export interface QuestionTitleTemplate {
+  template: string[];
+  data?: { [key: string]: string | AnimeTitle[] };
+}
+
+interface CommonQuestion {
   question: {
-    title: string;
+    title: QuestionTitleTemplate;
     image?: string;
     /**blur the image in question mode, reveal when answer is revealed */
     imageBlurred?: boolean;
     audioUrl?: string;
   };
+}
+
+export interface ServerQuestion extends CommonQuestion {
   answers: {
     wrong: number[];
     correct: number[];
-    all: string[];
+    all: (string | AnimeTitle[])[];
   };
   playerAnswers: Map<string, number>;
   timeoutMs: number;
 }
 
-export interface ClientQuestion {
-  question: {
-    title: string;
-    image?: string;
-    /**blur the image in question mode, reveal when answer is revealed */
-    imageBlurred?: boolean;
-    audioUrl?: string;
-  };
-  answers: string[];
+export interface ClientQuestion extends CommonQuestion {
+  answers: (string | AnimeTitle[])[];
   timeoutMs: number;
 }

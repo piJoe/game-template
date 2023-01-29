@@ -700,10 +700,14 @@ input[type=checkbox]:disabled {
 
 .settings-dropdown {
   display: none;
+  background: var(--color-black);
   border: var(--border-width-small) solid var(--color-white);
   border-radius: var(--border-radius-medium);
   pointer-events: all;
   margin-top: 8px;
+  text-transform: uppercase;
+  font-size: var(--small-font-size);
+  font-weight: 600;
 }
 
 .settings-dropdown[data-active] {
@@ -711,8 +715,12 @@ input[type=checkbox]:disabled {
 }
 
 .settings-dropdown-entry {
-  padding: 8px;
+  padding: 12px;
   display: flex;
+  align-items: center;
+}
+.settings-dropdown-entry[data-link] {
+  cursor: pointer;
 }
 
 .settings-dropdown-entry:hover,
@@ -722,9 +730,9 @@ input[type=checkbox]:disabled {
 }
 
 .settings-dropdown-entry-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
 }
 
 .screen-container {
@@ -732,6 +740,7 @@ input[type=checkbox]:disabled {
   height: 100vh;
   overflow: hidden;
   position: relative;
+  z-index: 0;
 }
 
 .screen {
@@ -766,6 +775,10 @@ input[type=checkbox]:disabled {
   animation: slide-in-left 0.25s ease forwards;
 }
 
+.screen[data-screen-active=cur-fade] {
+  animation: slide-in-top 0.25s ease forwards;
+}
+
 .screen[data-screen-active=prev] {
   animation: slide-out-right 0.25s ease forwards;
 }
@@ -774,8 +787,17 @@ input[type=checkbox]:disabled {
   animation: slide-out-left 0.25s ease forwards;
 }
 
+.screen[data-screen-active=prev-fade] {
+  animation: slide-out-top 0.25s ease forwards;
+}
+
 .screen[data-screen-active=next] {
   transform: translateX(100vw);
+}
+
+.screen[data-screen-overlay=true] {
+  background: var(--color-black);
+  z-index: 99;
 }
 
 .screen .content-wrapper {
@@ -820,22 +842,26 @@ input[type=checkbox]:disabled {
     transform: translateX(-100vw);
   }
 }
-@keyframes fade-in {
+@keyframes slide-in-top {
   0% {
-    opacity: 0;
+    transform: translateY(-100%);
   }
   100% {
-    opacity: 1;
+    transform: translateY(0%);
   }
 }
-@keyframes fade-out {
+@keyframes slide-out-top {
   0% {
-    opacity: 1;
+    transform: translateY(0%);
   }
   100% {
-    opacity: 0;
+    transform: translateY(-100%);
   }
 }
+.screen.gradient-bg-screen {
+  background: var(--gradient-blue-purple);
+}
+
 .question-wrapper {
   margin: auto;
   max-width: 860px;
@@ -985,10 +1011,6 @@ input[type=checkbox]:disabled {
   font-size: var(--base-font-size);
   font-style: italic;
   text-align: center;
-}
-
-.lobby-screen {
-  background: var(--gradient-blue-purple);
 }
 
 .list.lobby-playerlist {

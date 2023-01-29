@@ -39,23 +39,25 @@ export const QuestionAnimeFromCharacter: AnimeQuestionGenerator = {
     );
 
     return correctChars.map((c, i): ServerQuestion => {
-      const correctAnswers: string[] = [c.animes[0].title];
-      const wrongAnswers: string[] = wrongAnimes
+      const correctAnswers = [c.animes[0].alternative_titles];
+      const wrongAnswers = wrongAnimes
         .slice(i * 3, i * 3 + 3)
-        .map((a) => a.title);
+        .map((a) => a.alternative_titles);
 
       const allAnswers = shuffle([...wrongAnswers, ...correctAnswers]);
 
       const wrongIds = wrongAnswers.map((a) => allAnswers.indexOf(a));
       const correctIds = correctAnswers.map((a) => allAnswers.indexOf(a));
 
-      // TODO: find better names (if original name is too long, try an `alternative_titles` with type `Synonym`)
-      // also somehow enable to transmit multiple titles, so we can display the alternatives via tooltip?
       return {
         question: {
-          title: `What anime title is ${
-            options.imageOnly ? "this character" : `"${c.title}"`
-          } from?`,
+          title: {
+            template: [
+              "What anime is ",
+              options.imageOnly ? "this character" : `"${c.title}"`,
+              " from?",
+            ],
+          },
           image: c.image,
         },
         answers: {
