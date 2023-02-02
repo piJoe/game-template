@@ -162,6 +162,12 @@
     openDialogs.set(id, { dom: container, options });
     overlay.setAttribute("data-active", "true");
     overlay.appendChild(container);
+    const input = container.querySelector("input[type=text]");
+    if (input) {
+      input.focus({
+        preventScroll: true
+      });
+    }
     if (options == null ? void 0 : options.closeDialogPromise) {
       options.closeDialogPromise.then(() => {
         closeDialog(id);
@@ -1820,18 +1826,23 @@
   // quiz/client/src/screens/join.ts
   var JoinScreen = class extends DOMScreen {
     init() {
-      this.domRef.querySelector("form[name=create]").addEventListener("submit", (e) => __async(this, null, function* () {
+      this.domRef.addEventListener("click", (e) => {
         e.preventDefault();
-        this.submitDisabled(true);
-        socket.sendMsg("game.create" /* GAME_CREATE */);
-      }));
-      this.domRef.querySelector("form[name=join]").addEventListener("submit", (e) => __async(this, null, function* () {
-        e.preventDefault();
-        document.activeElement.blur();
-        const joinId = e.target["lobby-id"].value;
-        this.submitDisabled(true);
-        socket.sendMsg("game.join" /* GAME_JOIN */, { id: joinId });
-      }));
+        const target = e.target;
+        const container = target.closest(".join-container");
+        if (!container) {
+          return;
+        }
+        const action = container.getAttribute("data-action");
+        switch (action) {
+          case "join":
+            this.showJoinDialog();
+            break;
+          case "create":
+            socket.sendMsg("game.create" /* GAME_CREATE */);
+            break;
+        }
+      });
       this.errListener = socket.on("generic.error" /* ERROR */, ({ title }) => {
         console.log("called err");
         showDialog(title);
@@ -1846,6 +1857,35 @@
         }
       );
     }
+    showJoinDialog() {
+      const joinDom = document.createElement("div");
+      joinDom.innerHTML = `<input type="text" name="lobby-id" autocomplete="off" required minlength=4 placeholder="XXXX">`;
+      showDialog("Join Game", "", {
+        alternativeContentDom: joinDom,
+        actions: [
+          {
+            value: "cancel",
+            title: "Cancel",
+            class: "button-outline"
+          },
+          {
+            value: "join",
+            title: "Join",
+            class: "button-primary"
+          }
+        ],
+        callback: (v) => {
+          switch (v) {
+            case "join":
+              const { value: joinId } = joinDom.querySelector(
+                '[name="lobby-id"]'
+              );
+              socket.sendMsg("game.join" /* GAME_JOIN */, { id: joinId });
+              break;
+          }
+        }
+      });
+    }
     submitDisabled(d) {
       this.domRef.querySelectorAll("input[type=submit]").forEach((i) => i.disabled = d);
     }
@@ -1858,20 +1898,24 @@
       return `
     <h1 class="title-h1">PLAY</h1>
     <section class="multiple-container-wrapper">
-      <div class="container">
-        <div class="title-h2">Create Lobby</div>
-        <form name="create">
-          <input type="submit" class="button button-primary" name="create-new" value="Create New">
-        </form>
+      <div class="container container-image join-container" data-action="join">
+        <img src="/imgs/join.jpg" alt="join">
+        <div class="container-image-content">
+          <div class="title-h2">Join Game</div>
+          <p class="join-container-description">Join an existing game and have fun with your friends</p>
+        </div>
       </div>
 
-      <label class="container">
-        <div class="title-h2">Join Lobby</div>
-        <form class="combined-form" name="join">
-          <input type="text" name="lobby-id" autocomplete="off" required minlength=4 placeholder="XXXX">
-          <input type="submit" class="button button-primary" name="join" value="Join">
-        </form>
-      </label>
+      <div class="container container-image join-container" data-action="create">
+        <img src="/imgs/create.jpg" alt="create">
+        <div class="container-image-content">
+          <div class="title-h2">Create Game</div>
+          <p class="join-container-description">Create a new game with your own custom settings</p>
+        </div>
+        <!-- <form name="create">
+          <input type="submit" class="button button-primary" name="create-new" value="Create New">
+        </form> -->
+      </div>
     </section>`;
     }
   };

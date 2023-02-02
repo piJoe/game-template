@@ -1,0 +1,14 @@
+.join-container {
+    max-width: 400px;
+    cursor: pointer;
+    will-change: transform;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.join-container-description {
+    text-transform: uppercase;
+}

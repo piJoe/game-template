@@ -24,6 +24,34 @@
     top: 0;
 }
 
+.container.container-image {
+    padding: 0;
+    position: relative;
+    z-index: 0;
+
+    border: 0;
+    &:after {
+        position: absolute;
+        content: " ";
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: var(--border-width-large) solid var(--color-white);
+        border-radius: var(--border-radius-large);
+        z-index: 1;
+    }
+
+    > img {
+        width: 100%;
+    }
+
+    .container-image-content {
+        padding: 36px 48px;
+    }
+}
+
 .container > .title-h2 {
     margin-bottom: 40px;
 }

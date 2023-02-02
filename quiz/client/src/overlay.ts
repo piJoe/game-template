@@ -81,6 +81,14 @@ export function showDialog(
   overlay.setAttribute("data-active", "true");
   overlay.appendChild(container);
 
+  // if we have an input, focus
+  const input = container.querySelector("input[type=text]") as HTMLInputElement;
+  if (input) {
+    input.focus({
+      preventScroll: true,
+    });
+  }
+
   if (options?.closeDialogPromise) {
     options.closeDialogPromise.then(() => {
       closeDialog(id);
