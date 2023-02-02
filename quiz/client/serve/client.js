@@ -1333,7 +1333,12 @@
           const playerListHTML = [...this.playerlist].map(
             (e) => `<li class="list-row">
                 <div class="list-row-entry player-row-entry">
-                  <span class="player-name">${e.name}</span>
+                  <div class="player-name">
+                    <span>${e.name}</span>
+                    <div class="player-icons">
+                      ${e === this.lobbyHost ? `<svg class="player-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L21 5V11C21 16.55 17.16 21.74 12 23C6.84 21.74 3 16.55 3 11V5L12 1M16 14H8V15.5C8 15.77 8.19 15.96 8.47 16L8.57 16H15.43C15.74 16 15.95 15.84 16 15.59L16 15.5V14M17 8L17 8L14.33 10.67L12 8.34L9.67 10.67L7 8L7 8L8 13H16L17 8Z" /></svg>` : ""}
+                    </div>
+                  </div>
                   ${e.ready ? `<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>` : `<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>`}
                 </div>
                 <div class="list-row-entry player-row-more">
@@ -1632,6 +1637,7 @@
       <h1 class="title-h1">LOBBY</h1>
       <div class="tab-menu">
         <div class="tab-menu-entry" data-active="true" data-target-tab="overview">Overview</div>
+        <!-- <div class="tab-menu-entry" data-target-tab="presets">Presets</div> -->
         <div class="tab-menu-entry" data-target-tab="settings">Settings</div>
       </div>
       <div class="title-bar-spacer"></div>
@@ -1674,6 +1680,16 @@
     <section class="content-wrapper" data-tab="settings" data-inactive="true">
       <div class="container-wrapper">
         <form class="lobby-settings list" id="lobby-settings"></form>
+      </div>
+    </section>
+    
+    <section class="content-wrapper" data-tab="presets" data-inactive="true">
+      <div class="grid-container-wrapper">
+        <div class="container">Hier ist mein Preset und da steht sogar ne megagro\xDFe und ausf\xFChrliche Beschreibung dabei</div>
+        <div class="container">Hier ist mein Preset</div>
+        <div class="container">Hier ist mein Preset</div>
+        <div class="container">Hier ist mein Preset</div>
+        <div class="container">Hier ist mein Preset</div>
       </div>
     </section>
 
