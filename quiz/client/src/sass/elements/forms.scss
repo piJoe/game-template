@@ -10,3 +10,13 @@
 .combined-form > .button {
     margin-left: -32px;
 }
+
+.stacked-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    > input[type="submit"] {
+        margin-top: 8px;
+    }
+}

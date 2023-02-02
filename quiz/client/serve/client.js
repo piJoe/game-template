@@ -1806,6 +1806,10 @@
 
   // quiz/client/src/screens/login.ts
   var LoginScreen = class extends DOMScreen {
+    constructor() {
+      super(...arguments);
+      this.additionalClasses = ["gradient-bg-screen"];
+    }
     init() {
       this.domRef.querySelector("form").addEventListener("submit", (e) => __async(this, null, function* () {
         e.preventDefault();
@@ -1825,13 +1829,22 @@
     }
     template() {
       return `
-    <h1 class="title-h1">otakuquiz.lol</h1>
-    <div class="container">
-      <div class="title-h2">Choose your username</div>
-      <form class="combined-form" name="login">
-        <input type="text" name="username" autocomplete="off" minlength=3 maxlength=12 required placeholder="username">
-        <input type="submit" class="button button-primary" name="submit" value="Connect!">
-      </form>
+    <div class="title-bar">
+      <div class="title-bar-spacer"></div>
+    </div>
+    <div class="content-wrapper">
+      <div class="vertical-container-wrapper">
+        <div class="login-logo">
+        <img src="/imgs/logo.png" alt="logo">
+        </div>
+        <form class="stacked-form" name="login">
+          <input type="text" name="username" autocomplete="off" minlength=3 maxlength=12 required placeholder="username">
+          <input type="submit" class="button button-primary" name="submit" value="Login">
+        </form>
+      </div>
+    </div>
+    <div class="bottom-container align-right" data-tab="overview">
+      <!-- <a href="" class="button button-outline button-small">Discord</a> -->
     </div>`;
     }
     die() {

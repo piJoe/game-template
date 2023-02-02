@@ -16,6 +16,11 @@
     box-shadow: var(--hover-dark);
 }
 
+.button.button-small {
+    font-weight: 700;
+    font-size: var(--small-font-size);
+}
+
 .button.button-outline {
     padding: 12px 32px;
     border: var(--border-width-small) solid var(--color-white-translucent);
