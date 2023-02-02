@@ -1342,9 +1342,13 @@
                   ${e.ready ? `<div class="skewed-tag skewed-tag-primary tag-ready">Ready</div>` : `<div class="skewed-tag skewed-tag-error tag-ready">Not Ready</div>`}
                 </div>
                 <div class="list-row-entry player-row-more">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
-                  </svg>
+                  <div 
+                    class="player-more-button" 
+                    data-player-id="${e.playerId}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+                    </svg>
+                  </div>
                 </div>
               </li>`
           ).join("");
@@ -1462,6 +1466,58 @@
           return;
         }
         this.settingsSubmitButton.setAttribute("data-active", "true");
+      });
+      playerListDom.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = e.target;
+        const closestMore = target.closest(".player-more-button");
+        if (!closestMore) {
+          return;
+        }
+        const playerId = closestMore.getAttribute("data-player-id");
+        const playerEntry = this.playerlist.find((e2) => e2.playerId === playerId);
+        if (!playerEntry) {
+          console.error("something went terribly wrong, idk how!");
+          return;
+        }
+        if (this.lobbyHost.playerId !== globalState.me.id) {
+          showDialog(
+            "You're not the host.",
+            "Only the host can interact with this."
+          );
+          return;
+        }
+        showDialog(playerEntry.name, "", {
+          actions: [
+            {
+              title: "Cancel",
+              class: "button-outline",
+              value: "cancel"
+            },
+            {
+              title: "Kick",
+              class: "button-error",
+              value: "kick"
+            },
+            {
+              title: "Make Host",
+              class: "button-primary",
+              value: "makehost"
+            }
+          ],
+          callback: (v) => {
+            switch (v) {
+              case "kick":
+                showDialog("Work in Progress", "kekw");
+                break;
+              case "makehost":
+                socket.sendMsg("game.change.host" /* GAME_CHANGE_HOST */, {
+                  newHost: playerEntry.playerId
+                });
+                break;
+            }
+          }
+        });
       });
     }
     renderSettings(settings2, availableQuestions) {

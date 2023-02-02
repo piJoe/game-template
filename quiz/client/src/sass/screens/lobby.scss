@@ -1,3 +1,5 @@
+@use "../base/helper.scss";
+
 .lobby-container-wrapper {
     height: 100%;
     overflow: hidden;
@@ -53,10 +55,15 @@
         align-items: center;
         justify-content: center;
         padding: 0;
+    }
+    .player-more-button {
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        @extend .expand-clickable;
 
         > svg {
-            width: 28px;
-            height: 28px;
+            width: 100%;
         }
     }
 }

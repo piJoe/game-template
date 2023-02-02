@@ -1,3 +1,5 @@
+@use "../base/helper.scss";
+
 .settings-overlay {
     position: absolute;
     top: 30px;
@@ -10,24 +12,12 @@
 }
 
 .settings-button {
-    position: relative;
     width: 28px;
     height: 28px;
     pointer-events: all;
     cursor: pointer;
 
-    // little hack to expand clickable zone
-    &:before {
-        content: " ";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        margin: -8px;
-        border-radius: 100%;
-        background: none;
-    }
+    @extend .expand-clickable;
 }
 
 .settings-dropdown {

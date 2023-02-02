@@ -171,6 +171,21 @@ dt:first-child {
   text-align: center;
 }
 
+.expand-clickable, .list.lobby-playerlist .player-more-button, .settings-button {
+  position: relative;
+}
+.expand-clickable:before, .list.lobby-playerlist .player-more-button:before, .settings-button:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: -8px;
+  border-radius: 100%;
+  background: none;
+}
+
 .title-h1 {
   font-size: var(--h1-font-size);
   font-weight: 600;
@@ -690,22 +705,10 @@ input[type=checkbox]:disabled {
 }
 
 .settings-button {
-  position: relative;
   width: 28px;
   height: 28px;
   pointer-events: all;
   cursor: pointer;
-}
-.settings-button:before {
-  content: " ";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: -8px;
-  border-radius: 100%;
-  background: none;
 }
 
 .settings-dropdown {
@@ -1074,9 +1077,13 @@ input[type=checkbox]:disabled {
   justify-content: center;
   padding: 0;
 }
-.list.lobby-playerlist .player-row-more > svg {
+.list.lobby-playerlist .player-more-button {
   width: 28px;
   height: 28px;
+  cursor: pointer;
+}
+.list.lobby-playerlist .player-more-button > svg {
+  width: 100%;
 }
 
 .settings-container {
