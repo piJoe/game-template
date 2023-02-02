@@ -53,7 +53,7 @@ export class LoginScreen extends DOMScreen {
         </div>
         <form class="stacked-form" name="login">
           <input type="text" name="username" autocomplete="off" minlength=3 maxlength=12 required placeholder="username">
-          <input type="submit" class="button button-primary" name="submit" value="Login">
+          <input type="submit" class="button button-primary" name="submit" value="Start">
         </form>
       </div>
     </div>

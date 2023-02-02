@@ -1839,7 +1839,7 @@
         </div>
         <form class="stacked-form" name="login">
           <input type="text" name="username" autocomplete="off" minlength=3 maxlength=12 required placeholder="username">
-          <input type="submit" class="button button-primary" name="submit" value="Login">
+          <input type="submit" class="button button-primary" name="submit" value="Start">
         </form>
       </div>
     </div>
@@ -1854,6 +1854,10 @@
   };
 
   // quiz/client/src/client.ts
+  window.onbeforeunload = function(e) {
+    e.preventDefault();
+    return "are you sure?";
+  };
   socket.on("me" /* ME */, (me) => {
     globalState.me.id = me.id;
     globalState.me.name = me.name;
