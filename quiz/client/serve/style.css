@@ -465,7 +465,7 @@ input[type=checkbox]:disabled {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 24px;
   max-width: 1000px;
   margin: auto;
 }
