@@ -33,6 +33,7 @@ class Socket {
         "The session was closed by the server.",
         {
           callback: () => {
+            window.onbeforeunload = null;
             location.reload();
           },
         }
