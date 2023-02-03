@@ -1444,7 +1444,6 @@
         e.preventDefault();
         const domElem = e.target;
         const targetTab = domElem.getAttribute("data-target-tab");
-        console.log(domElem, targetTab);
         if (!targetTab) {
           return;
         }

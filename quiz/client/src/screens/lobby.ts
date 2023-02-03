@@ -265,7 +265,6 @@ export class LobbyScreen extends DOMScreen {
       e.preventDefault();
       const domElem = e.target as HTMLElement;
       const targetTab = domElem.getAttribute("data-target-tab");
-      console.log(domElem, targetTab);
       if (!targetTab) {
         return;
       }
