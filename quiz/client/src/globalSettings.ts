@@ -15,7 +15,9 @@ const settings = {
 export const globalSettings = new Proxy<typeof defaultSettings>(settings, {
   set(obj, prop, val) {
     obj[prop] = val;
-    localStorage.setItem("settings", JSON.stringify(obj));
+    try {
+      localStorage.setItem("settings", JSON.stringify(obj));
+    } catch (_) {}
     document.dispatchEvent(
       new CustomEvent("globalSettingsChanged", {
         detail: obj,

@@ -8,9 +8,12 @@ import { DOMScreen } from "./screen";
 
 export class LoginScreen extends DOMScreen {
   private errListener: number;
+  private inputDom: HTMLInputElement;
   protected additionalClasses = ["gradient-bg-screen"];
 
   init() {
+    this.inputDom = this.domRef.querySelector("input[name=username]");
+
     this.domRef
       .querySelector("form")
       .addEventListener("submit", async (e: SubmitEvent) => {
@@ -24,7 +27,16 @@ export class LoginScreen extends DOMScreen {
         }
         socket.sendMsg(ClientPacketType.ME_CHANGE_NAME, { name });
         DOMScreen.spawnScreen(new JoinScreen()).setActive();
+
+        try {
+          localStorage.setItem("username", name);
+        } catch (_) {}
       });
+
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      this.inputDom.value = storedUsername;
+    }
 
     // this.errListener = socket.on(ServerPacketType.ERROR, ({ title }) => {
     //   popup(title);
@@ -36,9 +48,8 @@ export class LoginScreen extends DOMScreen {
 
   setActive(): void {
     super.setActive("none");
-    (
-      this.domRef.querySelector("input[name=username]") as HTMLInputElement
-    ).focus({ preventScroll: true });
+    this.inputDom.focus({ preventScroll: true });
+    this.inputDom.select();
   }
 
   template() {

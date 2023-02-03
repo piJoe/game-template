@@ -1089,6 +1089,7 @@ input[type=checkbox]:disabled {
 .list.lobby-playerlist .player-row-entry {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 .list.lobby-playerlist .player-row-entry-empty {
   color: var(--color-disabled);
