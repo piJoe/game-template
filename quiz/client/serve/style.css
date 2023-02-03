@@ -420,6 +420,7 @@ input[type=checkbox]:disabled {
   z-index: 1;
 }
 .container.container-image > img {
+  height: 265px;
   width: 100%;
 }
 .container.container-image .container-image-content {
