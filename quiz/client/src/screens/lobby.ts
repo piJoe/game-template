@@ -697,6 +697,23 @@ export class LobbyScreen extends DOMScreen {
     }
   }
 
+  setActive(
+    direction?: "left" | "right" | "none" | "fade",
+    asOverlay?: boolean
+  ): void {
+    super.setActive(direction, asOverlay);
+
+    // set lobby id in url hash
+    location.hash = "#/" + this.lobbyId;
+  }
+
+  setInactive(direction?: "left" | "right" | "none" | "fade"): void {
+    super.setInactive(direction);
+
+    // cleanup lobby id in url hash
+    location.hash = "";
+  }
+
   die() {
     super.die();
 

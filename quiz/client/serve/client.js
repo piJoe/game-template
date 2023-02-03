@@ -1803,6 +1803,14 @@
         this.scoreboardCloseCallback = null;
       }
     }
+    setActive(direction, asOverlay) {
+      super.setActive(direction, asOverlay);
+      location.hash = "#/" + this.lobbyId;
+    }
+    setInactive(direction) {
+      super.setInactive(direction);
+      location.hash = "";
+    }
     die() {
       super.die();
       socket.off("game.status" /* GAME_STATUS */, this.statusListener);
@@ -1859,6 +1867,14 @@
           lobby.setActive();
         }
       );
+    }
+    setActive(direction, asOverlay) {
+      super.setActive(direction, asOverlay);
+      const hashPath = location.hash.split("/");
+      if (hashPath.length > 1) {
+        const lobbyId = hashPath[1];
+        socket.sendMsg("game.join" /* GAME_JOIN */, { id: lobbyId });
+      }
     }
     showJoinDialog() {
       const joinDom = document.createElement("div");

@@ -68,6 +68,20 @@ export class JoinScreen extends DOMScreen {
     );
   }
 
+  setActive(
+    direction?: "left" | "right" | "none" | "fade",
+    asOverlay?: boolean
+  ): void {
+    super.setActive(direction, asOverlay);
+
+    // dirty lobby id url check
+    const hashPath = location.hash.split("/");
+    if (hashPath.length > 1) {
+      const lobbyId = hashPath[1];
+      socket.sendMsg(ClientPacketType.GAME_JOIN, { id: lobbyId });
+    }
+  }
+
   private showJoinDialog() {
     const joinDom = document.createElement("div");
     joinDom.innerHTML = `<input type="text" name="lobby-id" autocomplete="off" required minlength=4 placeholder="XXXX">`;
