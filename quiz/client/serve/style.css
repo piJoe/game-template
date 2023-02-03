@@ -323,6 +323,21 @@ input[type=checkbox]:disabled {
   cursor: default;
 }
 
+select {
+  appearance: none;
+  outline: none;
+  font-family: "Fira Sans", sans-serif;
+  font-weight: 800;
+  font-size: var(--base-font-size);
+  background: var(--color-white);
+  border: none;
+  border-radius: var(--border-radius-medium);
+  color: var(--color-black);
+  padding: 10px 16px;
+  text-transform: uppercase;
+  min-width: 0;
+}
+
 .skewed-tag {
   display: inline-block;
   position: relative;
@@ -422,6 +437,7 @@ input[type=checkbox]:disabled {
 .container.container-image > img {
   height: 265px;
   width: 100%;
+  display: block;
 }
 .container.container-image .container-image-content {
   padding: 36px 48px;

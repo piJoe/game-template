@@ -1,6 +1,9 @@
 import escapeHTML from "escape-html";
 import { toPairs } from "lodash-es";
-import { ClientPacketType } from "../../../common/types/packets";
+import {
+  ClientPacketType,
+  ServerPacketType,
+} from "../../../common/types/packets";
 import { ClientQuestion } from "../../../common/types/question";
 import {
   calcStringWidth,
@@ -13,6 +16,7 @@ import { LobbyScreen } from "./lobby";
 import { DOMScreen } from "./screen";
 import { GlobalDropdownOption } from "../types/globalDropdown";
 import { showDialog } from "../overlay";
+import { GAME_SETTING } from "../../../common/types/game";
 
 export class QuestionScreen extends DOMScreen {
   public readonly globalDropdownOptions: GlobalDropdownOption[] = [
@@ -27,9 +31,13 @@ export class QuestionScreen extends DOMScreen {
   private question: ClientQuestion;
   private ownAnwser: number = null;
   private timerStarted: number;
+  private timerReverse = false;
+  private timeoutMs: number;
   private timerDOM: HTMLElement;
   private audio: HTMLAudioElement;
   private questionDone = false;
+  private resetTimeoutListener: number;
+
   constructor(
     lobby: LobbyScreen,
     questionId: number,
@@ -39,12 +47,24 @@ export class QuestionScreen extends DOMScreen {
     this.lobby = lobby;
     this.questionId = questionId;
     this.question = question;
+    this.timeoutMs = this.question.timeoutMs;
   }
 
   init() {
     this.domRef.addEventListener("click", (e) => {
       const elem = e.target as HTMLElement;
       if (!elem.hasAttribute("data-answer")) {
+        return;
+      }
+
+      if (this.questionDone) {
+        return;
+      }
+
+      if (
+        this.ownAnwser !== null &&
+        this.lobby.getSetting(GAME_SETTING.ALLOW_CHANGE_ANSWER) === false
+      ) {
         return;
       }
 
@@ -62,6 +82,20 @@ export class QuestionScreen extends DOMScreen {
         });
       elem.setAttribute("data-answer-selected", "true");
     });
+
+    this.resetTimeoutListener = socket.on(
+      ServerPacketType.GAME_QUESTION_RESET_TIMEOUT,
+      ({ id, timeoutMs, reverse }) => {
+        if (this.questionId !== id) {
+          return;
+        }
+
+        this.timeoutMs = timeoutMs;
+        this.timerStarted = Date.now();
+        this.timerReverse = reverse;
+        console.log("reset timer");
+      }
+    );
 
     // preload audio, if exists
     if (this.question.question.audioUrl) {
@@ -110,7 +144,11 @@ export class QuestionScreen extends DOMScreen {
   }
 
   updateTimer() {
-    const timeoutMs = this.question.timeoutMs - 500;
+    // if (this.questionDone) {
+    //   return;
+    // }
+
+    const timeoutMs = this.timeoutMs - 250;
 
     const timeLeftSeconds = Math.ceil(
       (this.timerStarted + timeoutMs - Date.now()) / 1000
@@ -125,6 +163,9 @@ export class QuestionScreen extends DOMScreen {
       timePercentage = 0.0;
     }
 
+    // if (this.timerReverse) {
+    //   timePercentage = 1 - timePercentage;
+    // }
     this.timerDOM.style.transform = `scaleX(${timePercentage})`;
 
     if (timeLeftSeconds > 0 || !this.questionDone) {
@@ -203,6 +244,8 @@ export class QuestionScreen extends DOMScreen {
   setInactive(direction?: "left" | "right"): void {
     super.setInactive(direction);
 
+    this.questionDone = true;
+
     // stop audio, if exists
     if (this.audio) {
       this.audio.pause();
@@ -212,7 +255,13 @@ export class QuestionScreen extends DOMScreen {
 
   die() {
     super.die();
+
     document.removeEventListener("globalSettingsChanged", this.settingsChanged);
+
+    socket.off(
+      ServerPacketType.GAME_QUESTION_RESET_TIMEOUT,
+      this.resetTimeoutListener
+    );
   }
 
   template(): string {

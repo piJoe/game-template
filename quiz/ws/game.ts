@@ -1,8 +1,10 @@
 import { shuffle } from "fast-shuffle";
 import { flatten } from "lodash-es";
 import {
+  ANSWER_TIMEOUT_MODE,
   GameSettings,
   GAME_AVAILABLE_QUESTION_ID,
+  GAME_SETTING,
   GAME_STATUS,
 } from "../common/types/game";
 import { ServerPacketType } from "../common/types/packets";
@@ -113,6 +115,7 @@ export class Game {
       return;
     }
 
+    const questionId = this.currentQuestion;
     const q = this.questions[this.currentQuestion];
     if (!q) {
       this.endGame();
@@ -132,9 +135,10 @@ export class Game {
     }
 
     const timeoutQuestion = timeout(q.timeoutMs);
-    // TODO: activate additional promise
-    const waitForAllAnswers = this.waitForPlayerAnswers(this.currentQuestion);
-    await Promise.any([timeoutQuestion, waitForAllAnswers]);
+    const waitForPlayerAnswers = this.waitForPlayerAnswers(
+      this.currentQuestion
+    );
+    await Promise.any([timeoutQuestion, waitForPlayerAnswers]);
     this.resolveAnyOldWaitForPlayerPromises();
 
     this.updateGameScores(this.currentQuestion);
@@ -143,6 +147,11 @@ export class Game {
     const hasNextQuestion = this.setNextActiveQuestionIndex();
 
     // sleep for some time for players to process the results
+    this.session.sendMsg(ServerPacketType.GAME_QUESTION_RESET_TIMEOUT, {
+      id: questionId,
+      timeoutMs: UX_SLEEP_TIMER,
+      reverse: true,
+    });
     await timeout(UX_SLEEP_TIMER);
 
     if (!hasNextQuestion) {
@@ -205,18 +214,83 @@ export class Game {
     this.waitForAnswersCallback.clear();
   }
 
-  setPlayerAnswer(player: Player, questionId: number, answer: number) {
+  async setPlayerAnswer(player: Player, questionId: number, answer: number) {
     if (this.currentQuestion !== questionId) {
       // TODO: throw error or smth idk (it's not the right time to answer this question)
       return;
     }
+
+    // if we do not allow to change answers, never set answer again.
+    if (
+      !this.settings.allowChangeAnswer &&
+      this.questions[questionId]?.playerAnswers.has(player.id)
+    ) {
+      // TODO: throw error or smth idk (it's not the right time to answer this question)
+      return;
+    }
+
+    const wasFirstAlreadyAnswered =
+      this.questions[questionId]?.playerAnswers.size > 0;
+
+    const wasEveryoneAnswered =
+      this.questions[questionId]?.playerAnswers.size ===
+      this.session.playerCount;
+
     this.questions[questionId]?.playerAnswers.set(player.id, answer);
 
+    // never actually fullfil the waitForAnswers callback, when we're in always_timeout mode
+    if (this.settings.answerTimeout === ANSWER_TIMEOUT_MODE.ALWAYS_TIMEOUT) {
+      return;
+    }
+
     // everyone gave an answer we can skip the countdown :poggies:
-    if (
+    const everyoneAnswered =
       this.questions[questionId]?.playerAnswers.size ===
-      this.session.playerCount
-    ) {
+      this.session.playerCount;
+
+    const waitForFirstAnswer =
+      this.settings.answerTimeout === ANSWER_TIMEOUT_MODE.WAIT_FIRST_ANSWER;
+
+    // only first player answered, but we're in a special mode where this is relevant
+    const firstAnswered =
+      waitForFirstAnswer &&
+      this.questions[questionId]?.playerAnswers.size === 1;
+
+    if (firstAnswered && !wasFirstAlreadyAnswered) {
+      // sleep for some time
+      if (this.settings[GAME_SETTING.SECONDS_AFTER_ANSWER] > 0) {
+        const timeoutMs =
+          this.settings[GAME_SETTING.SECONDS_AFTER_ANSWER] * 1000;
+        this.session.sendMsg(ServerPacketType.GAME_QUESTION_RESET_TIMEOUT, {
+          id: questionId,
+          timeoutMs: timeoutMs,
+          reverse: false,
+        });
+        await timeout(timeoutMs);
+      }
+
+      const callback = this.waitForAnswersCallback.get(questionId);
+      if (callback) {
+        callback();
+      }
+      this.waitForAnswersCallback.delete(questionId);
+
+      return;
+    }
+
+    if (!waitForFirstAnswer && everyoneAnswered && !wasEveryoneAnswered) {
+      // sleep for some time
+      if (this.settings[GAME_SETTING.SECONDS_AFTER_ANSWER] > 0) {
+        const timeoutMs =
+          this.settings[GAME_SETTING.SECONDS_AFTER_ANSWER] * 1000;
+        this.session.sendMsg(ServerPacketType.GAME_QUESTION_RESET_TIMEOUT, {
+          id: questionId,
+          timeoutMs: timeoutMs,
+          reverse: false,
+        });
+        await timeout(timeoutMs);
+      }
+
       const callback = this.waitForAnswersCallback.get(questionId);
       if (callback) {
         callback();

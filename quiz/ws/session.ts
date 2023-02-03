@@ -1,4 +1,5 @@
 import {
+  ANSWER_TIMEOUT_MODE,
   GameSettings,
   GAME_AVAILABLE_QUESTION_ID,
   GAME_SETTING,
@@ -39,6 +40,10 @@ export class GameSession {
     [GAME_SETTING.MAX_POPULARITY]: -1,
     [GAME_SETTING.MIN_YEAR]: -1,
     [GAME_SETTING.MAX_YEAR]: -1,
+    [GAME_SETTING.ALLOW_CHANGE_ANSWER]: false,
+    [GAME_SETTING.ANSWER_TIMEOUT_MODE]:
+      ANSWER_TIMEOUT_MODE.WAIT_PLAYERS_OR_TIMEOUT,
+    [GAME_SETTING.SECONDS_AFTER_ANSWER]: 0,
   };
 
   constructor() {
@@ -158,6 +163,13 @@ export class GameSession {
       return;
     }
 
+    if (this.status === SESSION_STATUS.IN_GAME) {
+      player.sendMsg(ServerPacketType.ERROR, {
+        title: "Cannot change settings when in game.",
+      });
+      return;
+    }
+
     if (typeof settings[GAME_SETTING.QUESTION_COUNT] !== "number") {
       console.error("failed to validate settings");
       return;
@@ -175,6 +187,18 @@ export class GameSession {
       return;
     }
     if (typeof settings[GAME_SETTING.MAX_POPULARITY] !== "number") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.ALLOW_CHANGE_ANSWER] !== "boolean") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.ANSWER_TIMEOUT_MODE] !== "string") {
+      console.error("failed to validate settings");
+      return;
+    }
+    if (typeof settings[GAME_SETTING.SECONDS_AFTER_ANSWER] !== "number") {
       console.error("failed to validate settings");
       return;
     }
@@ -222,6 +246,18 @@ export class GameSession {
     if (this.settings[GAME_SETTING.MAX_YEAR] < 1) {
       this.settings[GAME_SETTING.MAX_YEAR] = -1;
     }
+
+    this.settings[GAME_SETTING.ALLOW_CHANGE_ANSWER] =
+      settings[GAME_SETTING.ALLOW_CHANGE_ANSWER] ?? false;
+
+    this.settings[GAME_SETTING.ANSWER_TIMEOUT_MODE] =
+      settings[GAME_SETTING.ANSWER_TIMEOUT_MODE] ??
+      ANSWER_TIMEOUT_MODE.WAIT_PLAYERS_OR_TIMEOUT;
+
+    this.settings[GAME_SETTING.SECONDS_AFTER_ANSWER] = Math.min(
+      Math.max(0, settings[GAME_SETTING.SECONDS_AFTER_ANSWER]),
+      15
+    );
 
     this.unreadyAllPlayers();
     this.sendGameSettings();

@@ -158,6 +158,12 @@ class Socket {
           data as ServerPackets[ServerPacketType.GAME_QUESTION_ANSWERS]
         );
         break;
+      case ServerPacketType.GAME_QUESTION_RESET_TIMEOUT:
+        this.callListeners(
+          ServerPacketType.GAME_QUESTION_RESET_TIMEOUT,
+          data as ServerPackets[ServerPacketType.GAME_QUESTION_RESET_TIMEOUT]
+        );
+        break;
       case ServerPacketType.ERROR:
         this.callListeners(
           ServerPacketType.ERROR,

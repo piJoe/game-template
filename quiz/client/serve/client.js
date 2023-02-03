@@ -199,6 +199,7 @@
           "The session was closed by the server.",
           {
             callback: () => {
+              window.onbeforeunload = null;
               location.reload();
             }
           }
@@ -300,6 +301,12 @@
         case "game.question.answers" /* GAME_QUESTION_ANSWERS */:
           this.callListeners(
             "game.question.answers" /* GAME_QUESTION_ANSWERS */,
+            data
+          );
+          break;
+        case "game.question.reset.timeout" /* GAME_QUESTION_RESET_TIMEOUT */:
+          this.callListeners(
+            "game.question.reset.timeout" /* GAME_QUESTION_RESET_TIMEOUT */,
             data
           );
           break;
@@ -1099,15 +1106,23 @@
       ];
       this.questionId = null;
       this.ownAnwser = null;
+      this.timerReverse = false;
       this.questionDone = false;
       this.lobby = lobby;
       this.questionId = questionId;
       this.question = question;
+      this.timeoutMs = this.question.timeoutMs;
     }
     init() {
       this.domRef.addEventListener("click", (e) => {
         const elem = e.target;
         if (!elem.hasAttribute("data-answer")) {
+          return;
+        }
+        if (this.questionDone) {
+          return;
+        }
+        if (this.ownAnwser !== null && this.lobby.getSetting("allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */) === false) {
           return;
         }
         const val = elem.getAttribute("data-answer");
@@ -1121,6 +1136,18 @@
         });
         elem.setAttribute("data-answer-selected", "true");
       });
+      this.resetTimeoutListener = socket.on(
+        "game.question.reset.timeout" /* GAME_QUESTION_RESET_TIMEOUT */,
+        ({ id, timeoutMs, reverse }) => {
+          if (this.questionId !== id) {
+            return;
+          }
+          this.timeoutMs = timeoutMs;
+          this.timerStarted = Date.now();
+          this.timerReverse = reverse;
+          console.log("reset timer");
+        }
+      );
       if (this.question.question.audioUrl) {
         this.audio = new Audio(this.question.question.audioUrl);
         this.audio.preload = "auto";
@@ -1156,7 +1183,7 @@
       this.audio.volume = e.detail.volume;
     }
     updateTimer() {
-      const timeoutMs = this.question.timeoutMs - 500;
+      const timeoutMs = this.timeoutMs - 250;
       const timeLeftSeconds = Math.ceil(
         (this.timerStarted + timeoutMs - Date.now()) / 1e3
       );
@@ -1226,6 +1253,7 @@
     }
     setInactive(direction) {
       super.setInactive(direction);
+      this.questionDone = true;
       if (this.audio) {
         this.audio.pause();
         this.audio.remove();
@@ -1234,6 +1262,10 @@
     die() {
       super.die();
       document.removeEventListener("globalSettingsChanged", this.settingsChanged);
+      socket.off(
+        "game.question.reset.timeout" /* GAME_QUESTION_RESET_TIMEOUT */,
+        this.resetTimeoutListener
+      );
     }
     template() {
       const question = this.question.question;
@@ -1390,6 +1422,7 @@
       this.gameSettingsListener = socket.on(
         "game.settings" /* GAME_SETTINGS */,
         ({ currentSettings, availableQuestions }) => {
+          this.currentSettings = currentSettings;
           this.renderSettings(currentSettings, availableQuestions);
           document.querySelector("#lobby-dd-question-amount").innerHTML = `${currentSettings["questionCount" /* QUESTION_COUNT */]}`;
         }
@@ -1529,7 +1562,7 @@
       });
     }
     renderSettings(settings2, availableQuestions) {
-      const entries = [
+      const gameplayEntries = [
         {
           label: "No. of Questions",
           inputs: [
@@ -1542,6 +1575,55 @@
             }
           ]
         },
+        {
+          label: "Allow to Switch Answer",
+          inputs: [
+            {
+              value: settings2["allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */],
+              checked: settings2["allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */],
+              name: "allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */,
+              type: "checkbox"
+            }
+          ]
+        },
+        {
+          label: "Question Timeout Mode",
+          inputs: [
+            {
+              value: settings2["answerTimeout" /* ANSWER_TIMEOUT_MODE */],
+              name: "answerTimeout" /* ANSWER_TIMEOUT_MODE */,
+              type: "select",
+              options: [
+                {
+                  value: "playersOrTimeout" /* WAIT_PLAYERS_OR_TIMEOUT */,
+                  label: "Normal (Wait for all players)"
+                },
+                {
+                  value: "alwaysTimeout" /* ALWAYS_TIMEOUT */,
+                  label: "Always wait for timeout"
+                },
+                {
+                  value: "firstAnswer" /* WAIT_FIRST_ANSWER */,
+                  label: "Timeout after first answer"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          label: "Additional Timeout After Answer",
+          inputs: [
+            {
+              value: settings2["secAfterAnswer" /* SECONDS_AFTER_ANSWER */],
+              name: "secAfterAnswer" /* SECONDS_AFTER_ANSWER */,
+              type: "number",
+              min: 0,
+              max: 15
+            }
+          ]
+        }
+      ];
+      const filterEntries = [
         {
           label: "Popularity",
           inputs: [
@@ -1592,7 +1674,35 @@
           ]
         }
       ];
-      const filterSettings = entries.map((e) => {
+      const gameplaySettings = gameplayEntries.map((e) => {
+        return `<div class="list-row">
+          <div class="list-row-entry setting-row-entry">
+            <span class="setting-row-entry-label">${e.label}</span>
+            ${e.inputs.map((i) => {
+          switch (i.type) {
+            case "select":
+              return `<select name="${i.name}">
+                    ${i.options.map(
+                (o) => `<option 
+                        value="${o.value}" 
+                        ${o.value === i.value ? "selected" : ""}>
+                        ${o.label}
+                        </option>`
+              )}
+                    </select>`;
+            default:
+              return `<input name="${i.name}" type="${i.type}" 
+                    ${i.type !== "checkbox" ? 'style="width:6rem" required' : ""} 
+                    value="${i.value}" 
+                    ${i.min ? `min="${i.min}"` : ""} 
+                    ${i.max ? `max="${i.max}"` : ""} 
+                    ${i.checked ? `checked` : ""}>`;
+          }
+        }).join(" - ")}
+          </div>
+        </div>`;
+      }).join("");
+      const filterSettings = filterEntries.map((e) => {
         return `<div class="list-row">
           <div class="list-row-entry setting-row-entry">
             <span class="setting-row-entry-label">${e.label}</span>
@@ -1620,7 +1730,11 @@
           </div>
         </div>`;
       }).join("");
-      this.lobbySettingsDom.innerHTML = `<div class="list-row list-row-header">Filters</div>
+      this.lobbySettingsDom.innerHTML = `
+    <div class="list-row list-row-header">Gameplay</div>
+    ${gameplaySettings}
+
+    <div class="list-row list-row-header">Filters</div>
     ${filterSettings}
     
     <div class="list-row list-row-header">Questions</div>
@@ -1662,6 +1776,17 @@
             this.lobbySettingsDom.querySelector(
               `[name="${"maxYear" /* MAX_YEAR */}"]`
             ).value
+          ),
+          ["allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */]: this.lobbySettingsDom.querySelector(
+            `[name="${"allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */}"]`
+          ).checked,
+          ["answerTimeout" /* ANSWER_TIMEOUT_MODE */]: this.lobbySettingsDom.querySelector(
+            `[name="${"answerTimeout" /* ANSWER_TIMEOUT_MODE */}"]`
+          ).value,
+          ["secAfterAnswer" /* SECONDS_AFTER_ANSWER */]: parseInt(
+            this.lobbySettingsDom.querySelector(
+              `[name="${"secAfterAnswer" /* SECONDS_AFTER_ANSWER */}"]`
+            ).value
           )
         }
       });
@@ -1694,6 +1819,10 @@
     }
     selfIsHost() {
       return this.lobbyHost && this.lobbyHost.playerId === globalState.me.id;
+    }
+    getSetting(setting) {
+      var _a2, _b;
+      return (_b = (_a2 = this.currentSettings) == null ? void 0 : _a2[setting]) != null ? _b : null;
     }
     template() {
       return `

@@ -49,3 +49,18 @@ input[type="checkbox"] {
         cursor: default;
     }
 }
+
+select {
+    appearance: none;
+    outline: none;
+    font-family: "Fira Sans", sans-serif;
+    font-weight: 800;
+    font-size: var(--base-font-size);
+    background: var(--color-white);
+    border: none;
+    border-radius: var(--border-radius-medium);
+    color: var(--color-black);
+    padding: 10px 16px;
+    text-transform: uppercase;
+    min-width: 0;
+}

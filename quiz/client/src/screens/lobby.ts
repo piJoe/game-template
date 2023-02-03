@@ -1,4 +1,5 @@
 import {
+  ANSWER_TIMEOUT_MODE,
   GameSettings,
   GAME_AVAILABLE_QUESTION_ID,
   GAME_SETTING,
@@ -42,6 +43,7 @@ export class LobbyScreen extends DOMScreen {
   private playerlist: PlayerListEntry[] = [];
   private lobbyHost: PlayerListEntry;
   private questions = new Map<number, QuestionScreen>();
+  private currentSettings: GameSettings;
 
   constructor() {
     super();
@@ -200,6 +202,7 @@ export class LobbyScreen extends DOMScreen {
     this.gameSettingsListener = socket.on(
       ServerPacketType.GAME_SETTINGS,
       ({ currentSettings, availableQuestions }) => {
+        this.currentSettings = currentSettings;
         this.renderSettings(currentSettings, availableQuestions);
 
         document.querySelector("#lobby-dd-question-amount").innerHTML = `${
@@ -370,7 +373,7 @@ export class LobbyScreen extends DOMScreen {
     settings: GameSettings,
     availableQuestions: GAME_AVAILABLE_QUESTION_ID[]
   ) {
-    const entries = [
+    const gameplayEntries = [
       {
         label: "No. of Questions",
         inputs: [
@@ -383,6 +386,56 @@ export class LobbyScreen extends DOMScreen {
           },
         ],
       },
+      {
+        label: "Allow to Switch Answer",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.ALLOW_CHANGE_ANSWER],
+            checked: settings[GAME_SETTING.ALLOW_CHANGE_ANSWER],
+            name: GAME_SETTING.ALLOW_CHANGE_ANSWER,
+            type: "checkbox",
+          },
+        ],
+      },
+      {
+        label: "Question Timeout Mode",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.ANSWER_TIMEOUT_MODE],
+            name: GAME_SETTING.ANSWER_TIMEOUT_MODE,
+            type: "select",
+            options: [
+              {
+                value: ANSWER_TIMEOUT_MODE.WAIT_PLAYERS_OR_TIMEOUT,
+                label: "Normal (Wait for all players)",
+              },
+              {
+                value: ANSWER_TIMEOUT_MODE.ALWAYS_TIMEOUT,
+                label: "Always wait for timeout",
+              },
+              {
+                value: ANSWER_TIMEOUT_MODE.WAIT_FIRST_ANSWER,
+                label: "Timeout after first answer",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        label: "Additional Timeout After Answer",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.SECONDS_AFTER_ANSWER],
+            name: GAME_SETTING.SECONDS_AFTER_ANSWER,
+            type: "number",
+            min: 0,
+            max: 15,
+          },
+        ],
+      },
+    ];
+
+    const filterEntries = [
       {
         label: "Popularity",
         inputs: [
@@ -434,7 +487,43 @@ export class LobbyScreen extends DOMScreen {
       },
     ];
 
-    const filterSettings = entries
+    const gameplaySettings = gameplayEntries
+      .map((e) => {
+        return `<div class="list-row">
+          <div class="list-row-entry setting-row-entry">
+            <span class="setting-row-entry-label">${e.label}</span>
+            ${e.inputs
+              .map((i) => {
+                switch (i.type) {
+                  case "select":
+                    return `<select name="${i.name}">
+                    ${i.options.map(
+                      (o) =>
+                        `<option 
+                        value="${o.value}" 
+                        ${o.value === i.value ? "selected" : ""}>
+                        ${o.label}
+                        </option>`
+                    )}
+                    </select>`;
+                  default:
+                    return `<input name="${i.name}" type="${i.type}" 
+                    ${
+                      i.type !== "checkbox" ? 'style="width:6rem" required' : ""
+                    } 
+                    value="${i.value}" 
+                    ${i.min ? `min="${i.min}"` : ""} 
+                    ${i.max ? `max="${i.max}"` : ""} 
+                    ${i.checked ? `checked` : ""}>`;
+                }
+              })
+              .join(" - ")}
+          </div>
+        </div>`;
+      })
+      .join("");
+
+    const filterSettings = filterEntries
       .map((e) => {
         return `<div class="list-row">
           <div class="list-row-entry setting-row-entry">
@@ -475,7 +564,11 @@ export class LobbyScreen extends DOMScreen {
       })
       .join("");
 
-    this.lobbySettingsDom.innerHTML = `<div class="list-row list-row-header">Filters</div>
+    this.lobbySettingsDom.innerHTML = `
+    <div class="list-row list-row-header">Gameplay</div>
+    ${gameplaySettings}
+
+    <div class="list-row list-row-header">Filters</div>
     ${filterSettings}
     
     <div class="list-row list-row-header">Questions</div>
@@ -538,6 +631,26 @@ export class LobbyScreen extends DOMScreen {
             ) as HTMLInputElement
           ).value
         ),
+
+        [GAME_SETTING.ALLOW_CHANGE_ANSWER]: (
+          this.lobbySettingsDom.querySelector(
+            `[name="${GAME_SETTING.ALLOW_CHANGE_ANSWER}"]`
+          ) as HTMLInputElement
+        ).checked,
+
+        [GAME_SETTING.ANSWER_TIMEOUT_MODE]: (
+          this.lobbySettingsDom.querySelector(
+            `[name="${GAME_SETTING.ANSWER_TIMEOUT_MODE}"]`
+          ) as HTMLInputElement
+        ).value as ANSWER_TIMEOUT_MODE,
+
+        [GAME_SETTING.SECONDS_AFTER_ANSWER]: parseInt(
+          (
+            this.lobbySettingsDom.querySelector(
+              `[name="${GAME_SETTING.SECONDS_AFTER_ANSWER}"]`
+            ) as HTMLInputElement
+          ).value
+        ),
       },
     });
   }
@@ -581,6 +694,10 @@ export class LobbyScreen extends DOMScreen {
 
   selfIsHost() {
     return this.lobbyHost && this.lobbyHost.playerId === globalState.me.id;
+  }
+
+  getSetting(setting: GAME_SETTING) {
+    return this.currentSettings?.[setting] ?? null;
   }
 
   template() {

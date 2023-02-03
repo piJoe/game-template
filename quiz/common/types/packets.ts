@@ -53,6 +53,7 @@ export enum ServerPacketType {
   GAME_QUESTION = "game.question",
   GAME_QUESTION_ACTIVE = "game.question.active",
   GAME_QUESTION_ANSWERS = "game.question.answers",
+  GAME_QUESTION_RESET_TIMEOUT = "game.question.reset.timeout",
   GAME_SETTINGS = "game.settings",
   PRELOAD_URL = "preload.url",
   ERROR = "generic.error",
@@ -91,6 +92,11 @@ export type ServerPackets = {
     playerAnswers: {
       [key: string]: number;
     };
+  };
+  [ServerPacketType.GAME_QUESTION_RESET_TIMEOUT]: {
+    id: number;
+    timeoutMs: number;
+    reverse: boolean;
   };
   [ServerPacketType.GAME_SETTINGS]: {
     currentSettings: GameSettings;
