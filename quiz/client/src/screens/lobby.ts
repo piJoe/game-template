@@ -185,14 +185,6 @@ export class LobbyScreen extends DOMScreen {
           )
           .join("");
 
-        const readyCount = this.playerlist.filter((e) => e.ready).length;
-        document.querySelector(
-          "#lobby-dd-ready"
-        ).innerHTML = `${readyCount}/${this.playerlist.length}`;
-
-        document.querySelector("#lobby-dd-host").innerHTML =
-          this.lobbyHost?.name;
-
         const self = playerlist.find((e) => e.playerId === globalState.me.id);
         this.selfReady = self?.ready;
         this.updateReadyButton();
@@ -209,6 +201,31 @@ export class LobbyScreen extends DOMScreen {
         document.querySelector("#lobby-dd-question-amount").innerHTML = `${
           currentSettings[GAME_SETTING.QUESTION_COUNT]
         }`;
+
+        document.querySelector("#lobby-dd-answer-switching").innerHTML =
+          currentSettings[GAME_SETTING.ALLOW_CHANGE_ANSWER] ? "YES" : "NO";
+
+        const timeoutMode = currentSettings[GAME_SETTING.ANSWER_TIMEOUT_MODE];
+        let timeoutModeStr = "";
+        switch (timeoutMode) {
+          case ANSWER_TIMEOUT_MODE.ALWAYS_TIMEOUT:
+            timeoutModeStr = "Always wait";
+            break;
+          case ANSWER_TIMEOUT_MODE.WAIT_FIRST_ANSWER:
+            timeoutModeStr = "First Answer";
+            break;
+          case ANSWER_TIMEOUT_MODE.WAIT_PLAYERS_OR_TIMEOUT:
+            timeoutModeStr = "Wait for All";
+            break;
+          default:
+            timeoutModeStr = "???";
+            break;
+        }
+        document.querySelector("#lobby-dd-timeout-mode").innerHTML =
+          timeoutModeStr;
+
+        document.querySelector("#lobby-dd-score-penalty").innerHTML =
+          currentSettings[GAME_SETTING.WRONG_ANSER_PENALTY] ? "YES" : "NO";
       }
     );
 
@@ -747,14 +764,17 @@ export class LobbyScreen extends DOMScreen {
           </div>
 
           <dl>
-            <dt>Player Ready</dt>
-            <dd id="lobby-dd-ready">0/0</dd>
-
             <dt>No. of Questions</dt>
             <dd id="lobby-dd-question-amount">20</dd>
 
-            <dt>Host</dt>
-            <dd id="lobby-dd-host">-/-</dd>
+            <dt>Can Switch Answer</dt>
+            <dd id="lobby-dd-answer-switching">NO</dd>
+
+            <dt>Timeout Mode</dt>
+            <dd id="lobby-dd-timeout-mode">Normal</dd>
+
+            <dt>Wrong Answer Penalty</dt>
+            <dd id="lobby-dd-score-penalty">NO</dd>
           </dl>
         </div>
 

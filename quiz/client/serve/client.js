@@ -1405,7 +1405,6 @@
       this.playerlistListener = socket.on(
         "game.playerlist" /* GAME_PLAYERLIST */,
         ({ playerlist, host }) => {
-          var _a2;
           this.playerlist = playerlist;
           this.lobbyHost = this.playerlist.find((e) => e.playerId === host);
           const dummyFiller = new Array(
@@ -1449,11 +1448,6 @@
                 <div class="skewed-tag ${e.playerId === globalState.me.id ? "skewed-tag-primary" : ""} tag-score">${e.score}</div>
               </li>`
           ).join("");
-          const readyCount = this.playerlist.filter((e) => e.ready).length;
-          document.querySelector(
-            "#lobby-dd-ready"
-          ).innerHTML = `${readyCount}/${this.playerlist.length}`;
-          document.querySelector("#lobby-dd-host").innerHTML = (_a2 = this.lobbyHost) == null ? void 0 : _a2.name;
           const self2 = playerlist.find((e) => e.playerId === globalState.me.id);
           this.selfReady = self2 == null ? void 0 : self2.ready;
           this.updateReadyButton();
@@ -1466,6 +1460,25 @@
           this.currentSettings = currentSettings;
           this.renderSettings(currentSettings, availableQuestions);
           document.querySelector("#lobby-dd-question-amount").innerHTML = `${currentSettings["questionCount" /* QUESTION_COUNT */]}`;
+          document.querySelector("#lobby-dd-answer-switching").innerHTML = currentSettings["allowChangeAnswer" /* ALLOW_CHANGE_ANSWER */] ? "YES" : "NO";
+          const timeoutMode = currentSettings["answerTimeout" /* ANSWER_TIMEOUT_MODE */];
+          let timeoutModeStr = "";
+          switch (timeoutMode) {
+            case "alwaysTimeout" /* ALWAYS_TIMEOUT */:
+              timeoutModeStr = "Always wait";
+              break;
+            case "firstAnswer" /* WAIT_FIRST_ANSWER */:
+              timeoutModeStr = "First Answer";
+              break;
+            case "playersOrTimeout" /* WAIT_PLAYERS_OR_TIMEOUT */:
+              timeoutModeStr = "Wait for All";
+              break;
+            default:
+              timeoutModeStr = "???";
+              break;
+          }
+          document.querySelector("#lobby-dd-timeout-mode").innerHTML = timeoutModeStr;
+          document.querySelector("#lobby-dd-score-penalty").innerHTML = currentSettings["wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */] ? "YES" : "NO";
         }
       );
       this.questionListener = socket.on(
@@ -1908,14 +1921,17 @@
           </div>
 
           <dl>
-            <dt>Player Ready</dt>
-            <dd id="lobby-dd-ready">0/0</dd>
-
             <dt>No. of Questions</dt>
             <dd id="lobby-dd-question-amount">20</dd>
 
-            <dt>Host</dt>
-            <dd id="lobby-dd-host">-/-</dd>
+            <dt>Can Switch Answer</dt>
+            <dd id="lobby-dd-answer-switching">NO</dd>
+
+            <dt>Timeout Mode</dt>
+            <dd id="lobby-dd-timeout-mode">Normal</dd>
+
+            <dt>Wrong Answer Penalty</dt>
+            <dd id="lobby-dd-score-penalty">NO</dd>
           </dl>
         </div>
 
