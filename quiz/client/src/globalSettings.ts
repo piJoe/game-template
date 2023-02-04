@@ -5,7 +5,8 @@ import { GlobalDropdownOption } from "./types/globalDropdown";
 
 const defaultSettings = {
   volume: 1.0,
-  languagePreference: ClientAnimeTitleLanguagePreferences.DEFAULT,
+  languagePreference: ClientAnimeTitleLanguagePreferences.OFFICIAL,
+  secondaryLanguagePreference: ClientAnimeTitleLanguagePreferences.OFFICIAL,
 };
 
 const settings = {

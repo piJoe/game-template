@@ -1,5 +1,5 @@
 export enum ClientAnimeTitleLanguagePreferences {
-  DEFAULT = "Default",
+  OFFICIAL = "Official",
   SHORTEST = "Shortest",
   ENGLISH = "English",
   JAPANESE = "Japanese",

@@ -52,8 +52,8 @@ export class QuestionScreen extends DOMScreen {
 
   init() {
     this.domRef.addEventListener("click", (e) => {
-      const elem = e.target as HTMLElement;
-      if (!elem.hasAttribute("data-answer")) {
+      const elem = (e.target as HTMLElement).closest("[data-answer]");
+      if (elem === null) {
         return;
       }
 
@@ -113,12 +113,11 @@ export class QuestionScreen extends DOMScreen {
     // scale font for answers
     const answerContainers = this.domRef.querySelectorAll(".answers > li");
     answerContainers.forEach((a: HTMLElement) => {
-      const containerWidth = a.getBoundingClientRect().width - 64;
+      const containerWidth = a.getBoundingClientRect().width - 80;
       const stringWidth = calcStringWidth(a.getAttribute("data-str-val"));
 
-      a.style.fontSize = `${Math.min(
-        Math.max(22 * (containerWidth / stringWidth), 16),
-        22
+      a.style.fontSize = `${Math.floor(
+        Math.min(Math.max(22 * (containerWidth / stringWidth), 16), 22)
       )}px`;
     });
 
@@ -295,9 +294,20 @@ export class QuestionScreen extends DOMScreen {
         ${answers
           .map((a, idx) => {
             const str = escapeHTML(renderAnimeTitle(a));
+            const secondaryTitle = escapeHTML(renderAnimeTitle(a, true));
+
+            const secondaryIsSame =
+              secondaryTitle.toLowerCase() === str.toLowerCase();
 
             return `<li data-answer="${idx}" data-str-val="${str}">
-            ${str}
+            <div>
+              ${str}
+              ${
+                !secondaryIsSame
+                  ? `<span class="secondary-answer">${secondaryTitle}</span>`
+                  : ""
+              }
+            </div>
             <div class="answer-others-container"></div>
           </li>`;
           })

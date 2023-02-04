@@ -6,7 +6,10 @@ import {
 import { globalSettings } from "../globalSettings";
 import { ClientAnimeTitleLanguagePreferences } from "../types/clientSettings";
 
-export function renderAnimeTitle(titles: string | AnimeTitle[]): string {
+export function renderAnimeTitle(
+  titles: string | AnimeTitle[],
+  secondary = false
+): string {
   if (typeof titles === "string") {
     return titles;
   }
@@ -15,8 +18,13 @@ export function renderAnimeTitle(titles: string | AnimeTitle[]): string {
     titles.find((t) => t.type === AnimeTitleType.DEFAULT)?.title ??
     titles.at(0).title;
 
-  switch (globalSettings.languagePreference) {
-    case ClientAnimeTitleLanguagePreferences.DEFAULT:
+  let languageSetting = globalSettings.languagePreference;
+  if (secondary) {
+    languageSetting = globalSettings.secondaryLanguagePreference;
+  }
+
+  switch (languageSetting) {
+    case ClientAnimeTitleLanguagePreferences.OFFICIAL:
       return defaultTitle;
       break;
     case ClientAnimeTitleLanguagePreferences.SHORTEST:
@@ -91,5 +99,5 @@ export function calcStringWidth(
   font: string = "800 22px Fira Sans, sans-serif"
 ) {
   canvasContext.font = font;
-  return canvasContext.measureText(str).width;
+  return Math.ceil(canvasContext.measureText(str).width);
 }

@@ -6,6 +6,16 @@ export class SettingsScreen extends DOMScreen {
   protected killWhenInactive = false;
   protected additionalClasses = ["gradient-bg-screen"];
 
+  private languagePreferences = [
+    ClientAnimeTitleLanguagePreferences.OFFICIAL,
+    ClientAnimeTitleLanguagePreferences.SHORTEST,
+    ClientAnimeTitleLanguagePreferences.ENGLISH,
+    ClientAnimeTitleLanguagePreferences.JAPANESE,
+    ClientAnimeTitleLanguagePreferences.GERMAN,
+    ClientAnimeTitleLanguagePreferences.SPANISH,
+    ClientAnimeTitleLanguagePreferences.FRENCH,
+  ];
+
   constructor() {
     super();
   }
@@ -25,7 +35,12 @@ export class SettingsScreen extends DOMScreen {
         elements.namedItem("anime-title-language") as HTMLOptionElement
       ).value as ClientAnimeTitleLanguagePreferences;
 
+      const secondaryLanguage = (
+        elements.namedItem("secondary-title-language") as HTMLOptionElement
+      ).value as ClientAnimeTitleLanguagePreferences;
+
       globalSettings.languagePreference = animeTitleLanguage;
+      globalSettings.secondaryLanguagePreference = secondaryLanguage;
     });
   }
 
@@ -49,22 +64,32 @@ export class SettingsScreen extends DOMScreen {
         <form class="list">
           <div class="list-row">
             <div class="list-row-entry setting-row-entry">
-              <span class="setting-row-entry-label">Anime Title Language</span>
+              <span class="setting-row-entry-label">Title Language Preference</span>
               <select name="anime-title-language">
-                ${[
-                  ClientAnimeTitleLanguagePreferences.DEFAULT,
-                  ClientAnimeTitleLanguagePreferences.SHORTEST,
-                  ClientAnimeTitleLanguagePreferences.ENGLISH,
-                  ClientAnimeTitleLanguagePreferences.JAPANESE,
-                  ClientAnimeTitleLanguagePreferences.GERMAN,
-                  ClientAnimeTitleLanguagePreferences.SPANISH,
-                  ClientAnimeTitleLanguagePreferences.FRENCH,
-                ].map(
+                ${this.languagePreferences.map(
                   (l) =>
                     `<option 
                       value="${l}" 
                       ${
                         globalSettings.languagePreference === l
+                          ? "selected"
+                          : ""
+                      }>${l}</option>`
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-entry setting-row-entry">
+              <span class="setting-row-entry-label">Secondary Language Preference</span>
+              <select name="secondary-title-language">
+                ${this.languagePreferences.map(
+                  (l) =>
+                    `<option 
+                      value="${l}" 
+                      ${
+                        globalSettings.secondaryLanguagePreference === l
                           ? "selected"
                           : ""
                       }>${l}</option>`

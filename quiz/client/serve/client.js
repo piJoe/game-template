@@ -897,6 +897,15 @@
       super();
       this.killWhenInactive = false;
       this.additionalClasses = ["gradient-bg-screen"];
+      this.languagePreferences = [
+        "Official" /* OFFICIAL */,
+        "Shortest" /* SHORTEST */,
+        "English" /* ENGLISH */,
+        "Japanese" /* JAPANESE */,
+        "German" /* GERMAN */,
+        "Spanish" /* SPANISH */,
+        "French" /* FRENCH */
+      ];
     }
     init() {
       this.domRef.querySelector("#settings-close").addEventListener("click", (e) => {
@@ -906,7 +915,9 @@
       form.addEventListener("input", (e) => {
         const elements = form.elements;
         const animeTitleLanguage = elements.namedItem("anime-title-language").value;
+        const secondaryLanguage = elements.namedItem("secondary-title-language").value;
         globalSettings.languagePreference = animeTitleLanguage;
+        globalSettings.secondaryLanguagePreference = secondaryLanguage;
       });
     }
     setActive() {
@@ -928,20 +939,25 @@
         <form class="list">
           <div class="list-row">
             <div class="list-row-entry setting-row-entry">
-              <span class="setting-row-entry-label">Anime Title Language</span>
+              <span class="setting-row-entry-label">Title Language Preference</span>
               <select name="anime-title-language">
-                ${[
-        "Default" /* DEFAULT */,
-        "Shortest" /* SHORTEST */,
-        "English" /* ENGLISH */,
-        "Japanese" /* JAPANESE */,
-        "German" /* GERMAN */,
-        "Spanish" /* SPANISH */,
-        "French" /* FRENCH */
-      ].map(
+                ${this.languagePreferences.map(
         (l) => `<option 
                       value="${l}" 
                       ${globalSettings.languagePreference === l ? "selected" : ""}>${l}</option>`
+      )}
+              </select>
+            </div>
+          </div>
+
+          <div class="list-row">
+            <div class="list-row-entry setting-row-entry">
+              <span class="setting-row-entry-label">Secondary Language Preference</span>
+              <select name="secondary-title-language">
+                ${this.languagePreferences.map(
+        (l) => `<option 
+                      value="${l}" 
+                      ${globalSettings.secondaryLanguagePreference === l ? "selected" : ""}>${l}</option>`
       )}
               </select>
             </div>
@@ -959,7 +975,8 @@
   // quiz/client/src/globalSettings.ts
   var defaultSettings = {
     volume: 1,
-    languagePreference: "Default" /* DEFAULT */
+    languagePreference: "Official" /* OFFICIAL */,
+    secondaryLanguagePreference: "Official" /* OFFICIAL */
   };
   var _a;
   var settings = __spreadValues(__spreadValues({}, defaultSettings), JSON.parse((_a = localStorage.getItem("settings")) != null ? _a : "{}"));
@@ -1040,14 +1057,18 @@
   }
 
   // quiz/client/src/utils/titles.ts
-  function renderAnimeTitle(titles) {
+  function renderAnimeTitle(titles, secondary = false) {
     var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
     if (typeof titles === "string") {
       return titles;
     }
     const defaultTitle = (_b = (_a2 = titles.find((t) => t.type === "Default" /* DEFAULT */)) == null ? void 0 : _a2.title) != null ? _b : titles.at(0).title;
-    switch (globalSettings.languagePreference) {
-      case "Default" /* DEFAULT */:
+    let languageSetting = globalSettings.languagePreference;
+    if (secondary) {
+      languageSetting = globalSettings.secondaryLanguagePreference;
+    }
+    switch (languageSetting) {
+      case "Official" /* OFFICIAL */:
         return defaultTitle;
         break;
       case "Shortest" /* SHORTEST */:
@@ -1090,7 +1111,7 @@
   var canvasContext = document.createElement("canvas").getContext("2d");
   function calcStringWidth(str, font = "800 22px Fira Sans, sans-serif") {
     canvasContext.font = font;
-    return canvasContext.measureText(str).width;
+    return Math.ceil(canvasContext.measureText(str).width);
   }
 
   // quiz/client/src/screens/question.ts
@@ -1115,8 +1136,8 @@
     }
     init() {
       this.domRef.addEventListener("click", (e) => {
-        const elem = e.target;
-        if (!elem.hasAttribute("data-answer")) {
+        const elem = e.target.closest("[data-answer]");
+        if (elem === null) {
           return;
         }
         if (this.questionDone) {
@@ -1160,11 +1181,10 @@
       }
       const answerContainers = this.domRef.querySelectorAll(".answers > li");
       answerContainers.forEach((a) => {
-        const containerWidth = a.getBoundingClientRect().width - 64;
+        const containerWidth = a.getBoundingClientRect().width - 80;
         const stringWidth = calcStringWidth(a.getAttribute("data-str-val"));
-        a.style.fontSize = `${Math.min(
-          Math.max(22 * (containerWidth / stringWidth), 16),
-          22
+        a.style.fontSize = `${Math.floor(
+          Math.min(Math.max(22 * (containerWidth / stringWidth), 16), 22)
         )}px`;
       });
       this.timerDOM = this.domRef.querySelector(".question-timer");
@@ -1288,8 +1308,13 @@
       <ul class="answers">
         ${answers.map((a, idx) => {
         const str = (0, import_escape_html.default)(renderAnimeTitle(a));
+        const secondaryTitle = (0, import_escape_html.default)(renderAnimeTitle(a, true));
+        const secondaryIsSame = secondaryTitle.toLowerCase() === str.toLowerCase();
         return `<li data-answer="${idx}" data-str-val="${str}">
-            ${str}
+            <div>
+              ${str}
+              ${!secondaryIsSame ? `<span class="secondary-answer">${secondaryTitle}</span>` : ""}
+            </div>
             <div class="answer-others-container"></div>
           </li>`;
       }).join("")}
