@@ -37,6 +37,7 @@ export class QuestionScreen extends DOMScreen {
   private audio: HTMLAudioElement;
   private questionDone = false;
   private resetTimeoutListener: number;
+  private globalSettingsChangedListener: (e: CustomEvent) => void;
 
   constructor(
     lobby: LobbyScreen,
@@ -104,9 +105,10 @@ export class QuestionScreen extends DOMScreen {
       this.audio.autoplay = false;
       this.audio.volume = globalSettings.volume;
 
+      this.globalSettingsChangedListener = this.settingsChanged.bind(this);
       document.addEventListener(
         "globalSettingsChanged",
-        this.settingsChanged.bind(this)
+        this.globalSettingsChangedListener
       );
     }
 
@@ -250,7 +252,10 @@ export class QuestionScreen extends DOMScreen {
   die() {
     super.die();
 
-    document.removeEventListener("globalSettingsChanged", this.settingsChanged);
+    document.removeEventListener(
+      "globalSettingsChanged",
+      this.globalSettingsChangedListener
+    );
 
     socket.off(
       ServerPacketType.GAME_QUESTION_RESET_TIMEOUT,

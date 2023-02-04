@@ -1187,9 +1187,10 @@
         this.audio.preload = "auto";
         this.audio.autoplay = false;
         this.audio.volume = globalSettings.volume;
+        this.globalSettingsChangedListener = this.settingsChanged.bind(this);
         document.addEventListener(
           "globalSettingsChanged",
-          this.settingsChanged.bind(this)
+          this.globalSettingsChangedListener
         );
       }
       const answerContainers = this.domRef.querySelectorAll(".answers > li");
@@ -1296,7 +1297,10 @@
     }
     die() {
       super.die();
-      document.removeEventListener("globalSettingsChanged", this.settingsChanged);
+      document.removeEventListener(
+        "globalSettingsChanged",
+        this.globalSettingsChangedListener
+      );
       socket.off(
         "game.question.reset.timeout" /* GAME_QUESTION_RESET_TIMEOUT */,
         this.resetTimeoutListener
