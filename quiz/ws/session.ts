@@ -44,6 +44,7 @@ export class GameSession {
     [GAME_SETTING.ANSWER_TIMEOUT_MODE]:
       ANSWER_TIMEOUT_MODE.WAIT_PLAYERS_OR_TIMEOUT,
     [GAME_SETTING.SECONDS_AFTER_ANSWER]: 0,
+    [GAME_SETTING.WRONG_ANSER_PENALTY]: false,
   };
 
   constructor() {
@@ -202,6 +203,10 @@ export class GameSession {
       console.error("failed to validate settings");
       return;
     }
+    if (typeof settings[GAME_SETTING.WRONG_ANSER_PENALTY] !== "boolean") {
+      console.error("failed to validate settings");
+      return;
+    }
 
     this.settings[GAME_SETTING.QUESTION_COUNT] = Math.min(
       Math.max(Game.MIN_QUESTION_AMOUNT, settings[GAME_SETTING.QUESTION_COUNT]),
@@ -258,6 +263,9 @@ export class GameSession {
       Math.max(0, settings[GAME_SETTING.SECONDS_AFTER_ANSWER]),
       15
     );
+
+    this.settings[GAME_SETTING.WRONG_ANSER_PENALTY] =
+      settings[GAME_SETTING.WRONG_ANSER_PENALTY] ?? false;
 
     this.unreadyAllPlayers();
     this.sendGameSettings();

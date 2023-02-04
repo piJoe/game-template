@@ -433,6 +433,17 @@ export class LobbyScreen extends DOMScreen {
           },
         ],
       },
+      {
+        label: "Score Penalty on Wrong Answer",
+        inputs: [
+          {
+            value: settings[GAME_SETTING.WRONG_ANSER_PENALTY],
+            checked: settings[GAME_SETTING.WRONG_ANSER_PENALTY],
+            name: GAME_SETTING.WRONG_ANSER_PENALTY,
+            type: "checkbox",
+          },
+        ],
+      },
     ];
 
     const filterEntries = [
@@ -651,6 +662,12 @@ export class LobbyScreen extends DOMScreen {
             ) as HTMLInputElement
           ).value
         ),
+
+        [GAME_SETTING.WRONG_ANSER_PENALTY]: (
+          this.lobbySettingsDom.querySelector(
+            `[name="${GAME_SETTING.WRONG_ANSER_PENALTY}"]`
+          ) as HTMLInputElement
+        ).checked,
       },
     });
   }

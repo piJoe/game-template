@@ -194,6 +194,11 @@ export class Game {
     q.playerAnswers.forEach((pAnswer, playerId) => {
       if (correctAnswers.includes(pAnswer)) {
         this.session.addPlayerScore(playerId);
+      } else {
+        // player has chosen a wrong anwser, give him negative points!
+        if (this.settings[GAME_SETTING.WRONG_ANSER_PENALTY]) {
+          this.session.addPlayerScore(playerId, -1);
+        }
       }
     });
 

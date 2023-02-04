@@ -1621,6 +1621,17 @@
               max: 15
             }
           ]
+        },
+        {
+          label: "Score Penalty on Wrong Answer",
+          inputs: [
+            {
+              value: settings2["wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */],
+              checked: settings2["wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */],
+              name: "wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */,
+              type: "checkbox"
+            }
+          ]
         }
       ];
       const filterEntries = [
@@ -1787,7 +1798,10 @@
             this.lobbySettingsDom.querySelector(
               `[name="${"secAfterAnswer" /* SECONDS_AFTER_ANSWER */}"]`
             ).value
-          )
+          ),
+          ["wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */]: this.lobbySettingsDom.querySelector(
+            `[name="${"wrongAnswerPenalty" /* WRONG_ANSER_PENALTY */}"]`
+          ).checked
         }
       });
     }

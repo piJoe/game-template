@@ -39,6 +39,7 @@ export enum GAME_SETTING {
   ALLOW_CHANGE_ANSWER = "allowChangeAnswer",
   ANSWER_TIMEOUT_MODE = "answerTimeout",
   SECONDS_AFTER_ANSWER = "secAfterAnswer",
+  WRONG_ANSER_PENALTY = "wrongAnswerPenalty",
 }
 
 export type GameSettings = {
@@ -52,4 +53,5 @@ export type GameSettings = {
   [GAME_SETTING.ALLOW_CHANGE_ANSWER]: boolean;
   [GAME_SETTING.ANSWER_TIMEOUT_MODE]: ANSWER_TIMEOUT_MODE;
   [GAME_SETTING.SECONDS_AFTER_ANSWER]: number;
+  [GAME_SETTING.WRONG_ANSER_PENALTY]: boolean;
 };
