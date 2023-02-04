@@ -394,7 +394,7 @@ export class Game {
   }
 
   sendGameFinalScoreboard() {
-    // send scoreboard packet, also indicating to client that game is done, idk
+    // TODO: send scoreboard packet, also indicating to client that game is done, idk
   }
 
   static ALL_AVAILABLE_QUESTIONS = [

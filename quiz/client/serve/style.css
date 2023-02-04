@@ -787,6 +787,7 @@ select {
   overflow: auto;
   will-change: transform;
   padding: 30px;
+  visibility: hidden;
 }
 
 .screen > .title-h1 {
@@ -801,6 +802,10 @@ select {
 }
 .screen > .bottom-container.align-right {
   justify-content: flex-end;
+}
+
+.screen[data-screen-active^=cur] {
+  visibility: visible;
 }
 
 .screen[data-screen-active=cur] {

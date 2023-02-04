@@ -1363,8 +1363,10 @@
       const backToJoinButton = this.domRef.querySelector(
         "#lobby-back-button"
       );
-      document.addEventListener("keydown", this.keydown.bind(this));
-      document.addEventListener("keyup", this.keyup.bind(this));
+      this.keyDownListener = this.keydown.bind(this);
+      this.keyUpListener = this.keyup.bind(this);
+      document.addEventListener("keydown", this.keyDownListener);
+      document.addEventListener("keyup", this.keyUpListener);
       const playerListDom = this.domRef.querySelector(".lobby-playerlist");
       this.scoreboardDom = document.createElement("div");
       this.scoreboardDom.classList.add("playerlist", "playerlist-scoreboard");
@@ -2028,8 +2030,8 @@
       this.questions.forEach((q) => {
         q.die();
       });
-      document.removeEventListener("keydown", this.keydown);
-      document.removeEventListener("keyup", this.keyup);
+      document.removeEventListener("keydown", this.keyDownListener);
+      document.removeEventListener("keyup", this.keyUpListener);
     }
   };
 

@@ -17,6 +17,7 @@
     overflow: auto;
     will-change: transform;
     padding: 30px;
+    visibility: hidden;
 }
 .screen > .title-h1 {
     font-size: var(--h2-font-size);
@@ -32,6 +33,9 @@
     }
 }
 
+.screen[data-screen-active^="cur"] {
+    visibility: visible;
+}
 .screen[data-screen-active="cur"] {
     animation: slide-in-right 0.25s ease forwards;
 }

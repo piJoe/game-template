@@ -33,6 +33,8 @@ export class LobbyScreen extends DOMScreen {
   private questionActiveListener: number;
   private questionAnswersListener: number;
   private selfLeftListener: number;
+  private keyDownListener: (event: KeyboardEvent) => void;
+  private keyUpListener: (event: KeyboardEvent) => void;
   private scoreboardDom: HTMLElement;
   private scoreboardCloseCallback: () => void;
   private lobbyId = "";
@@ -66,8 +68,10 @@ export class LobbyScreen extends DOMScreen {
       "#lobby-back-button"
     ) as HTMLInputElement;
 
-    document.addEventListener("keydown", this.keydown.bind(this));
-    document.addEventListener("keyup", this.keyup.bind(this));
+    this.keyDownListener = this.keydown.bind(this);
+    this.keyUpListener = this.keyup.bind(this);
+    document.addEventListener("keydown", this.keyDownListener);
+    document.addEventListener("keyup", this.keyUpListener);
 
     const playerListDom = this.domRef.querySelector(".lobby-playerlist");
 
@@ -894,7 +898,7 @@ export class LobbyScreen extends DOMScreen {
     });
 
     // unregister keyboard listeners
-    document.removeEventListener("keydown", this.keydown);
-    document.removeEventListener("keyup", this.keyup);
+    document.removeEventListener("keydown", this.keyDownListener);
+    document.removeEventListener("keyup", this.keyUpListener);
   }
 }
