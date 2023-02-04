@@ -39,8 +39,13 @@ export class SettingsScreen extends DOMScreen {
         elements.namedItem("secondary-title-language") as HTMLOptionElement
       ).value as ClientAnimeTitleLanguagePreferences;
 
+      const showReverseTimer = (
+        elements.namedItem("showReverseTimer") as HTMLInputElement
+      ).checked;
+
       globalSettings.languagePreference = animeTitleLanguage;
       globalSettings.secondaryLanguagePreference = secondaryLanguage;
+      globalSettings.showReverseTimer = showReverseTimer;
     });
   }
 
@@ -97,6 +102,16 @@ export class SettingsScreen extends DOMScreen {
               </select>
             </div>
           </div>
+
+          <div class="list-row">
+            <div class="list-row-entry setting-row-entry">
+              <span class="setting-row-entry-label">Show Reverse Timer when loading next question</span>
+              <input type="checkbox" 
+                name="showReverseTimer" 
+                ${globalSettings.showReverseTimer ? "checked" : ""}>
+            </div>
+          </div>
+
         </form>
       </div>
     </section>

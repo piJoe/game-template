@@ -7,6 +7,7 @@ const defaultSettings = {
   volume: 1.0,
   languagePreference: ClientAnimeTitleLanguagePreferences.OFFICIAL,
   secondaryLanguagePreference: ClientAnimeTitleLanguagePreferences.OFFICIAL,
+  showReverseTimer: false,
 };
 
 const settings = {

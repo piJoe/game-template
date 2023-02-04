@@ -143,9 +143,10 @@ export class QuestionScreen extends DOMScreen {
   }
 
   updateTimer() {
-    // if (this.questionDone) {
-    //   return;
-    // }
+    if (this.questionDone && !globalSettings.showReverseTimer) {
+      this.timerDOM.style.transform = `scaleX(0)`;
+      return;
+    }
 
     const timeoutMs = this.timeoutMs - 250;
 
@@ -158,20 +159,14 @@ export class QuestionScreen extends DOMScreen {
       0.0
     );
 
-    if (this.questionDone) {
-      timePercentage = 0.0;
+    if (this.timerReverse) {
+      timePercentage = 1 - timePercentage;
     }
-
-    // if (this.timerReverse) {
-    //   timePercentage = 1 - timePercentage;
-    // }
     this.timerDOM.style.transform = `scaleX(${timePercentage})`;
 
-    if (timeLeftSeconds > 0 || !this.questionDone) {
-      window.requestAnimationFrame(() => {
-        this.updateTimer();
-      });
-    }
+    window.requestAnimationFrame(() => {
+      this.updateTimer();
+    });
   }
 
   showAnswers(

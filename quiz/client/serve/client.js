@@ -916,8 +916,10 @@
         const elements = form.elements;
         const animeTitleLanguage = elements.namedItem("anime-title-language").value;
         const secondaryLanguage = elements.namedItem("secondary-title-language").value;
+        const showReverseTimer = elements.namedItem("showReverseTimer").checked;
         globalSettings.languagePreference = animeTitleLanguage;
         globalSettings.secondaryLanguagePreference = secondaryLanguage;
+        globalSettings.showReverseTimer = showReverseTimer;
       });
     }
     setActive() {
@@ -962,6 +964,16 @@
               </select>
             </div>
           </div>
+
+          <div class="list-row">
+            <div class="list-row-entry setting-row-entry">
+              <span class="setting-row-entry-label">Show Reverse Timer when loading next question</span>
+              <input type="checkbox" 
+                name="showReverseTimer" 
+                ${globalSettings.showReverseTimer ? "checked" : ""}>
+            </div>
+          </div>
+
         </form>
       </div>
     </section>
@@ -976,7 +988,8 @@
   var defaultSettings = {
     volume: 1,
     languagePreference: "Official" /* OFFICIAL */,
-    secondaryLanguagePreference: "Official" /* OFFICIAL */
+    secondaryLanguagePreference: "Official" /* OFFICIAL */,
+    showReverseTimer: false
   };
   var _a;
   var settings = __spreadValues(__spreadValues({}, defaultSettings), JSON.parse((_a = localStorage.getItem("settings")) != null ? _a : "{}"));
@@ -1203,6 +1216,10 @@
       this.audio.volume = e.detail.volume;
     }
     updateTimer() {
+      if (this.questionDone && !globalSettings.showReverseTimer) {
+        this.timerDOM.style.transform = `scaleX(0)`;
+        return;
+      }
       const timeoutMs = this.timeoutMs - 250;
       const timeLeftSeconds = Math.ceil(
         (this.timerStarted + timeoutMs - Date.now()) / 1e3
@@ -1211,15 +1228,13 @@
         1 - (Date.now() - this.timerStarted) / timeoutMs,
         0
       );
-      if (this.questionDone) {
-        timePercentage = 0;
+      if (this.timerReverse) {
+        timePercentage = 1 - timePercentage;
       }
       this.timerDOM.style.transform = `scaleX(${timePercentage})`;
-      if (timeLeftSeconds > 0 || !this.questionDone) {
-        window.requestAnimationFrame(() => {
-          this.updateTimer();
-        });
-      }
+      window.requestAnimationFrame(() => {
+        this.updateTimer();
+      });
     }
     showAnswers(answers, playerAnswers) {
       const { correct, wrong } = answers;
