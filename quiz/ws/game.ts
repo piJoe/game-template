@@ -29,6 +29,10 @@ export class Game {
   private currentQuestion: number;
   private session: GameSession;
   private waitForAnswersCallback = new Map<number, () => void>();
+  private waitForTimeoutCallback = new Map<
+    number,
+    { resolve: () => void; reject: () => void }
+  >();
   private endGameNextTick = false;
 
   constructor(session: GameSession, settings: GameSettings) {
@@ -134,12 +138,19 @@ export class Game {
       this.sendQuestion(nextQuestion);
     }
 
-    const timeoutQuestion = timeout(q.timeoutMs);
-    const waitForPlayerAnswers = this.waitForPlayerAnswers(
-      this.currentQuestion
-    );
+    const timeoutQuestion = this.waitForTimeout(questionId);
+    const waitForPlayerAnswers = this.waitForPlayerAnswers(questionId);
+
+    timeout(q.timeoutMs).then(() => {
+      const callback = this.waitForTimeoutCallback.get(questionId);
+      if (callback) {
+        callback.resolve();
+      }
+      this.waitForTimeoutCallback.delete(questionId);
+    });
+
     await Promise.any([timeoutQuestion, waitForPlayerAnswers]);
-    this.resolveAnyOldWaitForPlayerPromises();
+    this.resolveAnyOldWaitPromises();
 
     this.updateGameScores(this.currentQuestion);
     this.sendQuestionAnswers(this.currentQuestion);
@@ -214,9 +225,26 @@ export class Game {
     return promise;
   }
 
-  resolveAnyOldWaitForPlayerPromises() {
+  waitForTimeout(questionId: number) {
+    const promise = new Promise<void>((res, rej) => {
+      this.waitForTimeoutCallback.set(questionId, {
+        resolve: () => {
+          res();
+        },
+        reject: () => {
+          rej();
+        },
+      });
+    });
+    return promise;
+  }
+
+  resolveAnyOldWaitPromises() {
     this.waitForAnswersCallback.forEach((c) => c());
     this.waitForAnswersCallback.clear();
+
+    this.waitForTimeoutCallback.forEach((c) => c.resolve());
+    this.waitForTimeoutCallback.clear();
   }
 
   async setPlayerAnswer(player: Player, questionId: number, answer: number) {
@@ -271,6 +299,14 @@ export class Game {
           timeoutMs: timeoutMs,
           reverse: false,
         });
+
+        // reject the timeout callback to prevent race condition
+        const callback = this.waitForTimeoutCallback.get(questionId);
+        if (callback) {
+          callback.reject();
+        }
+        this.waitForTimeoutCallback.delete(questionId);
+
         await timeout(timeoutMs);
       }
 
@@ -293,6 +329,14 @@ export class Game {
           timeoutMs: timeoutMs,
           reverse: false,
         });
+
+        // reject the timeout callback to prevent race condition
+        const callback = this.waitForTimeoutCallback.get(questionId);
+        if (callback) {
+          callback.reject();
+        }
+        this.waitForTimeoutCallback.delete(questionId);
+
         await timeout(timeoutMs);
       }
 
