@@ -169,6 +169,9 @@ export async function getRandomAnimesWithGenres(
   // group by animes.id, preventing doubles
   query += ` GROUP BY animes.id`;
 
+  // filter out any animes without genres
+  query += ` HAVING genreCount > 0`;
+
   // order random
   query += ` ORDER BY RANDOM()`;
 
@@ -200,7 +203,7 @@ export async function getRandomAnimesWithStudio(
     LEFT JOIN 'studios' ON anime_studios.studio_id = studios.id`;
 
   // optional where clauses
-  let wheres = [];
+  let wheres = [`studio IS NOT NULL`];
   if (options.excludeAnimes) {
     wheres.push(
       `animes.id NOT IN (${options.excludeAnimes.map((_) => "?").join(",")})`
