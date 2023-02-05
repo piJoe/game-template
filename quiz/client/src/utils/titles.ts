@@ -6,6 +6,8 @@ import {
 import { globalSettings } from "../globalSettings";
 import { ClientAnimeTitleLanguagePreferences } from "../types/clientSettings";
 
+// TODO: figure out what would cause a crash. (something `.find`??)
+
 export function renderAnimeTitle(
   titles: string | AnimeTitle[],
   secondary = false

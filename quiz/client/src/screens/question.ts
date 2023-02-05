@@ -269,6 +269,8 @@ export class QuestionScreen extends DOMScreen {
     const hasImage = this.question.question.image ? true : false;
     const hasAudio = this.question.question.audioUrl ? true : false;
 
+    // TODO: implement additional SKIP answer button? (should also prevent from being kicked due to inactivity)
+
     return `
     <div><!-- empty div for spacing --></div>
     <div class="question-wrapper">

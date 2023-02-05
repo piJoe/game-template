@@ -247,6 +247,7 @@ export class Game {
     this.waitForTimeoutCallback.clear();
   }
 
+  // TODO: implement SKIP answer button? (should also prevent from being kicked due to inactivity)
   async setPlayerAnswer(player: Player, questionId: number, answer: number) {
     if (this.currentQuestion !== questionId) {
       // TODO: throw error or smth idk (it's not the right time to answer this question)
