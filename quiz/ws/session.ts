@@ -150,7 +150,10 @@ export class GameSession {
 
   checkReadyStatus() {
     // as long as there are players not ready (!s.ready) continue like normal
-    if ([...this.playerStates.values()].some((s) => !s.ready)) {
+    if (
+      [...this.playerStates.values()].some((s) => !s.ready) ||
+      this.playerStates.size < 1
+    ) {
       return;
     }
 
