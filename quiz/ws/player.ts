@@ -9,6 +9,7 @@ import {
   ServerPacketType,
 } from "../common/types/packets";
 import { PLAYER_LEFT_REASON } from "../common/types/session";
+import { logger } from "../logging";
 import { generateUniqueId } from "../utils/uid";
 import { getGameSessionById, GameSession } from "./session";
 
@@ -28,7 +29,6 @@ export class Player {
   private lastPing: number;
 
   constructor(socket: WebSocket, name = generateUniqueId(5)) {
-    console.log("PLAYER CONNECTED", this.id);
     this.socket = socket;
     this.name = name;
 
@@ -43,9 +43,11 @@ export class Player {
     this.pingInterval = setInterval(() => {
       // close connection if last ping
       if (this.lastPing <= Date.now() - PING_TIMEOUT) {
-        console.log(
-          `Player ${this.id} (${this.name}) did not react to pings for a while, disconnecting...`
-        );
+        logger.info("Player kicked", {
+          reason: "inactivity",
+          playerId: this.id,
+          playerName: this.name,
+        });
         this.socket.close();
         this.disconnect();
         return;
@@ -180,7 +182,6 @@ export class Player {
   }
 
   disconnect() {
-    console.log("PLAYER DISCONNECTED", this.id);
     if (this.socket) {
       this.socket.terminate();
     }

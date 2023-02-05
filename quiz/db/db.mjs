@@ -1,7 +1,6 @@
 import Database from "better-sqlite3";
 import flat from "flat";
 
-// fs.copyFileSync("/animedb.sqlite", "/animedb_copy.sqlite");
 const fileDB = new Database("/animedb.sqlite", {
   readonly: true,
 });

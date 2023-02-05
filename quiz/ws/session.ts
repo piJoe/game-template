@@ -14,6 +14,7 @@ import {
   PLAYER_LEFT_REASON,
   SESSION_STATUS,
 } from "../common/types/session";
+import { logger } from "../logging";
 import { generateUniqueId } from "../utils/uid";
 import { Game } from "./game";
 import { Player } from "./player";
@@ -49,7 +50,9 @@ export class GameSession {
 
   constructor() {
     allSessions.set(this.id, this);
-    console.log("SESSION CREATED", this.id);
+    logger.info("Session created", {
+      lobbyId: this.id,
+    });
   }
 
   playerJoin(player: Player): boolean {
@@ -59,7 +62,11 @@ export class GameSession {
       this.sendGameStatus();
       this.sendPlayerlist();
       this.sendGameSettings(player);
-      console.log("PLAYER JOINED", this.id, player.id, player.name);
+      logger.info("Player joined", {
+        lobbyId: this.id,
+        playerId: player.id,
+        playerName: player.name,
+      });
       return true;
     }
 
@@ -67,7 +74,13 @@ export class GameSession {
   }
 
   playerLeave(player: Player, reason: PLAYER_LEFT_REASON) {
-    console.log("PLAYER LEFT", this.id, player.id, player.name);
+    logger.info("Player left", {
+      reason: reason,
+      lobbyId: this.id,
+      playerId: player.id,
+      playerName: player.name,
+    });
+
     player.sendMsg(ServerPacketType.ME_LEFT_GAME, {
       reason,
     });
@@ -136,7 +149,6 @@ export class GameSession {
   }
 
   checkReadyStatus() {
-    console.log("CHECK READY STATE");
     // as long as there are players not ready (!s.ready) continue like normal
     if ([...this.playerStates.values()].some((s) => !s.ready)) {
       return;
@@ -146,9 +158,12 @@ export class GameSession {
     if (this.game) {
       return;
     }
-    this.game = new Game(this, this.settings);
     this.updateStatus(SESSION_STATUS.IN_GAME);
-    console.log("GAME CREATED", this.id);
+    this.game = new Game(this, this.settings);
+    logger.info("Game created", {
+      lobbyId: this.id,
+      players: this.playerList.map((e) => e.name),
+    });
   }
 
   updateStatus(status: SESSION_STATUS) {
@@ -283,7 +298,9 @@ export class GameSession {
     this.game = null;
     this.playerStates.forEach((s) => (s.ready = false));
     this.sendPlayerlist();
-    console.log("GAME ENDED", this.id);
+    logger.info("Game ended", {
+      lobbyId: this.id,
+    });
   }
 
   kickInactivePlayers() {
@@ -369,7 +386,9 @@ export class GameSession {
   }
 
   destroy() {
-    console.log("SESSION DESTROYED", this.id);
+    logger.info("Session destroyed", {
+      lobbyId: this.id,
+    });
     allSessions.delete(this.id);
     if (this.game) {
       this.game.endGame();

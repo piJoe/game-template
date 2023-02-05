@@ -7,6 +7,7 @@ services:
       MEDIA_SERVER: "http://a.localhost:8080"
     volumes:
       - ./animedb.sqlite:/animedb.sqlite:ro
+      - ./logs:/logs
   caddy:
     image: caddy
     restart: unless-stopped
