@@ -12,6 +12,10 @@ export interface AnimeOptions {
   maxYear?: number;
 }
 
+export interface AnimeOpeningsOptions extends AnimeOptions {
+  openingType: "OP" | "ED";
+}
+
 export interface DBAnime {
   id: number;
   title: string;
@@ -42,13 +46,6 @@ export interface DBAnimeWithGenres extends DBAnime {
 
 export interface DBAnimeWithStudio extends DBAnime {
   studio: string;
-}
-
-export interface DBAnimeWithOpenings extends DBAnime {
-  openings: {
-    id: number;
-    filename: string;
-  }[];
 }
 
 export async function getRandomAnimesWithCharacters(
@@ -250,23 +247,33 @@ export async function getRandomAnimesWithStudio(
   });
 }
 
+export interface DBAnimeWithOpenings extends DBAnime {
+  openings: {
+    id: number;
+    filename: string;
+    type: "OP" | "ED";
+    artist: string;
+    title: string;
+  }[];
+}
+
 export async function getRandomAnimesWithOpenings(
   count = 1,
-  options: AnimeOptions = {}
+  options: AnimeOpeningsOptions = { openingType: "OP" }
 ): Promise<DBAnimeWithOpenings[]> {
   let queryParams: any[] = [];
   let query = `SELECT animes.*,
-  json_group_array(json_object('id', anime_openings.id, 'filename', anime_openings.filename)) as 'openings' FROM animes`;
+  json_group_array(json_object('id', anime_openings.id, 'filename', anime_openings.filename, 'type', anime_openings.type, 'artist', anime_openings.artist, 'title', anime_openings.title)) as 'openings' FROM animes`;
 
   // add genre info as well
   query += ` LEFT JOIN 'anime_openings' ON anime_openings.anime_id = animes.id`;
 
   // optional where clauses
-  let wheres = [
-    `anime_openings.filename IS NOT NULL`,
-    `anime_openings.type = ?`,
-  ];
-  queryParams.push("OP");
+  let wheres = [`anime_openings.filename IS NOT NULL`];
+  if (options.openingType) {
+    wheres.push(`anime_openings.type = ?`);
+    queryParams.push(options.openingType);
+  }
   if (options.excludeAnimes) {
     wheres.push(
       `animes.id NOT IN (${options.excludeAnimes.map((_) => "?").join(",")})`

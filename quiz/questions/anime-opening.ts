@@ -9,6 +9,7 @@ import { AnimeOptions, getRandomAnimesWithOpenings } from "../db/animes";
 
 export interface QuestionAnimeOpeningOptions extends AnimeOptions {
   imageOnly?: boolean;
+  openingType: "OP" | "ED";
 }
 
 export const QuestionAnimeOpening: AnimeQuestionGenerator = {
@@ -16,7 +17,7 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
   name: "Guess anime from opening",
   create: async (
     count: number,
-    options: QuestionAnimeOpeningOptions = {}
+    options: QuestionAnimeOpeningOptions = { openingType: "OP" }
   ): Promise<ServerQuestion[]> => {
     const animes = await getRandomAnimesWithOpenings(
       count,
@@ -35,8 +36,10 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
     );
 
     return animes.map((a, i): ServerQuestion => {
+      const opening = shuffle(a.openings)[0];
+
       const openingUrl = new URL(
-        shuffle(a.openings)[0].filename + ".ogg",
+        opening.filename + ".ogg",
         process.env["MEDIA_SERVER"]
       ).toString();
 
@@ -53,7 +56,11 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
       return {
         question: {
           title: {
-            template: ["What anime is this opening from?"],
+            template: [
+              `What anime is this ${
+                opening.type === "OP" ? "opening" : "ending"
+              } from?`,
+            ],
           },
           image: a.image,
           imageBlurred: true,

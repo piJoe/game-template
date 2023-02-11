@@ -77,7 +77,15 @@ export class Game {
           case GAME_AVAILABLE_QUESTION_ID.CHAR_BY_PICTURE:
             return QuestionCharByPicture.create(questionCounts[i], options);
           case GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING:
-            return QuestionAnimeOpening.create(questionCounts[i], options);
+            return QuestionAnimeOpening.create(questionCounts[i], {
+              ...options,
+              openingType: "OP",
+            });
+          case GAME_AVAILABLE_QUESTION_ID.ANIME_ENDING:
+            return QuestionAnimeOpening.create(questionCounts[i], {
+              ...options,
+              openingType: "ED",
+            });
           default:
             throw new Error("No handler for Question " + id);
         }
@@ -404,6 +412,7 @@ export class Game {
     GAME_AVAILABLE_QUESTION_ID.ANIME_GENRE,
     GAME_AVAILABLE_QUESTION_ID.ANIME_STUDIO,
     GAME_AVAILABLE_QUESTION_ID.ANIME_OPENING,
+    GAME_AVAILABLE_QUESTION_ID.ANIME_ENDING,
   ];
 
   static MIN_QUESTION_AMOUNT = 3;

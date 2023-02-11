@@ -19,6 +19,7 @@ export enum GAME_AVAILABLE_QUESTION_ID {
   ANIME_STUDIO = "animeStudio",
   CHAR_BY_PICTURE = "charByPicture",
   ANIME_OPENING = "animeOpening",
+  ANIME_ENDING = "animeEnding",
 }
 
 export enum ANSWER_TIMEOUT_MODE {
