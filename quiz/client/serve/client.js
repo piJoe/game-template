@@ -1239,7 +1239,7 @@
         this.updateTimer();
       });
     }
-    showAnswers(answers, playerAnswers) {
+    showAnswers(answers, playerAnswers, additionalAnswerMeta) {
       const { correct, wrong } = answers;
       const otherAnswers = toPairs_default(playerAnswers);
       correct.forEach((a) => {
@@ -1251,6 +1251,27 @@
       if (this.question.question.image) {
         const img = this.domRef.querySelector(".question-image");
         img.removeAttribute("data-blurred");
+      }
+      if (additionalAnswerMeta) {
+        switch (additionalAnswerMeta.type) {
+          case "OP":
+          case "ED":
+            this.domRef.querySelector(".question-meta-container").innerHTML = `
+            <dl>
+              <dt>Artist</dt>
+              <dd>${additionalAnswerMeta.artist && additionalAnswerMeta.artist.length > 0 ? additionalAnswerMeta.artist : "-/-"}</dd>
+              <dt>Title</dt>
+              <dd>${additionalAnswerMeta.title}</dd>
+              <dt>No.</dt>
+              <dd>
+                ${additionalAnswerMeta.type === "OP" ? "Opening " : "Ending "}
+                ${additionalAnswerMeta.number}
+              </dd>
+            </dl>
+          `;
+            this.domRef.querySelector(".question-meta-container").setAttribute("data-active", "true");
+            break;
+        }
       }
       otherAnswers.forEach(([playerId, answerId]) => {
         const playerName = this.lobby.getPlayerEntryById(playerId).name;
@@ -1318,9 +1339,14 @@
     <div class="question-wrapper">
       <div class="container question-container">
       <div class="skewed-tag skewed-tag-big tag-question-number">${this.questionId + 1}</div>
-        ${hasImage ? `<div class="question-image-container">
-            <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
-            </div>` : ""}
+        <div class="question-meta-wrapper">
+          ${hasImage ? `<div class="question-image-container">
+              <img class="question-image" ${question.imageBlurred ? "data-blurred=true" : ""} src="${(0, import_escape_html.default)(question.image)}">
+              </div>` : ""}
+          <div class="question-meta-container">
+            TEST TEST TEST
+          </div>
+        </div>
         <div class="question-title title-h3">${(0, import_escape_html.default)(
         renderTemplate(question.title)
       )}</div>
@@ -1507,9 +1533,13 @@
       );
       this.questionAnswersListener = socket.on(
         "game.question.answers" /* GAME_QUESTION_ANSWERS */,
-        ({ id, answers, playerAnswers }) => {
-          const q = this.questions.get(id);
-          q.showAnswers(answers, playerAnswers);
+        (questionAnswers) => {
+          const q = this.questions.get(questionAnswers.id);
+          q.showAnswers(
+            questionAnswers.answers,
+            questionAnswers.playerAnswers,
+            questionAnswers == null ? void 0 : questionAnswers.additionalAnswerMeta
+          );
         }
       );
       this.selfLeftListener = socket.on(

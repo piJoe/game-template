@@ -254,6 +254,7 @@ export interface DBAnimeWithOpenings extends DBAnime {
     type: "OP" | "ED";
     artist: string;
     title: string;
+    number: number;
   }[];
 }
 
@@ -263,7 +264,7 @@ export async function getRandomAnimesWithOpenings(
 ): Promise<DBAnimeWithOpenings[]> {
   let queryParams: any[] = [];
   let query = `SELECT animes.*,
-  json_group_array(json_object('id', anime_openings.id, 'filename', anime_openings.filename, 'type', anime_openings.type, 'artist', anime_openings.artist, 'title', anime_openings.title)) as 'openings' FROM animes`;
+  json_group_array(json_object('id', anime_openings.id, 'filename', anime_openings.filename, 'type', anime_openings.type, 'artist', anime_openings.artist, 'title', anime_openings.title, 'number', anime_openings.number)) as 'openings' FROM animes`;
 
   // add genre info as well
   query += ` LEFT JOIN 'anime_openings' ON anime_openings.anime_id = animes.id`;

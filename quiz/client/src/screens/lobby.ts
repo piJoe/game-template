@@ -253,9 +253,13 @@ export class LobbyScreen extends DOMScreen {
 
     this.questionAnswersListener = socket.on(
       ServerPacketType.GAME_QUESTION_ANSWERS,
-      ({ id, answers, playerAnswers }) => {
-        const q = this.questions.get(id);
-        q.showAnswers(answers, playerAnswers);
+      (questionAnswers) => {
+        const q = this.questions.get(questionAnswers.id);
+        q.showAnswers(
+          questionAnswers.answers,
+          questionAnswers.playerAnswers,
+          questionAnswers?.additionalAnswerMeta
+        );
       }
     );
 

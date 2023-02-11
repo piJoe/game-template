@@ -1,5 +1,5 @@
 import { GameSettings, GAME_AVAILABLE_QUESTION_ID } from "./game";
-import { ClientQuestion } from "./question";
+import { AdditionalAnswerMeta, ClientQuestion } from "./question";
 import { PlayerListEntry, PLAYER_LEFT_REASON, SESSION_STATUS } from "./session";
 
 export enum MediaType {
@@ -92,6 +92,7 @@ export type ServerPackets = {
     playerAnswers: {
       [key: string]: number;
     };
+    additionalAnswerMeta?: AdditionalAnswerMeta;
   };
   [ServerPacketType.GAME_QUESTION_RESET_TIMEOUT]: {
     id: number;

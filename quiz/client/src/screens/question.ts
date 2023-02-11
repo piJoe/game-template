@@ -4,7 +4,10 @@ import {
   ClientPacketType,
   ServerPacketType,
 } from "../../../common/types/packets";
-import { ClientQuestion } from "../../../common/types/question";
+import {
+  AdditionalAnswerMeta,
+  ClientQuestion,
+} from "../../../common/types/question";
 import {
   calcStringWidth,
   renderAnimeTitle,
@@ -173,7 +176,8 @@ export class QuestionScreen extends DOMScreen {
 
   showAnswers(
     answers: { wrong: number[]; correct: number[] },
-    playerAnswers: { [key: string]: number }
+    playerAnswers: { [key: string]: number },
+    additionalAnswerMeta?: AdditionalAnswerMeta
   ) {
     const { correct, wrong } = answers;
     const otherAnswers = toPairs(playerAnswers);
@@ -194,6 +198,35 @@ export class QuestionScreen extends DOMScreen {
     if (this.question.question.image) {
       const img = this.domRef.querySelector(".question-image");
       img.removeAttribute("data-blurred");
+    }
+
+    if (additionalAnswerMeta) {
+      switch (additionalAnswerMeta.type) {
+        case "OP":
+        case "ED":
+          this.domRef.querySelector(".question-meta-container").innerHTML = `
+            <dl>
+              <dt>Artist</dt>
+              <dd>${
+                additionalAnswerMeta.artist &&
+                additionalAnswerMeta.artist.length > 0
+                  ? additionalAnswerMeta.artist
+                  : "-/-"
+              }</dd>
+              <dt>Title</dt>
+              <dd>${additionalAnswerMeta.title}</dd>
+              <dt>No.</dt>
+              <dd>
+                ${additionalAnswerMeta.type === "OP" ? "Opening " : "Ending "}
+                ${additionalAnswerMeta.number}
+              </dd>
+            </dl>
+          `;
+          this.domRef
+            .querySelector(".question-meta-container")
+            .setAttribute("data-active", "true");
+          break;
+      }
     }
 
     otherAnswers.forEach(([playerId, answerId]) => {
@@ -278,15 +311,20 @@ export class QuestionScreen extends DOMScreen {
       <div class="skewed-tag skewed-tag-big tag-question-number">${
         this.questionId + 1
       }</div>
-        ${
-          hasImage
-            ? `<div class="question-image-container">
-            <img class="question-image" ${
-              question.imageBlurred ? "data-blurred=true" : ""
-            } src="${escapeHTML(question.image)}">
-            </div>`
-            : ""
-        }
+        <div class="question-meta-wrapper">
+          ${
+            hasImage
+              ? `<div class="question-image-container">
+              <img class="question-image" ${
+                question.imageBlurred ? "data-blurred=true" : ""
+              } src="${escapeHTML(question.image)}">
+              </div>`
+              : ""
+          }
+          <div class="question-meta-container">
+            TEST TEST TEST
+          </div>
+        </div>
         <div class="question-title title-h3">${escapeHTML(
           renderTemplate(question.title)
         )}</div>

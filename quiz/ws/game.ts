@@ -166,12 +166,13 @@ export class Game {
     const hasNextQuestion = this.setNextActiveQuestionIndex();
 
     // sleep for some time for players to process the results
+    const sleepAnswerMs = q?.sleepAfterAnswerMs ?? UX_SLEEP_TIMER;
     this.session.sendMsg(ServerPacketType.GAME_QUESTION_RESET_TIMEOUT, {
       id: questionId,
-      timeoutMs: UX_SLEEP_TIMER,
+      timeoutMs: sleepAnswerMs,
       reverse: true,
     });
-    await timeout(UX_SLEEP_TIMER);
+    await timeout(sleepAnswerMs);
 
     if (!hasNextQuestion) {
       // no more questions available, end the game now!
@@ -399,6 +400,7 @@ export class Game {
       id,
       answers,
       playerAnswers: Object.fromEntries(playerAnswers.entries()),
+      additionalAnswerMeta: q?.additionalAnswerMeta,
     });
   }
 

@@ -28,6 +28,11 @@ interface CommonQuestion {
   };
 }
 
+export interface AdditionalAnswerMeta {
+  type: "OP" | "ED";
+  [key: string]: any;
+}
+
 export interface ServerQuestion extends CommonQuestion {
   answers: {
     wrong: number[];
@@ -36,6 +41,8 @@ export interface ServerQuestion extends CommonQuestion {
   };
   playerAnswers: Map<string, number>;
   timeoutMs: number;
+  sleepAfterAnswerMs?: number;
+  additionalAnswerMeta?: AdditionalAnswerMeta;
 }
 
 export interface ClientQuestion extends CommonQuestion {

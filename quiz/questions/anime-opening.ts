@@ -73,6 +73,13 @@ export const QuestionAnimeOpening: AnimeQuestionGenerator = {
         },
         playerAnswers: new Map<string, number>(),
         timeoutMs: 30 * 1000,
+        sleepAfterAnswerMs: 5 * 1000,
+        additionalAnswerMeta: {
+          type: opening.type,
+          artist: opening.artist,
+          title: opening.title,
+          number: opening.number,
+        },
       };
     });
   },
