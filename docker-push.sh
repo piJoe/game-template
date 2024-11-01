@@ -1,4 +1,4 @@
 #!/bin/sh
 
-docker build -t pijoe/anime-quiz .
-docker push pijoe/anime-quiz:latest
+# docker build -t pijoe/game-template .
+# docker push pijoe/game-template:latest

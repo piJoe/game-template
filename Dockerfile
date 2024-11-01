@@ -8,7 +8,7 @@ COPY tsconfig.json ./
 
 RUN npm install
 
-COPY quiz ./quiz
+COPY game ./game
 RUN npm run build-server
 Run npm prune --production
 
@@ -17,6 +17,6 @@ FROM node:19
 WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/quiz/build/index.mjs ./
+COPY --from=builder /app/game/build/index.mjs ./
 
 CMD ["node", "index.mjs"]

@@ -3,12 +3,12 @@ http://localhost:8080 {
         header Connection *Upgrade*
         header Upgrade    websocket
     }
-    reverse_proxy @websockets quiz-server:8081
+    reverse_proxy @websockets game-server:8081
     root * /serve
     file_server
 }
 
-http://a.localhost:8080 {
+http://media.localhost:8080 {
     root * /openings
     file_server
 }

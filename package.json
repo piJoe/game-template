@@ -1,14 +1,14 @@
 {
-  "name": "animu-quiz",
+  "name": "game-temaplte",
   "version": "1.0.0",
   "description": "",
   "main": "test.js",
   "type": "module",
   "scripts": {
-    "build-client": "esbuild ./quiz/client/src/client.ts --bundle --minify --outfile=./quiz/client/serve/client.js",
-    "watch-client": "esbuild ./quiz/client/src/client.ts --bundle --outfile=./quiz/client/serve/client.js --watch",
-    "watch-sass": "sass --watch ./quiz/client/src/sass/index.scss ./quiz/client/serve/style.css",
-    "build-server": "esbuild ./quiz/index.ts --bundle --platform=node --format=esm --packages=external --outfile=./quiz/build/index.mjs"
+    "build-client": "esbuild ./game/client/src/client.ts --bundle --minify --outfile=./game/client/serve/client.js",
+    "watch-client": "esbuild ./game/client/src/client.ts --bundle --outfile=./game/client/serve/client.js --watch",
+    "watch-sass": "sass --watch ./game/client/src/sass/index.scss ./game/client/serve/style.css",
+    "build-server": "esbuild ./game/index.ts --bundle --platform=node --format=esm --packages=external --outfile=./game/build/index.mjs"
   },
   "author": "",
   "license": "ISC",

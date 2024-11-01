@@ -1,12 +1,11 @@
 version: "3.7"
 services:
-  quiz-server:
+  game-server:
     build: .
     restart: unless-stopped
     environment:
-      MEDIA_SERVER: "http://a.localhost:8080"
+      MEDIA_SERVER: "http://media.localhost:8080"
     volumes:
-      - ./animedb.sqlite:/animedb.sqlite:ro
       - ./logs:/logs
   caddy:
     image: caddy
@@ -15,8 +14,8 @@ services:
       - 8080:8080
     volumes:
       - ./deployment/Caddyfile:/etc/caddy/Caddyfile
-      - ./quiz/client/serve:/serve
-      - ./openings:/openings
+      - ./game/client/serve:/serve
+      - ./media:/media
       - caddy_data:/data
       - caddy_config:/config
 
