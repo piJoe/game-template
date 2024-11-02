@@ -24,7 +24,7 @@ export class Player {
   public socket: WebSocket;
   public name: string;
   public gameSession: GameSession | null = null;
-  private pingInterval: NodeJS.Timer;
+  private pingInterval: ReturnType<typeof setTimeout>;
   private lastActivity: number;
   private lastPing: number;
 

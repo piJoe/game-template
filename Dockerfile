@@ -1,4 +1,4 @@
-FROM node:19 AS builder
+FROM node:23-alpine AS builder
 
 WORKDIR /app
 
@@ -6,13 +6,13 @@ COPY package.json ./
 COPY package-lock.json ./
 COPY tsconfig.json ./
 
-RUN npm install
+RUN npm install --verbose --no-progress
 
 COPY game ./game
 RUN npm run build-server
 Run npm prune --production
 
-FROM node:19
+FROM node:23-alpine
 
 WORKDIR /app
 

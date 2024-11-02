@@ -3,10 +3,11 @@ services:
   game-server:
     build: .
     restart: unless-stopped
-    environment:
-      MEDIA_SERVER: "http://media.localhost:8080"
     volumes:
+      - ./node_modules:/app/node_modules
+      - ./game:/app/game
       - ./logs:/logs
+    command: npx tsx watch ./game/index.ts
   caddy:
     image: caddy
     restart: unless-stopped
@@ -15,7 +16,6 @@ services:
     volumes:
       - ./deployment/Caddyfile:/etc/caddy/Caddyfile
       - ./game/client/serve:/serve
-      - ./media:/media
       - caddy_data:/data
       - caddy_config:/config
 
